@@ -88,7 +88,8 @@
 <meta property="og:description" content="在实时风格转换和超分辨率上使用感知损失函数作者：Justin Johnson, Alexandre Alahi, and Li Fei-Fei摘要本文研究图像转换问题，即将一个输入图像转化到一个输出图像，最近在这个问题上使用的典型方法是训练一个使用在输出和目标图像上逐像素计算损失函数（per-pixel loss）的卷积神经网络。有研究表明高质量的图像可以通过基于预训练网络提取的高级特征定义和优化">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://sutomorrow.github.io/2018/05/08/论文翻译之《Perceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution》/fig1.png">
-<meta property="og:updated_time" content="2018-05-16T12:28:42.194Z">
+<meta property="og:image" content="http://sutomorrow.github.io/2018/05/08/论文翻译之《Perceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution》/fig2.png">
+<meta property="og:updated_time" content="2018-05-17T14:57:41.485Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="论文翻译之《Perceptual Losses for Real-Time Style Transferand Super-Resolution》">
 <meta name="twitter:description" content="在实时风格转换和超分辨率上使用感知损失函数作者：Justin Johnson, Alexandre Alahi, and Li Fei-Fei摘要本文研究图像转换问题，即将一个输入图像转化到一个输出图像，最近在这个问题上使用的典型方法是训练一个使用在输出和目标图像上逐像素计算损失函数（per-pixel loss）的卷积神经网络。有研究表明高质量的图像可以通过基于预训练网络提取的高级特征定义和优化">
@@ -364,6 +365,12 @@
 </code></pre><p>最近大量的论文已经着手使用感知目标来优化图像的生成，依赖于从一个卷积网络中提取出的高级特征。图像可以根据最大化分类预测值[8,9]或者为了理解函数编码而是用个别特征[9]的方向来生成。相似的优化技术可以被用于生成高度混淆的图片[20,21]。</p>
 <p>Mahendran和Vedaldi[7]使用最小化一个特征重构损失反转卷积网络的特征来理解不同网络层保留的图像信息;相似的方法更早被用于反转局部二值描述[22.23]以及HOG特征[24]</p>
 <p>Dosovitskiy和Brox的研究[25]和我们非常相关，他们训练了一个前向神经网络来反转卷积特征，迅速的估计一个由[7]提出的优化问题的解。然而，他们的前向网络使用的是逐像素计算的重构损失，而我们直接优化了[7]中的特征重构损失。</p>
+<pre><code>风格转换
+</code></pre><p>Gatys等人[11]实现了艺术风格的转换，将一个图片的内容通过最小化[7]中的特征重构损失函数以及一个同样基于预训练的卷积网络提取的特征的风格重构损失来实现和另一个图片的风格结合；在这之前，有人用类似的方法来做纹理合成[10]。他们在这个问题上得到了非常好的结果，但是由于优化问题的每一步都需要在预训练的网络上前向和反向传播共两次，他们的方法需要非常大的计算量。为了减少这个计算负担，我们训练了一个前向网络来迅速估计他们的优化问题的解。论文[26,27]和我们同时提出了前向方法来快速转换图像风格。</p>
+<pre><code>图像超分辨率
+</code></pre><p>图像差分辨率问题是产生了许多技术的一个经典问题。Yang等人[28]在广泛采用卷积神经网络之前，对之前的技术做了广泛的评估。他们将超分辨率技术分组为基于预测的技术（biliner，bicubic，Lanczos，[29]）,基于边界的方法[30,31]，统计方法[32-34]，贴片型方法[30,35-41]，以及稀疏字典方法[42,43]。最近论文[1]在但图像超分辨率问题上使用了一个使用逐像素欧几里得损失的三层卷积神经网络实现了非常好的效果。其他近期的方法包括[44-46]。</p>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>如fig.2所示，我们的系统包括两个部分：一个图像转换网络以及一个损失网络</p>
+<img src="/2018/05/08/论文翻译之《Perceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution》/fig2.png" title="fig.2 系统概况，我们训练了一个图像转换网络来把输入图像转换到输出图像。我们使用一个预训练的图像分类网络来定义测量图像之间内容和风格上感知差异的感知损失函数。这个感知网络在训练过程中是固定不变的">
 <p>未完待续。。。</p>
 
       
@@ -404,6 +411,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/31/深度学习实践——肺结节假阳性减少/" rel="prev" title="深度学习实践——肺结节假阳性减少">
+                深度学习实践——肺结节假阳性减少 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -485,7 +496,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -507,7 +518,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -550,7 +561,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#在实时风格转换和超分辨率上使用感知损失函数"><span class="nav-number">1.</span> <span class="nav-text"><a href="#&#x5728;&#x5B9E;&#x65F6;&#x98CE;&#x683C;&#x8F6C;&#x6362;&#x548C;&#x8D85;&#x5206;&#x8FA8;&#x7387;&#x4E0A;&#x4F7F;&#x7528;&#x611F;&#x77E5;&#x635F;&#x5931;&#x51FD;&#x6570;" class="headerlink" title="&#x5728;&#x5B9E;&#x65F6;&#x98CE;&#x683C;&#x8F6C;&#x6362;&#x548C;&#x8D85;&#x5206;&#x8FA8;&#x7387;&#x4E0A;&#x4F7F;&#x7528;&#x611F;&#x77E5;&#x635F;&#x5931;&#x51FD;&#x6570;"></a>&#x5728;&#x5B9E;&#x65F6;&#x98CE;&#x683C;&#x8F6C;&#x6362;&#x548C;&#x8D85;&#x5206;&#x8FA8;&#x7387;&#x4E0A;&#x4F7F;&#x7528;&#x611F;&#x77E5;&#x635F;&#x5931;&#x51FD;&#x6570;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#作者：Justin-Johnson-Alexandre-Alahi-and-Li-Fei-Fei"><span class="nav-number">1.0.1.</span> <span class="nav-text"><a href="#&#x4F5C;&#x8005;&#xFF1A;Justin-Johnson-Alexandre-Alahi-and-Li-Fei-Fei" class="headerlink" title="&#x4F5C;&#x8005;&#xFF1A;Justin Johnson, Alexandre Alahi, and Li Fei-Fei"></a>&#x4F5C;&#x8005;&#xFF1A;Justin Johnson, Alexandre Alahi, and Li Fei-Fei</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#摘要"><span class="nav-number">1.0.2.</span> <span class="nav-text"><a href="#&#x6458;&#x8981;" class="headerlink" title="&#x6458;&#x8981;"></a>&#x6458;&#x8981;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关键词："><span class="nav-number">1.0.3.</span> <span class="nav-text"><a href="#&#x5173;&#x952E;&#x8BCD;&#xFF1A;" class="headerlink" title="&#x5173;&#x952E;&#x8BCD;&#xFF1A;"></a>&#x5173;&#x952E;&#x8BCD;&#xFF1A;</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x7B80;&#x4ECB;" class="headerlink" title="&#x7B80;&#x4ECB;"></a>&#x7B80;&#x4ECB;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关工作"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#&#x76F8;&#x5173;&#x5DE5;&#x4F5C;" class="headerlink" title="&#x76F8;&#x5173;&#x5DE5;&#x4F5C;"></a>&#x76F8;&#x5173;&#x5DE5;&#x4F5C;</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#在实时风格转换和超分辨率上使用感知损失函数"><span class="nav-number">1.</span> <span class="nav-text"><a href="#&#x5728;&#x5B9E;&#x65F6;&#x98CE;&#x683C;&#x8F6C;&#x6362;&#x548C;&#x8D85;&#x5206;&#x8FA8;&#x7387;&#x4E0A;&#x4F7F;&#x7528;&#x611F;&#x77E5;&#x635F;&#x5931;&#x51FD;&#x6570;" class="headerlink" title="&#x5728;&#x5B9E;&#x65F6;&#x98CE;&#x683C;&#x8F6C;&#x6362;&#x548C;&#x8D85;&#x5206;&#x8FA8;&#x7387;&#x4E0A;&#x4F7F;&#x7528;&#x611F;&#x77E5;&#x635F;&#x5931;&#x51FD;&#x6570;"></a>&#x5728;&#x5B9E;&#x65F6;&#x98CE;&#x683C;&#x8F6C;&#x6362;&#x548C;&#x8D85;&#x5206;&#x8FA8;&#x7387;&#x4E0A;&#x4F7F;&#x7528;&#x611F;&#x77E5;&#x635F;&#x5931;&#x51FD;&#x6570;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#作者：Justin-Johnson-Alexandre-Alahi-and-Li-Fei-Fei"><span class="nav-number">1.0.1.</span> <span class="nav-text"><a href="#&#x4F5C;&#x8005;&#xFF1A;Justin-Johnson-Alexandre-Alahi-and-Li-Fei-Fei" class="headerlink" title="&#x4F5C;&#x8005;&#xFF1A;Justin Johnson, Alexandre Alahi, and Li Fei-Fei"></a>&#x4F5C;&#x8005;&#xFF1A;Justin Johnson, Alexandre Alahi, and Li Fei-Fei</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#摘要"><span class="nav-number">1.0.2.</span> <span class="nav-text"><a href="#&#x6458;&#x8981;" class="headerlink" title="&#x6458;&#x8981;"></a>&#x6458;&#x8981;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关键词："><span class="nav-number">1.0.3.</span> <span class="nav-text"><a href="#&#x5173;&#x952E;&#x8BCD;&#xFF1A;" class="headerlink" title="&#x5173;&#x952E;&#x8BCD;&#xFF1A;"></a>&#x5173;&#x952E;&#x8BCD;&#xFF1A;</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x7B80;&#x4ECB;" class="headerlink" title="&#x7B80;&#x4ECB;"></a>&#x7B80;&#x4ECB;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关工作"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#&#x76F8;&#x5173;&#x5DE5;&#x4F5C;" class="headerlink" title="&#x76F8;&#x5173;&#x5DE5;&#x4F5C;"></a>&#x76F8;&#x5173;&#x5DE5;&#x4F5C;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法"><span class="nav-number">1.3.</span> <span class="nav-text"><a href="#&#x65B9;&#x6CD5;" class="headerlink" title="&#x65B9;&#x6CD5;"></a>&#x65B9;&#x6CD5;</span></a></li></ol></li></ol></div>
             
 
           </div>
