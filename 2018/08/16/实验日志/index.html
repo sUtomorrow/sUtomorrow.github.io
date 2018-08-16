@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="SeeYouTomorrow">
 <meta property="og:description" content="假阳性减少2018-08-16 在结节检测结果上进行五折交叉验证假阳性减少尝试用假阳性减少模型在结节检测的结果上划分5折交叉验证，原始三分支网络和类google网络的第一折效果都非常不好，已停止。 新增代码目录： 老服务器:~/Code/FPR_TEST_ON_DETECTION_RESULT/ 数据： 老服务器:/mnt/data1/lty/FPR_TEST_ON_DETECTION_RESUL">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-08-16T13:48:44.936Z">
+<meta property="og:updated_time" content="2018-08-16T13:57:17.402Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="实验日志">
 <meta name="twitter:description" content="假阳性减少2018-08-16 在结节检测结果上进行五折交叉验证假阳性减少尝试用假阳性减少模型在结节检测的结果上划分5折交叉验证，原始三分支网络和类google网络的第一折效果都非常不好，已停止。 新增代码目录： 老服务器:~/Code/FPR_TEST_ON_DETECTION_RESULT/ 数据： 老服务器:/mnt/data1/lty/FPR_TEST_ON_DETECTION_RESUL">
@@ -375,6 +375,8 @@
 </code></pre><p>结果目录：</p>
 <pre><code>老服务器:/mnt/data1/lty/FPR_TEST_ON_DETECTION_RESULT/
 </code></pre><h3 id="2018-08-16-和结节检测使用同样的训练集进行假阳性减少"><a href="#2018-08-16-和结节检测使用同样的训练集进行假阳性减少" class="headerlink" title="2018-08-16 和结节检测使用同样的训练集进行假阳性减少"></a>2018-08-16 和结节检测使用同样的训练集进行假阳性减少</h3><p>尝试用假阳性减少模型在结节检测的训练集上训练，然后再在结节检测结果上进行假阳性减少</p>
+<p>network_v1使用常规的学习速率衰减0.95</p>
+<p>network_v2使用断层的学习速率衰减：0.01 0.001 0.0001</p>
 <p>新增代码目录：</p>
 <pre><code>老服务器:~/Code/FPR_TEST_ON_DETECTION_TRAIN/
 </code></pre><p>训练数据目录：</p>
