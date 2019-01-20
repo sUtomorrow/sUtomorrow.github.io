@@ -89,7 +89,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://sutomorrow.github.io/2018/05/08/论文翻译之《Perceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution》/fig1.png">
 <meta property="og:image" content="http://sutomorrow.github.io/2018/05/08/论文翻译之《Perceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution》/fig2.png">
-<meta property="og:updated_time" content="2018-08-16T14:03:40.488Z">
+<meta property="og:updated_time" content="2019-01-20T07:46:37.506Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="论文翻译之《Perceptual Losses for Real-Time Style Transferand Super-Resolution》">
 <meta name="twitter:description" content="在实时风格转换和超分辨率上使用感知损失函数作者：Justin Johnson, Alexandre Alahi, and Li Fei-Fei摘要本文研究图像转换问题，即将一个输入图像转化到一个输出图像，最近在这个问题上使用的典型方法是训练一个使用在输出和目标图像上逐像素计算损失函数（per-pixel loss）的卷积神经网络。有研究表明高质量的图像可以通过基于预训练网络提取的高级特征定义和优化">
@@ -357,21 +357,21 @@
 <p>在本文中我们结合了两种方法的优点，我们训练一个用于图像转换任务的前向转换网络，但是不仅只是在低级的像素信息上使用逐像素的损失函数，我们在预训练的损失网络提取出的高级特征上使用感知损失函数。在训练过程中，感知损失函数在测试实时转换网络运行时在度量图像相似度的效果上比逐像素损失函数有更好的鲁棒性。</p>
 <p>我们在两个任务上进行了实验：风格转换和单图像超分辨率，两者本质上是病态的。在风格转换任务上，这里没有唯一正确的输出，而在超分辨率图像上，一个低分辨率输入可以生成很多高分辨率输出图像。l两个任务都需要在输入图像上进行语意推理。在风格转换任务中，虽然在纹理和颜色上有很大变化，但输出必须在语义上和输入相似。在超分辨率任务上，需要从视觉模糊的低分辨率图片上推断出细节。原则上，训练好的用于这两个任务的一个大容量的神经网络可以隐式的学习到推断相关的语义；然而实际上我们不需要从头学习，使用感知损失函数允许语义转换的知识从损失网络传递到转换网络。</p>
 <p>在图像风格转换优化问题[11]上；我们的结果在使用目标函数值衡量的质量上和[11]相似，但是快了三个数量级。对于超分辨率问题，我们发现使用感知损失函数替代逐像素计算的损失给出了在放大4倍和8倍的超分辨率问题上的令人满意的结果。</p>
-<h2 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h2><pre><code>前馈的图像转换
+<h2 id="相关工作"><a href="#相关工作" class="headerlink" title="相关工作"></a>相关工作</h2><pre><code> 前馈的图像转换
 </code></pre><p>在最近几年中，很多不同的图像转换任务使用逐像素计算的损失函数来训练。</p>
 <p>语义分隔方法[4,6,14-17]使用一个逐像素的分类损失，通过全卷积的方式在输入图像上运行网络来产生密集的场景标签，最近的深度和表层正态估计（normal estimation）方法[6,19]都是相似的，依靠使用一个前向的用逐像素的回归[5,6]或者分类损失函数[19]训练的前向卷积网络。一些方法在使用逐像素损失函数之外还使用图像梯度的惩罚[6]，将复发层和网络的其余部分一起训练来构建CRF推断[17]。或者使用一个CRF损失层[8]来加强输出中的局部一致性。</p>
 <p>我们的风格转换网络的架构来源于[4]和[16]，使用网络内下采样来减少<br>特征映射的空间范围，然后进行网络内上采样来产生最终的输出图像。</p>
-<pre><code>感知优化
+<pre><code> 感知优化
 </code></pre><p>最近大量的论文已经着手使用感知目标来优化图像的生成，依赖于从一个卷积网络中提取出的高级特征。图像可以根据最大化分类预测值[8,9]或者为了理解函数编码而是用个别特征[9]的方向来生成。相似的优化技术可以被用于生成高度混淆的图片[20,21]。</p>
 <p>Mahendran和Vedaldi[7]使用最小化一个特征重构损失反转卷积网络的特征来理解不同网络层保留的图像信息;相似的方法更早被用于反转局部二值描述[22.23]以及HOG特征[24]</p>
 <p>Dosovitskiy和Brox的研究[25]和我们非常相关，他们训练了一个前向神经网络来反转卷积特征，迅速的估计一个由[7]提出的优化问题的解。然而，他们的前向网络使用的是逐像素计算的重构损失，而我们直接优化了[7]中的特征重构损失。</p>
-<pre><code>风格转换
+<pre><code> 风格转换
 </code></pre><p>Gatys等人[11]实现了艺术风格的转换，将一个图片的内容通过最小化[7]中的特征重构损失函数以及一个同样基于预训练的卷积网络提取的特征的风格重构损失来实现和另一个图片的风格结合；在这之前，有人用类似的方法来做纹理合成[10]。他们在这个问题上得到了非常好的结果，但是由于优化问题的每一步都需要在预训练的网络上前向和反向传播共两次，他们的方法需要非常大的计算量。为了减少这个计算负担，我们训练了一个前向网络来迅速估计他们的优化问题的解。论文[26,27]和我们同时提出了前向方法来快速转换图像风格。</p>
-<pre><code>图像超分辨率
+<pre><code> 图像超分辨率
 </code></pre><p>图像差分辨率问题是产生了许多技术的一个经典问题。Yang等人[28]在广泛采用卷积神经网络之前，对之前的技术做了广泛的评估。他们将超分辨率技术分组为基于预测的技术（biliner，bicubic，Lanczos，[29]）,基于边界的方法[30,31]，统计方法[32-34]，贴片型方法[30,35-41]，以及稀疏字典方法[42,43]。最近论文[1]在但图像超分辨率问题上使用了一个使用逐像素欧几里得损失的三层卷积神经网络实现了非常好的效果。其他近期的方法包括[44-46]。</p>
 <h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>如fig.2所示，我们的系统包括两个部分：一个图像转换网络以及一个损失网络</p>
 <img src="/2018/05/08/论文翻译之《Perceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution》/fig2.png" title="fig.2 系统概况，我们训练了一个图像转换网络来把输入图像转换到输出图像。我们使用一个预训练的图像分类网络来定义测量图像之间内容和风格上感知差异的感知损失函数。这个感知网络在训练过程中是固定不变的">
-<p>未完待续。。。</p>
+<p>三个月过去了，发现翻译这篇论文没有啥意义，因此终止于此。</p>
 <p>引用请注明出处。</p>
 
       
@@ -403,8 +403,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/03/10/矩阵论学习笔记/" rel="next" title="矩阵论学习笔记">
-                <i class="fa fa-chevron-left"></i> 矩阵论学习笔记
+              <a href="/2018/03/10/日常学习笔记/" rel="next" title="日常学习笔记">
+                <i class="fa fa-chevron-left"></i> 日常学习笔记
               </a>
             
           </div>
@@ -497,7 +497,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -508,7 +508,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -519,7 +519,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -582,7 +582,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
@@ -787,6 +787,8 @@
   
 
   
+  
+
 
   
 
