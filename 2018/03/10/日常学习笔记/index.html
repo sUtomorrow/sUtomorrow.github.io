@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="SeeYouTomorrow">
 <meta property="og:description" content="2019-01-10之前我看《Deep Learning》这本书看不懂，上了一学期矩阵论之后，我发现现在看起来那些东西似乎不是很复杂，里面主要用到一些矩阵分解方法，非常基础，很多推导只要一步一步看下去，没有什么不能理解的，在深度学习中非常实用。 2019-01-20学习了如何在hexo的markdown中使用数学公式首先修改next的配置文件如下：  mathjax:     enable: tr">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-01-20T09:23:12.801Z">
+<meta property="og:updated_time" content="2019-01-20T10:25:15.535Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="日常学习笔记">
 <meta name="twitter:description" content="2019-01-10之前我看《Deep Learning》这本书看不懂，上了一学期矩阵论之后，我发现现在看起来那些东西似乎不是很复杂，里面主要用到一些矩阵分解方法，非常基础，很多推导只要一步一步看下去，没有什么不能理解的，在深度学习中非常实用。 2019-01-20学习了如何在hexo的markdown中使用数学公式首先修改next的配置文件如下：  mathjax:     enable: tr">
@@ -354,8 +354,35 @@
 <pre><code> mathjax: true
 </code></pre><p>写法和latex中的公式差不多，如：<br>     <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$\sum_&#123;i=0&#125;^&#123;n&#125;x_i$</span><br></pre></td></tr></table></figure></p>
 <p>显示效果：$\sum_{i=0}^{n}x_i$</p>
-<h2 id="《Deep-learning》读书笔记"><a href="#《Deep-learning》读书笔记" class="headerlink" title="《Deep learning》读书笔记"></a>《Deep learning》读书笔记</h2><p>极大似然估计表示如下：</p>
-<script type="math/tex; mode=display">\theta_{ML} = p_{model}</script>
+<p>但是在使用中碰到了数学公式渲染不正确的问题，网上说是hexo默认的渲染包有问题，因此需要修改。<br>首先在博客根目录使用以下命令，卸载原来的渲染包，安装新的。</p>
+<pre><code> npm uninstall hexo-renderer-marked --save
+ npm install hexo-renderer-kramed --save
+</code></pre><p>这里需要注意的是一定要在博客根目录下打开控制台，才会安装到博客的node_modules目录中，否则不起作用。</p>
+<p>之后还需要修改kramed的rule文件</p>
+<pre><code> 修改node_modules/kramed/lib/rules/inline.js
+ 第11行: escape: /^\\([\\`*{}\[\]()#$+\-.!_&gt;])/,
+ 替换为: escape: /^\\([`*\[\]()#$+\-.!_&gt;])/,
+ 第20行: em: /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
+ 替换为: em: /^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
+</code></pre><p>修改之后，一切正常。语法与latex公式基本相同，详细参考<a href="https://www.luogu.org/blog/IowaBattleship/latex-gong-shi-tai-quan" target="_blank" rel="noopener">latex数学公式</a></p>
+<h2 id="《Deep-learning》读书笔记"><a href="#《Deep-learning》读书笔记" class="headerlink" title="《Deep learning》读书笔记"></a>《Deep learning》读书笔记</h2><h3 id="极大似然与对数极大似然与KL散度"><a href="#极大似然与对数极大似然与KL散度" class="headerlink" title="极大似然与对数极大似然与KL散度"></a>极大似然与对数极大似然与KL散度</h3><p>极大似然估计表示如下：</p>
+<script type="math/tex; mode=display">\begin{aligned}
+\theta_{ML}  & = \mathop{\arg\max}_\theta p_{model}(\mathbb{X}; \theta)\\
+& = \mathop{\arg\max}_\theta \prod_{i=1}^m p_{model}(x^{(i)};\theta)
+\end{aligned}</script><p>由于这样的连乘容易造成下溢，因此可以替换为对数极大似然估计：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\theta_{ML} & = \mathop{\arg\max}_\theta\sum_{i=1}^m\log p_{model}(x^{(i)};\theta)
+\end{aligned}</script><p>将训练数据看做一种经验分布$\hat p_{data}$，且因整体缩放不会影响$\mathop{\arg\max}$操作，因此后面的项可以用期望表示，对数似然估计可以用下面的式子表达：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\theta_{ML} & = \mathop{\arg\max}_\theta \mathbb{E}_{\mathbf{x}\sim \hat p_{data}}\log p_{model}(x^{(i)};\theta)
+\end{aligned}</script><p>这其实就相当于最小化KL散度，KL散度的定义如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    D_{KL}(\hat p_{data} \| p_{model}) & = \mathbb{E}_{\mathbf{x} \sim \hat p_{data}}[\log \hat p_{data}(x) - \log p_{model}(x)]
+\end{aligned}</script><p>其中有最后一项的期望:$-\mathbb{E}_{\mathbf{x} \sim \hat p_{data}} \log p_{model}(x)$即是负的对数似然。</p>
+
       
     </div>
     
@@ -544,7 +571,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-01-10"><span class="nav-number">1.</span> <span class="nav-text"><a href="#2019-01-10" class="headerlink" title="2019-01-10"></a>2019-01-10</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-01-20"><span class="nav-number">2.</span> <span class="nav-text"><a href="#2019-01-20" class="headerlink" title="2019-01-20"></a>2019-01-20</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#学习了如何在hexo的markdown中使用数学公式"><span class="nav-number">2.1.</span> <span class="nav-text"><a href="#&#x5B66;&#x4E60;&#x4E86;&#x5982;&#x4F55;&#x5728;hexo&#x7684;markdown&#x4E2D;&#x4F7F;&#x7528;&#x6570;&#x5B66;&#x516C;&#x5F0F;" class="headerlink" title="&#x5B66;&#x4E60;&#x4E86;&#x5982;&#x4F55;&#x5728;hexo&#x7684;markdown&#x4E2D;&#x4F7F;&#x7528;&#x6570;&#x5B66;&#x516C;&#x5F0F;"></a>&#x5B66;&#x4E60;&#x4E86;&#x5982;&#x4F55;&#x5728;hexo&#x7684;markdown&#x4E2D;&#x4F7F;&#x7528;&#x6570;&#x5B66;&#x516C;&#x5F0F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#《Deep-learning》读书笔记"><span class="nav-number">2.2.</span> <span class="nav-text"><a href="#&#x300A;Deep-learning&#x300B;&#x8BFB;&#x4E66;&#x7B14;&#x8BB0;" class="headerlink" title="&#x300A;Deep learning&#x300B;&#x8BFB;&#x4E66;&#x7B14;&#x8BB0;"></a>&#x300A;Deep learning&#x300B;&#x8BFB;&#x4E66;&#x7B14;&#x8BB0;</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-01-10"><span class="nav-number">1.</span> <span class="nav-text"><a href="#2019-01-10" class="headerlink" title="2019-01-10"></a>2019-01-10</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-01-20"><span class="nav-number">2.</span> <span class="nav-text"><a href="#2019-01-20" class="headerlink" title="2019-01-20"></a>2019-01-20</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#学习了如何在hexo的markdown中使用数学公式"><span class="nav-number">2.1.</span> <span class="nav-text"><a href="#&#x5B66;&#x4E60;&#x4E86;&#x5982;&#x4F55;&#x5728;hexo&#x7684;markdown&#x4E2D;&#x4F7F;&#x7528;&#x6570;&#x5B66;&#x516C;&#x5F0F;" class="headerlink" title="&#x5B66;&#x4E60;&#x4E86;&#x5982;&#x4F55;&#x5728;hexo&#x7684;markdown&#x4E2D;&#x4F7F;&#x7528;&#x6570;&#x5B66;&#x516C;&#x5F0F;"></a>&#x5B66;&#x4E60;&#x4E86;&#x5982;&#x4F55;&#x5728;hexo&#x7684;markdown&#x4E2D;&#x4F7F;&#x7528;&#x6570;&#x5B66;&#x516C;&#x5F0F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#《Deep-learning》读书笔记"><span class="nav-number">2.2.</span> <span class="nav-text"><a href="#&#x300A;Deep-learning&#x300B;&#x8BFB;&#x4E66;&#x7B14;&#x8BB0;" class="headerlink" title="&#x300A;Deep learning&#x300B;&#x8BFB;&#x4E66;&#x7B14;&#x8BB0;"></a>&#x300A;Deep learning&#x300B;&#x8BFB;&#x4E66;&#x7B14;&#x8BB0;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#极大似然与对数极大似然与KL散度"><span class="nav-number">2.2.1.</span> <span class="nav-text"><a href="#&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;&#x5BF9;&#x6570;&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;KL&#x6563;&#x5EA6;" class="headerlink" title="&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;&#x5BF9;&#x6570;&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;KL&#x6563;&#x5EA6;"></a>&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;&#x5BF9;&#x6570;&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;KL&#x6563;&#x5EA6;</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
