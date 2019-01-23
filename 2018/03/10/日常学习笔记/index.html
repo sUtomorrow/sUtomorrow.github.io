@@ -87,10 +87,17 @@
 <meta property="og:site_name" content="SeeYouTomorrow">
 <meta property="og:description" content="2019-01-10之前我看《Deep Learning》这本书看不懂，上了一学期矩阵论之后，我发现现在看起来那些东西似乎不是很复杂，里面主要用到一些矩阵分解方法，非常基础，很多推导只要一步一步看下去，没有什么不能理解的，在深度学习中非常实用。 2019-01-20学习了如何在hexo的markdown中使用数学公式首先修改next的配置文件如下：  mathjax:     enable: tr">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-01-20T10:29:57.881Z">
+<meta property="og:image" content="http://sutomorrow.github.io/2018/03/10/日常学习笔记/空洞卷积感受野示意图.png">
+<meta property="og:image" content="http://sutomorrow.github.io/2018/03/10/日常学习笔记/DenseNet模型结构.png">
+<meta property="og:image" content="http://sutomorrow.github.io/2018/03/10/日常学习笔记/ROI_Pooling输入.png">
+<meta property="og:image" content="http://sutomorrow.github.io/2018/03/10/日常学习笔记/区域建议网络给出的位置.png">
+<meta property="og:image" content="http://sutomorrow.github.io/2018/03/10/日常学习笔记/按照设定的输出大小进行划分.png">
+<meta property="og:image" content="http://sutomorrow.github.io/2018/03/10/日常学习笔记/ROI_Pooling输出.png">
+<meta property="og:updated_time" content="2019-01-23T13:56:52.855Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="日常学习笔记">
 <meta name="twitter:description" content="2019-01-10之前我看《Deep Learning》这本书看不懂，上了一学期矩阵论之后，我发现现在看起来那些东西似乎不是很复杂，里面主要用到一些矩阵分解方法，非常基础，很多推导只要一步一步看下去，没有什么不能理解的，在深度学习中非常实用。 2019-01-20学习了如何在hexo的markdown中使用数学公式首先修改next的配置文件如下：  mathjax:     enable: tr">
+<meta name="twitter:image" content="http://sutomorrow.github.io/2018/03/10/日常学习笔记/空洞卷积感受野示意图.png">
 
 
 
@@ -406,6 +413,42 @@
 \begin{aligned}
     D_{KL}(\hat p_{data} \| p_{model}) & = \mathbb{E}_{\mathbf{x} \sim \hat p_{data}}[\log \hat p_{data}(x) - \log p_{model}(x)]
 \end{aligned}</script><p>其中有最后一项的期望:$-\mathbb{E}_{\mathbf{x} \sim \hat p_{data}} \log p_{model}(x)$即是负的对数似然。</p>
+<h1 id="2019-01-21"><a href="#2019-01-21" class="headerlink" title="2019-01-21"></a>2019-01-21</h1><h2 id="在vscode预览markdown时渲染数学公式"><a href="#在vscode预览markdown时渲染数学公式" class="headerlink" title="在vscode预览markdown时渲染数学公式"></a>在vscode预览markdown时渲染数学公式</h2><p>只需要安装’Markdown+Math’这个插件就OK了。</p>
+<h2 id="尝试解析keras保存的参数hd5文件"><a href="#尝试解析keras保存的参数hd5文件" class="headerlink" title="尝试解析keras保存的参数hd5文件"></a>尝试解析keras保存的参数hd5文件</h2><p>经过尝试，发现keras保存的参数文件结构如下：最上层有两个键:’optimizer_weights’和’model_weights’，其中’optimizer_weights’是优化器参数，这里不关心，第二个键有关于模型<br>权重的信息。</p>
+<p>‘model_weights’包含attrs属性，其下又会有三个键:’layer_names’,’backend’,’keras_version’。<br>重要的是其中的’layer_names’,这个下面需要包含所有层名，字节数组的形式。</p>
+<p>‘model_weights’下所有层名作为键值，每个键值都有attrs属性，attrs属性下有键值’weight_names’，包括所有的权重参数名，字节数组形式。</p>
+<h1 id="2019-01-22"><a href="#2019-01-22" class="headerlink" title="2019-01-22"></a>2019-01-22</h1><h2 id="空洞卷积-也叫膨胀卷积-Dilated-Convolution"><a href="#空洞卷积-也叫膨胀卷积-Dilated-Convolution" class="headerlink" title="空洞卷积(也叫膨胀卷积,Dilated Convolution)"></a>空洞卷积(也叫膨胀卷积,Dilated Convolution)</h2><p>空洞卷积的数学定义如下：<br>如果$F:\mathbb{Z}^2\rightarrow\mathbb{R}$是一个离散函数，定义一个变量域$\Omega_r = [-r, r]^2 \cap\mathbb{Z}^2$再定义一个大小为$(2r+1)^2$的离散卷积$k:\Omega_r\rightarrow \mathbb{R}$,那么卷积操作可以表示为：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+(F \ast k)(p) = \sum_{s+t=p}F(s)k(t)
+\end{aligned}</script><p>空洞卷积可以表示为：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+(F \ast_l k)(p) = \sum_{s+lt=p}F(s)k(t)
+\end{aligned}</script><p>可见，当$l$为1时，空洞卷积就是普通的卷积。</p>
+<p>空洞卷积可以增加感受野，空洞卷积感受野示意图如下，其中(a)图为普通卷积产生的感受野示意,记为$F1$，$3 \times 3$的普通卷积感受野和卷积核大小相同，(b)图为在(a)中的$F1$基础上进行$l$等于2的空洞卷积操作，结果记为$F2$，其感受野变为$7 \times 7$，(c)图为在(b)中$F2$的基础上进行$l$等于4的空洞卷积，其感受野计算为$(4 \ast 2 + 1) \times (4 \ast 2 + 1) = (9 \times 9)$，注意这里的感受野计算是基于逐层卷积的结果，很多博客中没有说明，我看了原文才知道。<br><img src="/2018/03/10/日常学习笔记/空洞卷积感受野示意图.png" title="空洞卷积感受野示意图"></p>
+<h1 id="2019-01-23"><a href="#2019-01-23" class="headerlink" title="2019-01-23"></a>2019-01-23</h1><h2 id="DenseNet论文阅读"><a href="#DenseNet论文阅读" class="headerlink" title="DenseNet论文阅读"></a>DenseNet论文阅读</h2><p>论文地址：<a href="https://arxiv.org/pdf/1608.06993.pdf" target="_blank" rel="noopener">Densely Connected Convolutional Networks</a></p>
+<p>DenseNet模型结构如下。</p>
+<img src="/2018/03/10/日常学习笔记/DenseNet模型结构.png" title="DenseNet模型结构">
+<p>其中$1 \times 1$卷积层称为bottleneck层，用于减少通道个数，DenseBlock由BN-ReLU-Conv($1 \times 1$)-BN-ReLU-Conv($3 \times 3$)这样的结构重复而组成，如果一个DenseBlock中每一个$3 \times 3$的卷积输出通道个数是$k$，那么作者建议设置的bottleneck层输出通道个数为$4k$，使用了bottleneck层的DenseNet称为DenseNet-B。</p>
+<p>之后的TransitionLayer会进一步压缩模型的通道个数，其输出通道个数为$\theta m$，其中m为DenseBlock的输出通道数。而$0 &lt; \theta \le 1$，如果$0 &lt; \theta &lt; 1$那么称为DenseNet-C。</p>
+<p>作者的实验中，最前面的一个卷积层输出通道数为$2k$，设置$\theta=0.5$并且使用了bottleneck层，因此称其模型为DenseNet-BC。训练过程中，使用SGD，初始学习率为0.1在30代和60代的时候分别除以10，训练batch_size：256，一共训练90代。</p>
+<p>论文中解释说Densenet的提出是希望解决深层网络带来的梯度消失和梯度爆炸问题，并提对深度学习模型提出了一种新的解释：传统的前向传播模型就像是一种具有状态的算法，每一层读取其前一层的状态(输入)并对其进行处理，修改并保存了认为需要保存的状态，之后传到下一层，而Resnet通过相加处理，显式的保存了前一层的状态，Densenet通过通道连接，不仅保存了前一层的状态，而且还可以加以区分，虽然连接更密集，但是Densenet的模型可以参数相比于Resnet少，因为Densenet在DenseBlock中每一层的卷积核个数可以很少，通过$k$来指定。</p>
+<h2 id="ROI-Pooling"><a href="#ROI-Pooling" class="headerlink" title="ROI Pooling"></a>ROI Pooling</h2><p>ROI Pooling可以根据提供的区域位置信息，将特征图上的位置pooling到一个固定大小的输出。</p>
+<p>以一个输出为$2 \times 2$的ROI Pooling为例。</p>
+<p>输入为一张特征图。</p>
+<img src="/2018/03/10/日常学习笔记/ROI_Pooling输入.png" title="ROI Pooling输入">
+<p>由区域建议网络给出区域位置。</p>
+<img src="/2018/03/10/日常学习笔记/区域建议网络给出的位置.png" title="区域建议网络给出的位置">
+<p>将建议区域划分为$2 \times 2$的区域。</p>
+<img src="/2018/03/10/日常学习笔记/按照设定的输出大小进行划分.png" title="按照设定的输出大小进行划分">
+<p>在各个区域内进行Pooling操作(这里是Max Pooling)，得到最终输出。</p>
+<img src="/2018/03/10/日常学习笔记/ROI_Pooling输出.png" title="ROI Pooling输出">
+<h2 id="卷积层输出的尺寸计算"><a href="#卷积层输出的尺寸计算" class="headerlink" title="卷积层输出的尺寸计算"></a>卷积层输出的尺寸计算</h2><p>$n_{out} = [\dfrac{n_{in} + 2p - k}{s}] + 1$</p>
+<p>其中$n_{out}$表示输出的特征图的大小，$n_{in}$表示输入的特征图的大小，$p$表示padding大小，$k$表示卷积核大小，$s$表示stride大小。</p>
+<h2 id="Inception-Net"><a href="#Inception-Net" class="headerlink" title="Inception Net"></a>Inception Net</h2><p>Inception使用了NIN(Network in Network)的思想，网络中的一层不再是单一的卷积，而是几种大小的卷积分支或者几个不同深度的分支进行同时计算，最后在通道维度连接到一起。</p>
+<p>Inception在V1版本中(也就是GoogLeNet)使用了$5 \times 5$和$7 \times 7$大小的卷积核，以适应不同尺度的目标识别。</p>
+<p>Inception V2版本将V1中的$5 \times 5$和$7 \times 7$卷积拆开成了小卷积的堆叠，减少了计算量的同时，增加了层数。</p>
 
       
     </div>
@@ -585,7 +628,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-01-10"><span class="nav-number">1.</span> <span class="nav-text"><a href="#2019-01-10" class="headerlink" title="2019-01-10"></a>2019-01-10</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-01-20"><span class="nav-number">2.</span> <span class="nav-text"><a href="#2019-01-20" class="headerlink" title="2019-01-20"></a>2019-01-20</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#学习了如何在hexo的markdown中使用数学公式"><span class="nav-number">2.1.</span> <span class="nav-text"><a href="#&#x5B66;&#x4E60;&#x4E86;&#x5982;&#x4F55;&#x5728;hexo&#x7684;markdown&#x4E2D;&#x4F7F;&#x7528;&#x6570;&#x5B66;&#x516C;&#x5F0F;" class="headerlink" title="&#x5B66;&#x4E60;&#x4E86;&#x5982;&#x4F55;&#x5728;hexo&#x7684;markdown&#x4E2D;&#x4F7F;&#x7528;&#x6570;&#x5B66;&#x516C;&#x5F0F;"></a>&#x5B66;&#x4E60;&#x4E86;&#x5982;&#x4F55;&#x5728;hexo&#x7684;markdown&#x4E2D;&#x4F7F;&#x7528;&#x6570;&#x5B66;&#x516C;&#x5F0F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#《Deep-learning》读书笔记"><span class="nav-number">2.2.</span> <span class="nav-text"><a href="#&#x300A;Deep-learning&#x300B;&#x8BFB;&#x4E66;&#x7B14;&#x8BB0;" class="headerlink" title="&#x300A;Deep learning&#x300B;&#x8BFB;&#x4E66;&#x7B14;&#x8BB0;"></a>&#x300A;Deep learning&#x300B;&#x8BFB;&#x4E66;&#x7B14;&#x8BB0;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#极大似然与对数极大似然与KL散度"><span class="nav-number">2.2.1.</span> <span class="nav-text"><a href="#&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;&#x5BF9;&#x6570;&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;KL&#x6563;&#x5EA6;" class="headerlink" title="&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;&#x5BF9;&#x6570;&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;KL&#x6563;&#x5EA6;"></a>&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;&#x5BF9;&#x6570;&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;KL&#x6563;&#x5EA6;</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-01-10"><span class="nav-number">1.</span> <span class="nav-text"><a href="#2019-01-10" class="headerlink" title="2019-01-10"></a>2019-01-10</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-01-20"><span class="nav-number">2.</span> <span class="nav-text"><a href="#2019-01-20" class="headerlink" title="2019-01-20"></a>2019-01-20</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#学习了如何在hexo的markdown中使用数学公式"><span class="nav-number">2.1.</span> <span class="nav-text"><a href="#&#x5B66;&#x4E60;&#x4E86;&#x5982;&#x4F55;&#x5728;hexo&#x7684;markdown&#x4E2D;&#x4F7F;&#x7528;&#x6570;&#x5B66;&#x516C;&#x5F0F;" class="headerlink" title="&#x5B66;&#x4E60;&#x4E86;&#x5982;&#x4F55;&#x5728;hexo&#x7684;markdown&#x4E2D;&#x4F7F;&#x7528;&#x6570;&#x5B66;&#x516C;&#x5F0F;"></a>&#x5B66;&#x4E60;&#x4E86;&#x5982;&#x4F55;&#x5728;hexo&#x7684;markdown&#x4E2D;&#x4F7F;&#x7528;&#x6570;&#x5B66;&#x516C;&#x5F0F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#《Deep-learning》读书笔记"><span class="nav-number">2.2.</span> <span class="nav-text"><a href="#&#x300A;Deep-learning&#x300B;&#x8BFB;&#x4E66;&#x7B14;&#x8BB0;" class="headerlink" title="&#x300A;Deep learning&#x300B;&#x8BFB;&#x4E66;&#x7B14;&#x8BB0;"></a>&#x300A;Deep learning&#x300B;&#x8BFB;&#x4E66;&#x7B14;&#x8BB0;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#极大似然与对数极大似然与KL散度"><span class="nav-number">2.2.1.</span> <span class="nav-text"><a href="#&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;&#x5BF9;&#x6570;&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;KL&#x6563;&#x5EA6;" class="headerlink" title="&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;&#x5BF9;&#x6570;&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;KL&#x6563;&#x5EA6;"></a>&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;&#x5BF9;&#x6570;&#x6781;&#x5927;&#x4F3C;&#x7136;&#x4E0E;KL&#x6563;&#x5EA6;</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-01-21"><span class="nav-number">3.</span> <span class="nav-text"><a href="#2019-01-21" class="headerlink" title="2019-01-21"></a>2019-01-21</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#在vscode预览markdown时渲染数学公式"><span class="nav-number">3.1.</span> <span class="nav-text"><a href="#&#x5728;vscode&#x9884;&#x89C8;markdown&#x65F6;&#x6E32;&#x67D3;&#x6570;&#x5B66;&#x516C;&#x5F0F;" class="headerlink" title="&#x5728;vscode&#x9884;&#x89C8;markdown&#x65F6;&#x6E32;&#x67D3;&#x6570;&#x5B66;&#x516C;&#x5F0F;"></a>&#x5728;vscode&#x9884;&#x89C8;markdown&#x65F6;&#x6E32;&#x67D3;&#x6570;&#x5B66;&#x516C;&#x5F0F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#尝试解析keras保存的参数hd5文件"><span class="nav-number">3.2.</span> <span class="nav-text"><a href="#&#x5C1D;&#x8BD5;&#x89E3;&#x6790;keras&#x4FDD;&#x5B58;&#x7684;&#x53C2;&#x6570;hd5&#x6587;&#x4EF6;" class="headerlink" title="&#x5C1D;&#x8BD5;&#x89E3;&#x6790;keras&#x4FDD;&#x5B58;&#x7684;&#x53C2;&#x6570;hd5&#x6587;&#x4EF6;"></a>&#x5C1D;&#x8BD5;&#x89E3;&#x6790;keras&#x4FDD;&#x5B58;&#x7684;&#x53C2;&#x6570;hd5&#x6587;&#x4EF6;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-01-22"><span class="nav-number">4.</span> <span class="nav-text"><a href="#2019-01-22" class="headerlink" title="2019-01-22"></a>2019-01-22</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#空洞卷积-也叫膨胀卷积-Dilated-Convolution"><span class="nav-number">4.1.</span> <span class="nav-text"><a href="#&#x7A7A;&#x6D1E;&#x5377;&#x79EF;-&#x4E5F;&#x53EB;&#x81A8;&#x80C0;&#x5377;&#x79EF;-Dilated-Convolution" class="headerlink" title="&#x7A7A;&#x6D1E;&#x5377;&#x79EF;(&#x4E5F;&#x53EB;&#x81A8;&#x80C0;&#x5377;&#x79EF;,Dilated Convolution)"></a>&#x7A7A;&#x6D1E;&#x5377;&#x79EF;(&#x4E5F;&#x53EB;&#x81A8;&#x80C0;&#x5377;&#x79EF;,Dilated Convolution)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-01-23"><span class="nav-number">5.</span> <span class="nav-text"><a href="#2019-01-23" class="headerlink" title="2019-01-23"></a>2019-01-23</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DenseNet论文阅读"><span class="nav-number">5.1.</span> <span class="nav-text"><a href="#DenseNet&#x8BBA;&#x6587;&#x9605;&#x8BFB;" class="headerlink" title="DenseNet&#x8BBA;&#x6587;&#x9605;&#x8BFB;"></a>DenseNet&#x8BBA;&#x6587;&#x9605;&#x8BFB;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ROI-Pooling"><span class="nav-number">5.2.</span> <span class="nav-text"><a href="#ROI-Pooling" class="headerlink" title="ROI Pooling"></a>ROI Pooling</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#卷积层输出的尺寸计算"><span class="nav-number">5.3.</span> <span class="nav-text"><a href="#&#x5377;&#x79EF;&#x5C42;&#x8F93;&#x51FA;&#x7684;&#x5C3A;&#x5BF8;&#x8BA1;&#x7B97;" class="headerlink" title="&#x5377;&#x79EF;&#x5C42;&#x8F93;&#x51FA;&#x7684;&#x5C3A;&#x5BF8;&#x8BA1;&#x7B97;"></a>&#x5377;&#x79EF;&#x5C42;&#x8F93;&#x51FA;&#x7684;&#x5C3A;&#x5BF8;&#x8BA1;&#x7B97;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Inception-Net"><span class="nav-number">5.4.</span> <span class="nav-text"><a href="#Inception-Net" class="headerlink" title="Inception Net"></a>Inception Net</span></a></li></ol></li></ol></div>
             
 
           </div>
