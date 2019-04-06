@@ -88,7 +88,9 @@
 <meta property="og:description" content="2019-02-13支持向量机首先复习了数学上的一个小知识，如果有一个超平面可以表达为如下线性方程：  \begin{aligned}     w^Tx+b = 0 \end{aligned}则空间中任意一点$x_0$到该超平面的距离可以表示为如下：  \begin{aligned}     r = \frac{|w^Tx_0+b|}{||w||} \end{aligned}在分类问题的样本空间中">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://sutomorrow.github.io/2019/02/13/学习笔记-2019-02/支持向量机超平面示意.png">
-<meta property="og:updated_time" content="2019-02-13T09:17:37.960Z">
+<meta property="og:image" content="http://sutomorrow.github.io/2019/02/13/学习笔记-2019-02/约束条件和目标函数的等值线.png">
+<meta property="og:image" content="http://sutomorrow.github.io/2019/02/13/学习笔记-2019-02/l1正则化效果示意.png">
+<meta property="og:updated_time" content="2019-03-18T07:52:21.796Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="学习笔记_2019-02">
 <meta name="twitter:description" content="2019-02-13支持向量机首先复习了数学上的一个小知识，如果有一个超平面可以表达为如下线性方程：  \begin{aligned}     w^Tx+b = 0 \end{aligned}则空间中任意一点$x_0$到该超平面的距离可以表示为如下：  \begin{aligned}     r = \frac{|w^Tx_0+b|}{||w||} \end{aligned}在分类问题的样本空间中">
@@ -395,7 +397,7 @@
     &\min_{w,b}\frac{||w||^2}{2}\\
     &s.t.\quad y_i(w^Tx_i + b) \ge 1, i = 1,2,...,m
 \end{aligned}</script><p>这里可以使用不等式约束下的拉格朗日乘子法转换为对偶问题进行求解。</p>
-<p>支持向量机的基本型就是希望找到一个间隔最大的超平面，但是这里有个问题，在原始的特征空间中，样本不一定线性可分，因此引入一个函数，将原始特征空间映射到一个高维的特征空间，使得在这个高维空间中线性可分，这样即可将任何分类问题转换成线性可分的形式，但是这样也有一个问题，设映射后的特征向量为$\phi(x)$，求解超平面的过程中，会遇到${\phi(x)}^T\phi(x)$的情况，因为$\phi(x)$的维数可以为无穷，所以这里的计算无法进行，因此需要设想一个这样的函数：$k(x_i,x_j)={\phi(x)}^T\phi(x)$使得不需要通过$\phi(x)$来计算${\phi(x)}^T\phi(x)$，而是直接通过$k(x_i,x_j)$来表示，这个函数即称为核函数。</p>
+<p>支持向量机的基本型就是希望找到一个间隔最大的超平面，但是这里有个问题，在原始的特征空间中，样本不一定线性可分，因此引入一个函数，将原始特征空间映射到一个高维的特征空间，使得在这个高维空间中线性可分，这样即可将任何分类问题转换成线性可分的形式，但是这样也有一个问题，设映射后的特征向量为$\phi(x)$，求解超平面的过程中，会遇到${\phi(x)}^T\phi(x)$的情况，因为$\phi(x)$的维数可以为无穷，所以这里的计算无法进行，因此需要设想一个这样的函数：$k(x_i,x_j)={\phi(x_i)}^T\phi(x_j)$使得不需要通过$\phi(x)$来计算${\phi(x)}^T\phi(x)$，而是直接通过$k(x_i,x_j)$来表示，这个函数即称为核函数。</p>
 <p>核函数可以用一个核矩阵来表示如下，任何一个对称的半正定矩阵，都可以作为核矩阵。</p>
 <script type="math/tex; mode=display">
 k=\begin{bmatrix}
@@ -408,6 +410,268 @@ k=\begin{bmatrix}
 <p>但是在实际使用中，选出一个合适的特征空间恰好让这个样本线性可分非常不容易，因此将优化目标重写为：</p>
 <script type="math/tex; mode=display">
 \min_{w,b}\frac{1}{2}{||w||}^2+C\sum_{i=1}^ml(y_i(w^Tx_i+b) - 1)</script><p>这里的$C$为一个设定好的常数，决定模型的偏好，$l$为一种损失函数。这样的支持向量机被称为软间隔支持向量机。</p>
+<h1 id="2019-02-19"><a href="#2019-02-19" class="headerlink" title="2019-02-19"></a>2019-02-19</h1><h2 id="对拉格朗日乘子法的理解"><a href="#对拉格朗日乘子法的理解" class="headerlink" title="对拉格朗日乘子法的理解"></a>对拉格朗日乘子法的理解</h2><p>前置知识：梯度的方向是当前等值平面的法线方向。约束函数和目标函数相切时，约束函数和目标函数的梯度方向相同。</p>
+<p>如下图所示，其中$f(x,y)$是目标函数，$f(x,y) = d_1,f(x,y) = d_2,f(x,y) = d_3$都是目标函数的等值线，<br>$g(x,y) = c$是约束条件，在约束条件和等值线相切的地方，有$\nabla f = \lambda \nabla g$,这里假设$d_1 &lt; d_2 &lt; d_3$且所求问题为</p>
+<script type="math/tex; mode=display">
+\min f(x,y) \\
+s.t. g(x,y)=c</script><p>那么其最优解一定出现在相切的地方，即只要求如下联立方程即可得到最优解的可能位置。</p>
+<script type="math/tex; mode=display">
+\begin{cases}
+    \nabla f = \lambda \nabla g \\
+    g(x,y) = 0
+\end{cases}</script><p>但是一般看到的拉格朗日乘子法是下面的形式：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    &首先定义F(x,y,\lambda) = f(x,y) + \lambda g(x,y)\\
+    &之后求解\nabla F = \mathbf{0}
+\end{aligned}</script><p>其实是一样的，展开$\nabla F$即可，如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \begin{pmatrix}
+        \frac{\partial F}{\partial x}\\
+        \\
+        \frac{\partial F}{\partial y}\\
+        \\
+        \frac{\partial F}{\partial \lambda}\\
+    \end{pmatrix} &= \begin{pmatrix}
+        0\\
+        \\
+        0\\
+        \\
+        0\\
+    \end{pmatrix}\\
+    &即\\
+    \nabla f &= -\lambda \nabla g \\
+    \frac{\partial F}{\partial \lambda} &= g(x,y)\\
+    &= 0\\
+\end{aligned}</script><img src="/2019/02/13/学习笔记-2019-02/约束条件和目标函数的等值线.png" title="约束条件和目标函数的等值线">
+<p>上面只是单个约束时且约束为等式的情况，如果是多个等式约束，则可以写成</p>
+<p>$F(x,y,\lambda_1, \lambda_2,…,\lambda_m) = f(x,y) + \lambda_i g_i(x,y);i = 1, 2, …, m$</p>
+<p>同理求解如下：</p>
+<script type="math/tex; mode=display">
+\begin{cases}
+    \nabla f = \lambda_i \nabla g_i &i=1,2,...m\\
+    g_i(x,y) = 0&i=1,2,...m
+\end{cases}</script><p>也可以写成</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \begin{pmatrix}
+        \frac{\partial F}{\partial x}\\
+        \\
+        \frac{\partial F}{\partial y}\\
+        \\
+        \frac{\partial F}{\partial \lambda_1}\\
+        \vdots\\
+        \frac{\partial F}{\partial \lambda_m}\\
+    \end{pmatrix} = \begin{pmatrix}
+        0\\
+        \\
+        0\\
+        \\
+        0\\
+        \vdots\\
+        0\\
+    \end{pmatrix}
+\end{aligned}</script><p>如果是不等式约束，如下描述：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \min f(x,y)\\
+    s.t.\quad h(x,y) \le 0
+\end{aligned}</script><p>可以分成两种情况讨论，第一种情况是内部解，第二种情况是边界解，如果最优解在约束条件内部，那么约束条件不起作用， 退化为无约束问题，$\nabla f = 0 且 \lambda = 0$，如果在边界上，则满足$h(x,y)=0$因此不论哪种情况，$\mu h(x,y) = 0$恒成立。</p>
+<p>这里依旧定义一个如下形式的函数：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    F(x,y,\mu) = f(x,y) + \mu h(x,y)
+\end{aligned}</script><p>因此可以提出KKT条件的基本形式：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \begin{cases}
+        \begin{pmatrix}
+        \frac{\partial F}{\partial x}\\
+        \\
+        \frac{\partial F}{\partial y}
+    \end{pmatrix} &= \begin{pmatrix}
+        0\\
+        \\
+        0
+    \end{pmatrix}\\
+    h(x,y) &\le 0\\
+    \lambda &\ge 0 \\
+    \lambda h(x,y) &= 0
+    \end{cases}
+\end{aligned}</script><p>这里的$\lambda \ge 0$是因为要求的是$\min f(x,y)$，如果要求的是$\max f(x,y)$,则使用$\lambda \ge 0$</p>
+<p>对于多个等式约束和多个不等式约束的情况：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    &\min f(\mathbf{x})\\
+    s.t.\quad &g_j(\mathbf{x}) = 0, j=1,2,...m\\
+    s.t.\quad &h_k(\mathbf{x}) \le 0, k=1,2,...n
+\end{aligned}</script><p>首先定义拉格朗日函数：</p>
+<script type="math/tex; mode=display">
+L(\mathbf{x},\lambda_1,\lambda_2,...,\lambda_m,\mu_1,\mu_2,...,\mu_n) = f(\mathbf{x}) + \sum_{j=1}^m \lambda_j g_j(\mathbf{x}) + \sum_{k=1}^n \lambda_k h_k(\mathbf{x})</script><p>这里直接给出完整的KKT条件：</p>
+<script type="math/tex; mode=display">
+\begin{cases}
+    \nabla_{\mathbf{x}}L = \mathbf{0}\\
+    g_j(\mathbf{x})=0 \quad j=1,2,...,m\\
+    h_k(\mathbf{x})\le 0 \quad k=1,2,...,n\\
+    \mu_k \ge 0 \quad k=1,2,...,n\\
+    \mu_k h_k(\mathbf{x})=0 \quad k=1,2,...,n
+\end{cases}</script><p>求解KKT条件，即可找到约束优化问题的解。</p>
+<h1 id="2019-02-20"><a href="#2019-02-20" class="headerlink" title="2019-02-20"></a>2019-02-20</h1><h2 id="git的常用操作复习"><a href="#git的常用操作复习" class="headerlink" title="git的常用操作复习"></a>git的常用操作复习</h2><p>查看仓库当前状态</p>
+<pre><code> git status 
+</code></pre><p>查看修改内容</p>
+<pre><code> git diff &lt;file&gt;
+</code></pre><p>查看最近的提交</p>
+<pre><code> git log
+</code></pre><p>恢复最近提交</p>
+<pre><code> git reset --[soft|mixed|hard] HEAD~
+ soft:仅仅修改HEAD指向
+ mixed:在修改HEAD之后，修改暂存区内容
+ hard:在修改暂存区内容之后，修改工作区内容
+ HEAD~:等效于HEAD^，代表HEAD的上一次提交，可以使用HEAD~100代表HEAD之前100次提交
+ HEAD~也可替换为commit id
+</code></pre><p>如果指定恢复文件，则只从最后一次提交恢复暂存区文件。</p>
+<pre><code> git reset file
+ 等价于 git reset --mixed HEAD file
+</code></pre><p>查看版本库历史和commit id，可以用</p>
+<pre><code> git log
+</code></pre><p>修改最后一次commit的信息</p>
+<pre><code> git commit --amend
+</code></pre><p>查看版本库所有的改动，可以用</p>
+<pre><code> git reflog
+</code></pre><p>创建和切换分支</p>
+<pre><code> git branch &lt;branch_name&gt; #创建分支
+ git chechout &lt;branch_name&gt; #切换分支
+ git checkout -b &lt;branch_name&gt; #切换分支，不存在则创建
+</code></pre><p>将当前的暂存区改动压栈并隐藏</p>
+<pre><code> git stash
+</code></pre><p>查看当前的栈区</p>
+<pre><code> git stash list
+</code></pre><p>从栈顶恢复</p>
+<pre><code> git stash apply # 只恢复不删除栈内容
+ git stash pop # 恢复并删除栈内容
+</code></pre><p>查看当前分支</p>
+<pre><code> git branch
+</code></pre><p>合并分支</p>
+<pre><code> git merge &lt;branch_name&gt; #合并指定分支到当前分支
+</code></pre><p>如果合并出现冲突，修改冲突文件之后，可以重新add、commit进行提交</p>
+<p>删除分支</p>
+<pre><code> git branch -d &lt;branch_name&gt;
+</code></pre><p>关联远程分支和本地分支</p>
+<pre><code> git branch --set-upstream &lt;branch-name&gt; &lt;origin/branch-name&gt;
+</code></pre><p>之后就可以从远程分支pull或者push到远程分支了</p>
+<p>关联远程服务器</p>
+<pre><code> git remote add &lt;remote-name&gt; &lt;remote-url&gt;
+</code></pre><p>创建远程分支</p>
+<pre><code> git push &lt;remote-name&gt; &lt;local-branch-name&gt;:&lt;remote-branch-name&gt;
+</code></pre><p>删除远程分支</p>
+<pre><code> git push &lt;remote-name&gt; :&lt;remote-branch-name&gt;
+</code></pre><h1 id="2019-02-21"><a href="#2019-02-21" class="headerlink" title="2019-02-21"></a>2019-02-21</h1><h2 id="对l2正则化的理解"><a href="#对l2正则化的理解" class="headerlink" title="对l2正则化的理解"></a>对l2正则化的理解</h2><p>普通的损失函数可以写成如下：</p>
+<script type="math/tex; mode=display">
+J(w;X,y)</script><p>在权重参数上加上l2正则化项之后，损失函数如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    &\tilde{J} = \frac{\alpha}{2}w^Tw + J(w;X,y)\\
+    &对w的求导：\\
+    &\nabla_w\tilde{J} = \alpha w + \nabla_w J(w;X,y)
+\end{aligned}</script><p>每次的参数更新可以写成如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    &w \leftarrow w - \epsilon(\alpha w + \nabla_w J(w;X,y))\\
+    &等价于：\\
+    &w \leftarrow (1 - \epsilon\alpha) w + \epsilon\nabla_w J(w;X,y)
+\end{aligned}</script><p>为了分析l2正则化的作用，假定$J(w ^ \ast ; X , y)$是损失函数的极小值。<br>$ w^\ast$是使损失函数取得极小值的参数，先简单的对损失函数进行二次近似如下，这里没有一次项是因为在函数极小值的地方，一次导数应该为0。</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    J(w;X,y) = J(w^\ast;X,y) + (w-w^\ast)^TH(w-w^\ast)
+\end{aligned}</script><p>对加上l2正则化项的损失函数近似形式如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \hat{J}(w;X,y) = J(w^\ast;X,y) + (w-w^\ast)^TH(w-w^\ast) + \alpha\frac{1}{2}w^Tw
+\end{aligned}</script><p>对损失函数进行求导如下。</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \nabla_w \hat{J}(w;X,y) = \alpha w + H(w - w^\ast)
+\end{aligned}</script><p>当$\nabla_w\hat{J}(w;X,y) = 0$时，有如下推导：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \alpha w + H(w - w^\ast) = 0\\
+    (H + \alpha I)w = Hw^\ast\\
+    w = (H + \alpha I)^{-1}Hw^\ast
+\end{aligned}</script><p>可见当$\alpha \rightarrow 0$时，$w \rightarrow w^\ast$，进一步，因为$H$是实对称矩阵，因此必定可以正交对角化，$H=Q \Lambda Q^T$，因此进一步推导如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    w &= (Q \Lambda Q^T+ \alpha I)^{-1}Q \Lambda Q^Tw^\ast\\
+    &=[Q (\Lambda+ \alpha I) Q^T]^{-1}Q \Lambda Q^Tw^\ast\\
+    &=Q (\Lambda+ \alpha I)^{-1}\Lambda Q^Tw^\ast
+\end{aligned}</script><p>其中，假设$\Lambda$如下：</p>
+<script type="math/tex; mode=display">
+\begin{bmatrix}
+    &\lambda_1 &0 &0 &\cdots &0\\
+    &0 &\lambda_2 &0 &\cdots &0\\
+    &0 &0 &\lambda_3 &\cdots &0\\
+    &\vdots &\vdots &\vdots &\ddots &\vdots\\
+    &0 &0 &0 &\cdots &\lambda_n\\
+\end{bmatrix}</script><p>则$(\Lambda+ \alpha I)^{-1}\Lambda$如下：</p>
+<script type="math/tex; mode=display">
+\begin{bmatrix}
+    &\frac{\lambda_1}{\lambda_1 + \alpha} &0 &0 &\cdots &0\\
+    &0 &\frac{\lambda_2}{\lambda_2 + \alpha} &0 &\cdots &0\\
+    &0 &0 &\frac{\lambda_3}{\lambda_3 + \alpha} &\cdots &0\\
+    &\vdots &\vdots &\vdots &\ddots &\vdots\\
+    &0 &0 &0 &\cdots &\frac{\lambda_n}{\lambda_n + \alpha}\\
+\end{bmatrix}</script><p>这就相当于在原损失函数极小值点的Hession矩阵$H$的特征向量方向上，将$w^\ast$进行了缩放，而且特征值$\lambda_i$越小的方向，$\alpha$对其影响越大，缩小得越大，即加入l2正则化项之后，模型参数倾向于对损失函数影响显著的方向偏移。</p>
+<p>以最小二乘线性回归为例，其损失函数如下：</p>
+<script type="math/tex; mode=display">
+(Xw-y)^T(Xw-y)</script><p>如果加上l2正则化，则损失函数变成如下形式：</p>
+<script type="math/tex; mode=display">
+(Xw-y)^T(Xw-y) + \frac{1}{2}\alpha w^Tw</script><p>那么线性回归的解就从：</p>
+<script type="math/tex; mode=display">
+w = (X^TX)^{-1}X^Ty</script><p>变成了：</p>
+<script type="math/tex; mode=display">
+w = (X^TX + \alpha I)^{-1}X^Ty</script><p>其中$X$可以写成如下,其中$x_{ij}$表示第i个样本$x_i$的第j维：</p>
+<script type="math/tex; mode=display">
+X=\begin{bmatrix}
+    &x_{11} &x_{12} &\cdots &x_{1m}\\
+    &x_{21} &x_{22} &\cdots &x_{2m}\\
+    &\vdots &\vdots &\ddots &\vdots\\
+    &x_{n1} &x_{n1} &\cdots &x_{nm}\\
+\end{bmatrix}</script><p>则$X^TX$可以表示如下：</p>
+<script type="math/tex; mode=display">
+X^TX=\begin{bmatrix}
+    &\sum_i^nx_{i1}x_{i1} &\sum_i^nx_{i1}x_{i2} &\cdots &\sum_i^nx_{i1}x_{im}\\
+    &\sum_i^nx_{i2}x_{i1} &\sum_i^nx_{i2}x_{i2} &\cdots &\sum_i^nx_{i2}x_{im}\\
+    &\vdots &\vdots &\ddots &\vdots\\
+    &\sum_i^nx_{im}x_{i1} &\sum_i^nx_{im}x_{i2} &\cdots &\sum_i^nx_{im}x_{im}\\
+\end{bmatrix}</script><p>$X^TX$同样可以正交对角化，$X^TX = Q \Lambda Q^T$，这里的$\Lambda$对角线上的值是$X$奇异值的平方，之后的推导和上面相同，可见，加入l2正则化项之后，模型参数倾向于对损失函数影响显著的方向偏移，从而忽略掉数据中的一些干扰，增强模型泛化能力。</p>
+<h2 id="记录几个简单的矩阵求导公式"><a href="#记录几个简单的矩阵求导公式" class="headerlink" title="记录几个简单的矩阵求导公式"></a>记录几个简单的矩阵求导公式</h2><script type="math/tex; mode=display">
+\frac{\partial \beta^T X}{\partial X} = \beta\\
+\quad\\
+\frac{\partial X^T X}{\partial X} = X\\
+\quad\\
+\frac{\partial X^T A X}{\partial X} = (A+A^T)X\\</script><h1 id="2019-02-25"><a href="#2019-02-25" class="headerlink" title="2019-02-25"></a>2019-02-25</h1><h2 id="使用tensorflow后端的keras中的session和graph"><a href="#使用tensorflow后端的keras中的session和graph" class="headerlink" title="使用tensorflow后端的keras中的session和graph"></a>使用tensorflow后端的keras中的session和graph</h2><p>这两天在进行将keras模型集成到项目系统的工作，这个系统需要加载不同的模型和训练不同的模型，而且顺序不固定，多个模型可能同时存在，一些在训练，一些在预测，因此直接加载模型，使用keras创建的session和graph的时候，遇到了很多错误，最后的解决方案是为模型手动创建session，并在加载或者使用模型之前使用Keras.backend.set_session方法设置当前使用的session。</p>
+<p>还有一个问题是模型使用完成之后，已经使用del model的形式删除，但是windows任务管理器上显存依旧占用，尝试过Keras.backend.clear_session的方式，显存依旧占用，但是其它模型也可以继续跑，不知道是不是tensorflow自动分配了显存的原因。</p>
+<h2 id="python-multiprocessing的问题"><a href="#python-multiprocessing的问题" class="headerlink" title="python multiprocessing的问题"></a>python multiprocessing的问题</h2><p>前两天遇到一个问题，在使用multiprocessing进行多进程任务时，发现所调用的函数所在的文件，多次执行import操作，导致已经被修改的import变量出现不一致的问题，现在还没有找到解决办法，只能把多进程改为了单进程执行。</p>
+<h1 id="2019-02-26"><a href="#2019-02-26" class="headerlink" title="2019-02-26"></a>2019-02-26</h1><h2 id="对l1正则化的理解"><a href="#对l1正则化的理解" class="headerlink" title="对l1正则化的理解"></a>对l1正则化的理解</h2><p>进行l1正则化之后的损失函数如下：</p>
+<script type="math/tex; mode=display">
+\tilde{J} = \alpha ||w||_1 + J(w;X,y)</script><p>对其进行求导：</p>
+<script type="math/tex; mode=display">
+\nabla_w\tilde{J} = \alpha sign(w) + \nabla_wJ(w;X,y)</script><p>从这里可以看出l1正则化项对导数的影响是一个固定值，和l2有很大区别。</p>
+<p>使用在l2正则化分析中的损失函数近似方法，将原本的损失函数二次近似为$\hat{J}(w)$，其导数如下：</p>
+<script type="math/tex; mode=display">
+\nabla_w\hat{J} = H(w - w^\ast)</script><p>加上正则化项之后，其损失函数的二次近似可以表示为：</p>
+<script type="math/tex; mode=display">
+\hat{J}(w;X,y) = J(w^\ast;X,y) + \sum_i[\frac{1}{2}H_{i,i}(w_i-w_i^\ast)^2 + \alpha|w_i|]</script><p>这里将Hessian矩阵简化成了对角阵，这个类似对数据进行PCA之类的操作，将数据之间的相关性去掉了，因此Hessian矩阵变成对角阵，这样分析要简单一些。</p>
+<p>如果对$w_i$进行求导，如下：</p>
+<script type="math/tex; mode=display">
+\nabla_{w_i}\hat{J}(w;X,y) = H_{i,i}(w_i - w_i^\ast) + \alpha sign(w_i)</script><p>可以看出，加了l1正则化之后最优解变成了如下：</p>
+<script type="math/tex; mode=display">
+w_i = sign(w_i^\ast)max\{|w_i^\ast| - \frac{\alpha}{H_{i,i}}, 0\}</script><p>描述成图像大概如下：</p>
+<img src="/2019/02/13/学习笔记-2019-02/l1正则化效果示意.png" title="l1正则化效果示意">
+<p>可以看出，l1使得权重变得更加稀疏，这在特征选择方面非常有用。</p>
+<h1 id="2019-02-27"><a href="#2019-02-27" class="headerlink" title="2019-02-27"></a>2019-02-27</h1><h2 id="数据增强之噪声"><a href="#数据增强之噪声" class="headerlink" title="数据增强之噪声"></a>数据增强之噪声</h2><h3 id="1-直接在数据上添加噪声"><a href="#1-直接在数据上添加噪声" class="headerlink" title="1.直接在数据上添加噪声"></a>1.直接在数据上添加噪声</h3><p>普遍来说，在数据上添加噪声比简单的收缩权重更加有效。</p>
+<h3 id="2-在权重上添加噪声"><a href="#2-在权重上添加噪声" class="headerlink" title="2.在权重上添加噪声"></a>2.在权重上添加噪声</h3><p>类似贝叶斯方法中将权重参数也作为一个随机变量的做法，在权重上添加噪声类似于在损失函数上加上预测结果对权重的导数的l2正则化项:$\eta E_{p(x,y)}[||\nabla_W \hat{y}(x)||^2]$，其中$\hat{y}$表示模型的输出。这会使得模型偏好于一个对于参数来说更加平缓的区域。</p>
+<h3 id="3-在标签上添加噪声"><a href="#3-在标签上添加噪声" class="headerlink" title="3.在标签上添加噪声"></a>3.在标签上添加噪声</h3><p>对于二分类问题，可以使用$\epsilon$和$1 - \epsilon$来代替0、1标签，对于$k$类多分类问题，则可以使用$\frac{\epsilon}{k}$ 和 $1 - \frac{k - 1}{k}\epsilon$来代替，这对交叉熵损失函数可能没什么区别，因为交叉熵损失函数中为了避免$log0$，已经使用了这种标签平滑，但是对于最大似然学习并在最后一层使用softmax的算法，标签平滑可能会很有用，因为使用softmax之后，输出不可能为绝对的1和0，因此模型会尝试学习越来越大的权重，让输出更加极端，容易导致数值溢出和模型不稳定的问题，在标签上添加噪声可以解决这个问题，虽然通过权重衰减策略也可以解决这个问题，但是盲目的权重衰减可能影响到分类正确性，而在标签上添加噪声没有这个问题。</p>
 
       
     </div>
@@ -447,6 +711,10 @@ k=\begin{bmatrix}
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/06/学习笔记-2019-03/" rel="prev" title="学习笔记-2019-03">
+                学习笔记-2019-03 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -528,7 +796,7 @@ k=\begin{bmatrix}
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">14</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -583,7 +851,7 @@ k=\begin{bmatrix}
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-02-13"><span class="nav-number">1.</span> <span class="nav-text"><a href="#2019-02-13" class="headerlink" title="2019-02-13"></a>2019-02-13</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#支持向量机"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x652F;&#x6301;&#x5411;&#x91CF;&#x673A;" class="headerlink" title="&#x652F;&#x6301;&#x5411;&#x91CF;&#x673A;"></a>&#x652F;&#x6301;&#x5411;&#x91CF;&#x673A;</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-02-13"><span class="nav-number">1.</span> <span class="nav-text"><a href="#2019-02-13" class="headerlink" title="2019-02-13"></a>2019-02-13</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#支持向量机"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x652F;&#x6301;&#x5411;&#x91CF;&#x673A;" class="headerlink" title="&#x652F;&#x6301;&#x5411;&#x91CF;&#x673A;"></a>&#x652F;&#x6301;&#x5411;&#x91CF;&#x673A;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-02-19"><span class="nav-number">2.</span> <span class="nav-text"><a href="#2019-02-19" class="headerlink" title="2019-02-19"></a>2019-02-19</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对拉格朗日乘子法的理解"><span class="nav-number">2.1.</span> <span class="nav-text"><a href="#&#x5BF9;&#x62C9;&#x683C;&#x6717;&#x65E5;&#x4E58;&#x5B50;&#x6CD5;&#x7684;&#x7406;&#x89E3;" class="headerlink" title="&#x5BF9;&#x62C9;&#x683C;&#x6717;&#x65E5;&#x4E58;&#x5B50;&#x6CD5;&#x7684;&#x7406;&#x89E3;"></a>&#x5BF9;&#x62C9;&#x683C;&#x6717;&#x65E5;&#x4E58;&#x5B50;&#x6CD5;&#x7684;&#x7406;&#x89E3;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-02-20"><span class="nav-number">3.</span> <span class="nav-text"><a href="#2019-02-20" class="headerlink" title="2019-02-20"></a>2019-02-20</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#git的常用操作复习"><span class="nav-number">3.1.</span> <span class="nav-text"><a href="#git&#x7684;&#x5E38;&#x7528;&#x64CD;&#x4F5C;&#x590D;&#x4E60;" class="headerlink" title="git&#x7684;&#x5E38;&#x7528;&#x64CD;&#x4F5C;&#x590D;&#x4E60;"></a>git&#x7684;&#x5E38;&#x7528;&#x64CD;&#x4F5C;&#x590D;&#x4E60;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-02-21"><span class="nav-number">4.</span> <span class="nav-text"><a href="#2019-02-21" class="headerlink" title="2019-02-21"></a>2019-02-21</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对l2正则化的理解"><span class="nav-number">4.1.</span> <span class="nav-text"><a href="#&#x5BF9;l2&#x6B63;&#x5219;&#x5316;&#x7684;&#x7406;&#x89E3;" class="headerlink" title="&#x5BF9;l2&#x6B63;&#x5219;&#x5316;&#x7684;&#x7406;&#x89E3;"></a>&#x5BF9;l2&#x6B63;&#x5219;&#x5316;&#x7684;&#x7406;&#x89E3;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#记录几个简单的矩阵求导公式"><span class="nav-number">4.2.</span> <span class="nav-text"><a href="#&#x8BB0;&#x5F55;&#x51E0;&#x4E2A;&#x7B80;&#x5355;&#x7684;&#x77E9;&#x9635;&#x6C42;&#x5BFC;&#x516C;&#x5F0F;" class="headerlink" title="&#x8BB0;&#x5F55;&#x51E0;&#x4E2A;&#x7B80;&#x5355;&#x7684;&#x77E9;&#x9635;&#x6C42;&#x5BFC;&#x516C;&#x5F0F;"></a>&#x8BB0;&#x5F55;&#x51E0;&#x4E2A;&#x7B80;&#x5355;&#x7684;&#x77E9;&#x9635;&#x6C42;&#x5BFC;&#x516C;&#x5F0F;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-02-25"><span class="nav-number">5.</span> <span class="nav-text"><a href="#2019-02-25" class="headerlink" title="2019-02-25"></a>2019-02-25</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用tensorflow后端的keras中的session和graph"><span class="nav-number">5.1.</span> <span class="nav-text"><a href="#&#x4F7F;&#x7528;tensorflow&#x540E;&#x7AEF;&#x7684;keras&#x4E2D;&#x7684;session&#x548C;graph" class="headerlink" title="&#x4F7F;&#x7528;tensorflow&#x540E;&#x7AEF;&#x7684;keras&#x4E2D;&#x7684;session&#x548C;graph"></a>&#x4F7F;&#x7528;tensorflow&#x540E;&#x7AEF;&#x7684;keras&#x4E2D;&#x7684;session&#x548C;graph</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python-multiprocessing的问题"><span class="nav-number">5.2.</span> <span class="nav-text"><a href="#python-multiprocessing&#x7684;&#x95EE;&#x9898;" class="headerlink" title="python multiprocessing&#x7684;&#x95EE;&#x9898;"></a>python multiprocessing&#x7684;&#x95EE;&#x9898;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-02-26"><span class="nav-number">6.</span> <span class="nav-text"><a href="#2019-02-26" class="headerlink" title="2019-02-26"></a>2019-02-26</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对l1正则化的理解"><span class="nav-number">6.1.</span> <span class="nav-text"><a href="#&#x5BF9;l1&#x6B63;&#x5219;&#x5316;&#x7684;&#x7406;&#x89E3;" class="headerlink" title="&#x5BF9;l1&#x6B63;&#x5219;&#x5316;&#x7684;&#x7406;&#x89E3;"></a>&#x5BF9;l1&#x6B63;&#x5219;&#x5316;&#x7684;&#x7406;&#x89E3;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-02-27"><span class="nav-number">7.</span> <span class="nav-text"><a href="#2019-02-27" class="headerlink" title="2019-02-27"></a>2019-02-27</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据增强之噪声"><span class="nav-number">7.1.</span> <span class="nav-text"><a href="#&#x6570;&#x636E;&#x589E;&#x5F3A;&#x4E4B;&#x566A;&#x58F0;" class="headerlink" title="&#x6570;&#x636E;&#x589E;&#x5F3A;&#x4E4B;&#x566A;&#x58F0;"></a>&#x6570;&#x636E;&#x589E;&#x5F3A;&#x4E4B;&#x566A;&#x58F0;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-直接在数据上添加噪声"><span class="nav-number">7.1.1.</span> <span class="nav-text"><a href="#1-&#x76F4;&#x63A5;&#x5728;&#x6570;&#x636E;&#x4E0A;&#x6DFB;&#x52A0;&#x566A;&#x58F0;" class="headerlink" title="1.&#x76F4;&#x63A5;&#x5728;&#x6570;&#x636E;&#x4E0A;&#x6DFB;&#x52A0;&#x566A;&#x58F0;"></a>1.&#x76F4;&#x63A5;&#x5728;&#x6570;&#x636E;&#x4E0A;&#x6DFB;&#x52A0;&#x566A;&#x58F0;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-在权重上添加噪声"><span class="nav-number">7.1.2.</span> <span class="nav-text"><a href="#2-&#x5728;&#x6743;&#x91CD;&#x4E0A;&#x6DFB;&#x52A0;&#x566A;&#x58F0;" class="headerlink" title="2.&#x5728;&#x6743;&#x91CD;&#x4E0A;&#x6DFB;&#x52A0;&#x566A;&#x58F0;"></a>2.&#x5728;&#x6743;&#x91CD;&#x4E0A;&#x6DFB;&#x52A0;&#x566A;&#x58F0;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-在标签上添加噪声"><span class="nav-number">7.1.3.</span> <span class="nav-text"><a href="#3-&#x5728;&#x6807;&#x7B7E;&#x4E0A;&#x6DFB;&#x52A0;&#x566A;&#x58F0;" class="headerlink" title="3.&#x5728;&#x6807;&#x7B7E;&#x4E0A;&#x6DFB;&#x52A0;&#x566A;&#x58F0;"></a>3.&#x5728;&#x6807;&#x7B7E;&#x4E0A;&#x6DFB;&#x52A0;&#x566A;&#x58F0;</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>

@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="刘腾营,博客" />
+  <meta name="keywords" content="学习笔记，杂项," />
 
 
 
@@ -79,13 +79,18 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="SeeYouTomorrow">
-<meta property="og:url" content="http://sUtomorrow.github.io/archives/index.html">
+<meta name="description" content="2019-04-06对于随机批梯度下降理解 对于batch size：从n个训练数据对真实数据分布进行估计，其标准差可以写为$\sigma/\sqrt{n}$，因此加大batch size对模型的学习效果的提升不是线性的。 对于数据：随机批梯度下降，可以减少计算的冗余度，因为很多数据其求出的梯度基本相同，最坏的情况就是训练集中每个数据都是相同的，如果使用原始的梯度下降算法，对于整个训练集进行梯度计">
+<meta name="keywords" content="学习笔记，杂项">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习笔记-2019-04">
+<meta property="og:url" content="http://sUtomorrow.github.io/2019/04/06/学习笔记-2019-04/index.html">
 <meta property="og:site_name" content="SeeYouTomorrow">
+<meta property="og:description" content="2019-04-06对于随机批梯度下降理解 对于batch size：从n个训练数据对真实数据分布进行估计，其标准差可以写为$\sigma/\sqrt{n}$，因此加大batch size对模型的学习效果的提升不是线性的。 对于数据：随机批梯度下降，可以减少计算的冗余度，因为很多数据其求出的梯度基本相同，最坏的情况就是训练集中每个数据都是相同的，如果使用原始的梯度下降算法，对于整个训练集进行梯度计">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-06T14:06:09.306Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="SeeYouTomorrow">
+<meta name="twitter:title" content="学习笔记-2019-04">
+<meta name="twitter:description" content="2019-04-06对于随机批梯度下降理解 对于batch size：从n个训练数据对真实数据分布进行估计，其标准差可以写为$\sigma/\sqrt{n}$，因此加大batch size对模型的学习效果的提升不是线性的。 对于数据：随机批梯度下降，可以减少计算的冗余度，因为很多数据其求出的梯度基本相同，最坏的情况就是训练集中每个数据都是相同的，如果使用原始的梯度下降算法，对于整个训练集进行梯度计">
 
 
 
@@ -115,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://sUtomorrow.github.io/archives/"/>
+  <link rel="canonical" href="http://sUtomorrow.github.io/2019/04/06/学习笔记-2019-04/"/>
 
 
 
 
 
-  <title>归档 | SeeYouTomorrow</title>
+  <title>学习笔记-2019-04 | SeeYouTomorrow</title>
   
 
 
@@ -150,7 +155,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -278,416 +283,181 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
 
-      <span class="archive-page-counter">
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sUtomorrow.github.io/2019/04/06/学习笔记-2019-04/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="刘腾营">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SeeYouTomorrow">
+    </span>
+
+    
+      <header class="post-header">
+
         
         
+          <h1 class="post-title" itemprop="name headline">学习笔记-2019-04</h1>
         
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-06T20:05:26+08:00">
+                2019-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
           
-        
-        嗯..! 目前共计 14 篇日志。 继续努力。
-      </span>
 
-      
-
-        
-        
-        
-
-        
           
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2019">2019</h1>
-          </div>
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2019/04/06/学习笔记-2019-04/" itemprop="url">
-              
-                <span itemprop="name">学习笔记-2019-04</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2019-04-06T20:05:26+08:00"
-              content="2019-04-06" >
-          04-06
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2019/03/12/乳腺癌症检测实验日志/" itemprop="url">
-              
-                <span itemprop="name">乳腺癌症检测实验日志</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2019-03-12T09:32:58+08:00"
-              content="2019-03-12" >
-          03-12
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2019/03/11/津南数字制造比赛记录/" itemprop="url">
-              
-                <span itemprop="name">津南数字制造比赛记录</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2019-03-11T09:44:39+08:00"
-              content="2019-03-11" >
-          03-11
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2019/03/06/学习笔记-2019-03/" itemprop="url">
-              
-                <span itemprop="name">学习笔记-2019-03</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2019-03-06T08:50:08+08:00"
-              content="2019-03-06" >
-          03-06
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2019/02/13/学习笔记-2019-02/" itemprop="url">
-              
-                <span itemprop="name">学习笔记_2019-02</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2019-02-13T15:16:58+08:00"
-              content="2019-02-13" >
-          02-13
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2019/02/13/学习笔记-2019-01/" itemprop="url">
-              
-                <span itemprop="name">学习笔记_2019-01</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2019-02-13T15:06:42+08:00"
-              content="2019-02-13" >
-          02-13
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
-        
-        
-        
-
-        
+            
           
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2018">2018</h1>
-          </div>
-        
-        
 
-        
+          
+          
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 被阅读
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
 
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/11/07/道路交通标志检测与识别/" itemprop="url">
-              
-                <span itemprop="name">道路交通标志检测与识别</span>
-              
-            </a>
-        
-      </h2>
+          
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-11-07T15:24:07+08:00"
-              content="2018-11-07" >
-          11-07
-        </time>
-      </div>
+          
 
-    </header>
-  </article>
+        </div>
+      </header>
+    
 
-
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/10/12/关于广东工业智造大数据创新大赛-智能算法赛的记录/" itemprop="url">
-              
-                <span itemprop="name">关于广东工业智造大数据创新大赛-智能算法赛的记录</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-10-12T17:26:46+08:00"
-              content="2018-10-12" >
-          10-12
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/08/21/修改经典二维图像分类网络用于三维医学图像/" itemprop="url">
-              
-                <span itemprop="name">修改经典二维图像分类网络用于三维医学图像</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-08-21T19:34:16+08:00"
-              content="2018-08-21" >
-          08-21
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
+      
+        <h1 id="2019-04-06"><a href="#2019-04-06" class="headerlink" title="2019-04-06"></a>2019-04-06</h1><h2 id="对于随机批梯度下降理解"><a href="#对于随机批梯度下降理解" class="headerlink" title="对于随机批梯度下降理解"></a>对于随机批梯度下降理解</h2><ul>
+<li>对于batch size：从n个训练数据对真实数据分布进行估计，其标准差可以写为$\sigma/\sqrt{n}$，因此加大batch size对模型的学习效果的提升不是线性的。</li>
+<li>对于数据：随机批梯度下降，可以减少计算的冗余度，因为很多数据其求出的梯度基本相同，最坏的情况就是训练集中每个数据都是相同的，如果使用原始的梯度下降算法，对于整个训练集进行梯度计算，最后得到的梯度和根据单个样本计算的梯度相同，存在大量计算冗余，随机批梯度下降对这种问题有一定缓解作用。</li>
+<li>小的batch size：小的batch size 可以起到正则化的作用，有可能是因为小的batch size在估计梯度的过程中，引入了一定地噪声，从而可以使得模型的泛化误差减小，但是小的batch size 需要更小的学习速率和更多的学习步数。</li>
+<li>对于优化算法：不同的优化算法对于batch size有不一样的要求，因为不同的优化算法对采样误差的敏感程度不同，可能一些优化算法需要从样本中提取的信息很难从少量的样本中估计出来，因此需要设置batch size为一个较大值才会有较好效果。仅仅直接使用梯度$g$的优化算法往往有较好的鲁棒性，并一般可以适应100这种小的batch size。</li>
+</ul>
+<h2 id="病态矩阵与条件数理解"><a href="#病态矩阵与条件数理解" class="headerlink" title="病态矩阵与条件数理解"></a>病态矩阵与条件数理解</h2><p>对于矩阵方程如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    A x = b
+\end{aligned}</script><p>若对于一个较小的样本观察误差$\Delta b$，使得$A(x+\Delta x)=b + \Delta b$，$\Delta x$如果比$\Delta b$大很多，则称矩阵A是一个病态矩阵，一个典型的病态矩阵如下：</p>
+<script type="math/tex; mode=display">
+\begin{bmatrix}
+    1000 &1000\\
+    0 &0.001
+\end{bmatrix}</script><p>其中两个列向量的相关性非常大，夹角非常小，表示的特征太过相似，若$b$是第一个列向量方向的单位向量,则求出的解为$[n, 0]^T$，若$b$稍微偏差一点，变到了第二个列向量的方向，则求出来的解变为$[0\ 1]^T$，两次解的差距非常大，仅仅因为$b$上有非常小的偏移。</p>
+<p>对于某种矩阵范数$||A||$以及某种向量范数$||b||$，若:</p>
+<script type="math/tex; mode=display">
+A(x+\Delta x)=b + \Delta b</script><p>则</p>
+<script type="math/tex; mode=display">
+A\Delta x = \Delta b</script><p>即</p>
+<script type="math/tex; mode=display">
+\Delta x = A^{-1}\Delta b</script><p>则有</p>
+<script type="math/tex; mode=display">
+||\Delta x|| \le ||A^{-1}||\cdot||\Delta b||</script><p>同时有</p>
+<script type="math/tex; mode=display">
+||A|| \cdot ||x|| \ge ||b||</script><p>因此</p>
+<script type="math/tex; mode=display">
+\frac{||\Delta x||}{||A|| \cdot ||x||} \le \frac{||A^{-1}||\cdot||\Delta b||}{||b||}</script><script type="math/tex; mode=display">
+\frac{||\Delta x||}{||x||} \le (||A^{-1}||\cdot||A||)\frac{||\Delta b||}{||b||}</script><p>这里将$||A^{-1}||\cdot||A||$称为矩阵A的条件数，对于不同的范数，条件数各有不同，但都反映了矩阵A的病态程度，条件数越大，矩阵呈现更加明显的病态特征。</p>
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2018/08/16/实验日志/" itemprop="url">
-              
-                <span itemprop="name">实验日志</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-08-16T15:04:50+08:00"
-              content="2018-08-16" >
-          08-16
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
     </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/学习笔记，杂项/" rel="tag"># 学习笔记，杂项</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/12/乳腺癌症检测实验日志/" rel="next" title="乳腺癌症检测实验日志">
+                <i class="fa fa-chevron-left"></i> 乳腺癌症检测实验日志
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
-
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/archives/page/2/">2</a><a class="extend next" rel="next" href="/archives/page/2/"><i class="fa fa-angle-right"></i></a>
-  </nav>
+  </article>
 
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -695,6 +465,15 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNDczOC8xMTI3NQ=="></div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -715,8 +494,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -776,6 +564,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-04-06"><span class="nav-number">1.</span> <span class="nav-text"><a href="#2019-04-06" class="headerlink" title="2019-04-06"></a>2019-04-06</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对于随机批梯度下降理解"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x5BF9;&#x4E8E;&#x968F;&#x673A;&#x6279;&#x68AF;&#x5EA6;&#x4E0B;&#x964D;&#x7406;&#x89E3;" class="headerlink" title="&#x5BF9;&#x4E8E;&#x968F;&#x673A;&#x6279;&#x68AF;&#x5EA6;&#x4E0B;&#x964D;&#x7406;&#x89E3;"></a>&#x5BF9;&#x4E8E;&#x968F;&#x673A;&#x6279;&#x68AF;&#x5EA6;&#x4E0B;&#x964D;&#x7406;&#x89E3;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#病态矩阵与条件数理解"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#&#x75C5;&#x6001;&#x77E9;&#x9635;&#x4E0E;&#x6761;&#x4EF6;&#x6570;&#x7406;&#x89E3;" class="headerlink" title="&#x75C5;&#x6001;&#x77E9;&#x9635;&#x4E0E;&#x6761;&#x4EF6;&#x6570;&#x7406;&#x89E3;"></a>&#x75C5;&#x6001;&#x77E9;&#x9635;&#x4E0E;&#x6761;&#x4EF6;&#x6570;&#x7406;&#x89E3;</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -923,6 +727,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
@@ -951,6 +759,17 @@
 
 
 
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 
