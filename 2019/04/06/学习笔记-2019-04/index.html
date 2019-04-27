@@ -87,10 +87,12 @@
 <meta property="og:site_name" content="SeeYouTomorrow">
 <meta property="og:description" content="2019-04-06对于随机批梯度下降理解 对于batch size：从n个训练数据对真实数据分布进行估计，其标准差可以写为$\sigma/\sqrt{n}$，因此加大batch size对模型的学习效果的提升不是线性的。 对于数据：随机批梯度下降，可以减少计算的冗余度，因为很多数据其求出的梯度基本相同，最坏的情况就是训练集中每个数据都是相同的，如果使用原始的梯度下降算法，对于整个训练集进行梯度计">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-06T14:06:09.306Z">
+<meta property="og:image" content="http://sutomorrow.github.io/2019/04/06/学习笔记-2019-04/center_ness.png">
+<meta property="og:updated_time" content="2019-04-27T13:58:16.623Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="学习笔记-2019-04">
 <meta name="twitter:description" content="2019-04-06对于随机批梯度下降理解 对于batch size：从n个训练数据对真实数据分布进行估计，其标准差可以写为$\sigma/\sqrt{n}$，因此加大batch size对模型的学习效果的提升不是线性的。 对于数据：随机批梯度下降，可以减少计算的冗余度，因为很多数据其求出的梯度基本相同，最坏的情况就是训练集中每个数据都是相同的，如果使用原始的梯度下降算法，对于整个训练集进行梯度计">
+<meta name="twitter:image" content="http://sutomorrow.github.io/2019/04/06/学习笔记-2019-04/center_ness.png">
 
 
 
@@ -399,6 +401,104 @@ A\Delta x = \Delta b</script><p>即</p>
 <script type="math/tex; mode=display">
 \frac{||\Delta x||}{||A|| \cdot ||x||} \le \frac{||A^{-1}||\cdot||\Delta b||}{||b||}</script><script type="math/tex; mode=display">
 \frac{||\Delta x||}{||x||} \le (||A^{-1}||\cdot||A||)\frac{||\Delta b||}{||b||}</script><p>这里将$||A^{-1}||\cdot||A||$称为矩阵A的条件数，对于不同的范数，条件数各有不同，但都反映了矩阵A的病态程度，条件数越大，矩阵呈现更加明显的病态特征。</p>
+<h1 id="2019-04-11"><a href="#2019-04-11" class="headerlink" title="2019-04-11"></a>2019-04-11</h1><h2 id="SGD中的Momentum方法"><a href="#SGD中的Momentum方法" class="headerlink" title="SGD中的Momentum方法"></a>SGD中的Momentum方法</h2><p>momentum方法主要针对两个问题：</p>
+<ul>
+<li>参数空间存在条件数较大的病态Hessian矩阵。</li>
+<li>随机梯度下降对梯度的估计存在偏差。<script type="math/tex; mode=display">
+v = \alpha v - \epsilon \nabla_\theta(\frac{1}{m}\sum_{i=1}^{m}L(f(x^{(i)};\theta), y^{(i)}))\\
+\theta \leftarrow \theta + v</script>如果每次梯度都是$g$，那么最终的$v$会趋近于$\frac{\epsilon g}{1 - \alpha}$</li>
+</ul>
+<h2 id="SGD中的Nesterov-Momentum方法"><a href="#SGD中的Nesterov-Momentum方法" class="headerlink" title="SGD中的Nesterov Momentum方法"></a>SGD中的Nesterov Momentum方法</h2><script type="math/tex; mode=display">
+v = \alpha v - \epsilon \nabla_\theta(\frac{1}{m}\sum_{i=1}^{m}L(f(x^{(i)};\theta + \alpha v), y^{(i)}))\\
+\theta \leftarrow \theta + v</script><h2 id="网络权重随机初始化的原因"><a href="#网络权重随机初始化的原因" class="headerlink" title="网络权重随机初始化的原因"></a>网络权重随机初始化的原因</h2><p>如果两个计算单元具有相同的输入和激活函数，如果初始化相同，那么这两个计算单元在优化过程中很可能一直同步，最终出现冗余单元的情况，即两个计算单元计算的是相同的函数，重复计算没有意义。</p>
+<h1 id="2019-04-12"><a href="#2019-04-12" class="headerlink" title="2019-04-12"></a>2019-04-12</h1><h2 id="AdaGrad优化算法"><a href="#AdaGrad优化算法" class="headerlink" title="AdaGrad优化算法"></a>AdaGrad优化算法</h2><p>Global learning rate $\epsilon$</p>
+<p>Initial parameter $\theta$</p>
+<p>Small constant $\delta$</p>
+<p>Initial variable $r = 0$</p>
+<p>batch size $m$</p>
+<p>$A \odot B$: hadamard product of $A$ and $B$</p>
+<p>每次计算迭代过程如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+g &\leftarrow \frac{1}{m} \nabla_\theta\sum_iL(f(x^{(i)}; \theta), y^{(i)})\\
+r &\leftarrow r + g \odot g\\
+\Delta \theta &\leftarrow -\frac{\epsilon}{\delta + \sqrt{r}} \odot g\\
+\theta &\leftarrow \theta + \Delta \theta    
+\end{aligned}</script><p>此算法主要用于凸函数的优化问题，在梯度较小的地方可以加大参数移动速度，但是我觉得这个算法不好，因为对梯度的方向进行了更改，而且$r$项一直增大，会使得学习过程很快趋于停滞。</p>
+<h2 id="RMSProp优化算法"><a href="#RMSProp优化算法" class="headerlink" title="RMSProp优化算法"></a>RMSProp优化算法</h2><p>Global learning rate $\epsilon$</p>
+<p>decay rate $\rho$</p>
+<p>Initial parameter $\theta$</p>
+<p>Small constant $\delta$</p>
+<p>Initial variable $r = 0$</p>
+<p>batch size $m$</p>
+<p>$A \odot B$: hadamard product of $A$ and $B$</p>
+<p>每次计算迭代过程如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+g &\leftarrow \frac{1}{m} \nabla_\theta\sum_iL(f(x^{(i)}; \theta), y^{(i)})\\
+r &\leftarrow \rho r + (1 - \rho)g \odot g\\
+\Delta \theta &\leftarrow -\frac{\epsilon}{\sqrt{\delta + r}} \odot g\\
+\theta &\leftarrow \theta + \Delta \theta    
+\end{aligned}</script><p>在AdaGrad算法的基础上，通过衰减参数$\rho$可以避免学习过程趋于停滞。</p>
+<h2 id="带有Nesterov-Momentum-的RMSProp优化算法"><a href="#带有Nesterov-Momentum-的RMSProp优化算法" class="headerlink" title="带有Nesterov Momentum 的RMSProp优化算法"></a>带有Nesterov Momentum 的RMSProp优化算法</h2><p>Global learning rate $\epsilon$</p>
+<p>decay rate $\rho$</p>
+<p>momentum coefficent $\alpha$</p>
+<p>Initial parameter $\theta$</p>
+<p>Small constant $\delta$</p>
+<p>initial velocity $v$</p>
+<p>Initial variable $r = 0$</p>
+<p>batch size $m$</p>
+<p>$A \odot B$: hadamard product of $A$ and $B$</p>
+<p>每次计算迭代过程如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\tilde{\theta} &\leftarrow \theta + \alpha v\\
+g &\leftarrow \frac{1}{m} \nabla_{\tilde{\theta}}\sum_iL(f(x^{(i)}; \tilde{\theta}), y^{(i)})\\
+r &\leftarrow \rho r + (1 - \rho)g \odot g\\
+v &\leftarrow \alpha v -\frac{\epsilon}{\sqrt{r}} \odot g\\
+\theta &\leftarrow \theta + v
+\end{aligned}</script><p>这里计算了Nesterov动量项以应对可能的梯度估计偏差和参数空间病态Hessian矩阵问题。</p>
+<h2 id="Adam优化算法"><a href="#Adam优化算法" class="headerlink" title="Adam优化算法"></a>Adam优化算法</h2><p>Step size $\epsilon$</p>
+<p>Exponential decay rates for moment estimates $\rho_1$ $\rho_2$</p>
+<p>Small constant $\delta$</p>
+<p>Initial parameter $\theta$</p>
+<p>Initialize 1st and 2nd moment variables $s=0$ $r=0$</p>
+<p>Initialize time step $t=0$</p>
+<p>$A \odot B$: hadamard product of $A$ and $B$</p>
+<p>每次计算迭代过程如下:</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    g &\leftarrow \frac{1}{m} \nabla_\theta\sum_iL(f(x^{(i)}; \theta), y^{(i)})\\
+    t &\leftarrow t + 1\\
+    s &\leftarrow \rho_1 s + (1-\rho_1) g\\
+    r &\leftarrow \rho_2 r + (1-\rho_2) g \odot g\\
+    \hat{s} &\leftarrow \frac{s}{1-\rho_1^t}\\
+    \hat{r} &\leftarrow \frac{r}{1 - \rho_2^t}\\
+    \Delta_\theta &\leftarrow -\epsilon \frac{\hat{s}}{\sqrt{\hat{r}} + \delta}\\
+    \theta &\leftarrow \theta + \Delta_\theta
+\end{aligned}</script><h2 id="牛顿法"><a href="#牛顿法" class="headerlink" title="牛顿法"></a>牛顿法</h2><p>首先通过二阶估计来表达损失函数：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \hat{J}(\theta) &\approx J(\theta_0) + (\theta - \theta_0)^T\nabla_\theta J(\theta_0) + \frac{1}{2}(\theta - \theta_0)^TH(\theta - \theta_0)\\
+\end{aligned}</script><p>其一阶导数：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\frac{\partial \hat{J}}{\partial \theta} &= (\nabla_\theta J(\theta_0))^T + \frac{1}{2}(H + H^T)(\theta - \theta_0)\\
+&= \nabla_\theta J(\theta_0) + H(\theta - \theta_0)
+\end{aligned}</script><p>对于凸函数，当一阶导数为0时，有可以直接得到最优解：</p>
+<script type="math/tex; mode=display">
+\nabla_\theta J(\theta_0) + H(\theta - \theta_0) = 0\\
+\theta = \theta_0 - H^{-1}\nabla_\theta J(\theta_0)</script><p>对于非凸函数，牛顿法不能有效的收敛。</p>
+<h1 id="2019-04-27"><a href="#2019-04-27" class="headerlink" title="2019-04-27"></a>2019-04-27</h1><h2 id="论文：Feature-Selective-Anchor-Free-Module-for-Single-Shot-Object-Detection"><a href="#论文：Feature-Selective-Anchor-Free-Module-for-Single-Shot-Object-Detection" class="headerlink" title="论文：Feature Selective Anchor-Free Module for Single-Shot Object Detection"></a>论文：Feature Selective Anchor-Free Module for Single-Shot Object Detection</h2><p>这篇论文对retinanet进行了改进，在原始的anchor-based分支上，新增了一个anchor-free分支。</p>
+<p>目前一阶段的目标检测大部分都是基于先验框进行，就是对于所谓的anchor(锚点)，事先定义好anchor box的大小、比例、个数，模型的回归输出作为基于anchor box的偏移，训练时将目标检测框映射分配到anchor box上，指定回归输出的优化目标，而inference过程是将和先验anchor box一起计算得到最终的predict box。</p>
+<p>anchor-free分支不需要计算先验框，不需要定义anchor box的大小、比例、个数等超参数，而是直接将目标检测框映射到feature map上，并定义有效范围和忽略范围，feature map上在有效范围内的点作为正样本，在忽略范围外的点作为负样本进行训练，训练时，对于多尺度feature map的选择则根据每种大小的feature map的损失函数来计算，训练时只选择损失函数最小的feature map层进行训练。</p>
+<h2 id="论文FCOS-Fully-Convolutional-One-Stage-Object-Detection"><a href="#论文FCOS-Fully-Convolutional-One-Stage-Object-Detection" class="headerlink" title="论文FCOS: Fully Convolutional One-Stage Object Detection"></a>论文FCOS: Fully Convolutional One-Stage Object Detection</h2><p>这篇论文也致力于目标检测的模型去anchor化工作，将anchor-based的预测修改为anchor-free的方式，但是Feature Selective Anchor-Free Module for Single-Shot Object Detection论文中不同的是，这里的anchor-free分支不需要计算有效范围和忽略范围，而是直接将目标框在feature map上的投影覆盖的所有点作为正样本点，其余的直接作为负样本点，这样可以提升检测的召回率，但是必然提升检测的假阳性率，因此论文中针对这个问题，提出了center-ness层，在训练过程中，让这一层来预测当前像素点到gt中心的距离度量，这一层的训练目标被定义为如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    centerness^* = \sqrt{\frac{\min(l^*, r^*)}{\max(l^*, r^*)}\frac{\min(t^*, b^*)}{\max(t^*, b^*)}}
+\end{aligned}</script><p>其中$t^<em>\ b^</em>\ l^<em>\ r^</em>$四个值的定义如下图，这里截取的整张图都在同一个目标框的范围内，这里计算的就是两个轴交点的$centerness^*$值：</p>
+<img src="/2019/04/06/学习笔记-2019-04/center_ness.png" title="center ness示意">
+<p>距离目标框中心越近，$centerness^<em>$值越大，在进行inference的时候，$centerness^</em>$值将作为feature map上每个点的预测权重，用于抑制和目标框偏移较大的点的预测值。</p>
 
       
     </div>
@@ -438,6 +538,10 @@ A\Delta x = \Delta b</script><p>即</p>
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/15/refineDet模型结构要点/" rel="prev" title="refineDet模型结构要点">
+                refineDet模型结构要点 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -519,7 +623,7 @@ A\Delta x = \Delta b</script><p>即</p>
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -574,7 +678,7 @@ A\Delta x = \Delta b</script><p>即</p>
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-04-06"><span class="nav-number">1.</span> <span class="nav-text"><a href="#2019-04-06" class="headerlink" title="2019-04-06"></a>2019-04-06</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对于随机批梯度下降理解"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x5BF9;&#x4E8E;&#x968F;&#x673A;&#x6279;&#x68AF;&#x5EA6;&#x4E0B;&#x964D;&#x7406;&#x89E3;" class="headerlink" title="&#x5BF9;&#x4E8E;&#x968F;&#x673A;&#x6279;&#x68AF;&#x5EA6;&#x4E0B;&#x964D;&#x7406;&#x89E3;"></a>&#x5BF9;&#x4E8E;&#x968F;&#x673A;&#x6279;&#x68AF;&#x5EA6;&#x4E0B;&#x964D;&#x7406;&#x89E3;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#病态矩阵与条件数理解"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#&#x75C5;&#x6001;&#x77E9;&#x9635;&#x4E0E;&#x6761;&#x4EF6;&#x6570;&#x7406;&#x89E3;" class="headerlink" title="&#x75C5;&#x6001;&#x77E9;&#x9635;&#x4E0E;&#x6761;&#x4EF6;&#x6570;&#x7406;&#x89E3;"></a>&#x75C5;&#x6001;&#x77E9;&#x9635;&#x4E0E;&#x6761;&#x4EF6;&#x6570;&#x7406;&#x89E3;</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-04-06"><span class="nav-number">1.</span> <span class="nav-text"><a href="#2019-04-06" class="headerlink" title="2019-04-06"></a>2019-04-06</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对于随机批梯度下降理解"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x5BF9;&#x4E8E;&#x968F;&#x673A;&#x6279;&#x68AF;&#x5EA6;&#x4E0B;&#x964D;&#x7406;&#x89E3;" class="headerlink" title="&#x5BF9;&#x4E8E;&#x968F;&#x673A;&#x6279;&#x68AF;&#x5EA6;&#x4E0B;&#x964D;&#x7406;&#x89E3;"></a>&#x5BF9;&#x4E8E;&#x968F;&#x673A;&#x6279;&#x68AF;&#x5EA6;&#x4E0B;&#x964D;&#x7406;&#x89E3;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#病态矩阵与条件数理解"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#&#x75C5;&#x6001;&#x77E9;&#x9635;&#x4E0E;&#x6761;&#x4EF6;&#x6570;&#x7406;&#x89E3;" class="headerlink" title="&#x75C5;&#x6001;&#x77E9;&#x9635;&#x4E0E;&#x6761;&#x4EF6;&#x6570;&#x7406;&#x89E3;"></a>&#x75C5;&#x6001;&#x77E9;&#x9635;&#x4E0E;&#x6761;&#x4EF6;&#x6570;&#x7406;&#x89E3;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-04-11"><span class="nav-number">2.</span> <span class="nav-text"><a href="#2019-04-11" class="headerlink" title="2019-04-11"></a>2019-04-11</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SGD中的Momentum方法"><span class="nav-number">2.1.</span> <span class="nav-text"><a href="#SGD&#x4E2D;&#x7684;Momentum&#x65B9;&#x6CD5;" class="headerlink" title="SGD&#x4E2D;&#x7684;Momentum&#x65B9;&#x6CD5;"></a>SGD&#x4E2D;&#x7684;Momentum&#x65B9;&#x6CD5;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SGD中的Nesterov-Momentum方法"><span class="nav-number">2.2.</span> <span class="nav-text"><a href="#SGD&#x4E2D;&#x7684;Nesterov-Momentum&#x65B9;&#x6CD5;" class="headerlink" title="SGD&#x4E2D;&#x7684;Nesterov Momentum&#x65B9;&#x6CD5;"></a>SGD&#x4E2D;&#x7684;Nesterov Momentum&#x65B9;&#x6CD5;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络权重随机初始化的原因"><span class="nav-number">2.3.</span> <span class="nav-text"><a href="#&#x7F51;&#x7EDC;&#x6743;&#x91CD;&#x968F;&#x673A;&#x521D;&#x59CB;&#x5316;&#x7684;&#x539F;&#x56E0;" class="headerlink" title="&#x7F51;&#x7EDC;&#x6743;&#x91CD;&#x968F;&#x673A;&#x521D;&#x59CB;&#x5316;&#x7684;&#x539F;&#x56E0;"></a>&#x7F51;&#x7EDC;&#x6743;&#x91CD;&#x968F;&#x673A;&#x521D;&#x59CB;&#x5316;&#x7684;&#x539F;&#x56E0;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-04-12"><span class="nav-number">3.</span> <span class="nav-text"><a href="#2019-04-12" class="headerlink" title="2019-04-12"></a>2019-04-12</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AdaGrad优化算法"><span class="nav-number">3.1.</span> <span class="nav-text"><a href="#AdaGrad&#x4F18;&#x5316;&#x7B97;&#x6CD5;" class="headerlink" title="AdaGrad&#x4F18;&#x5316;&#x7B97;&#x6CD5;"></a>AdaGrad&#x4F18;&#x5316;&#x7B97;&#x6CD5;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RMSProp优化算法"><span class="nav-number">3.2.</span> <span class="nav-text"><a href="#RMSProp&#x4F18;&#x5316;&#x7B97;&#x6CD5;" class="headerlink" title="RMSProp&#x4F18;&#x5316;&#x7B97;&#x6CD5;"></a>RMSProp&#x4F18;&#x5316;&#x7B97;&#x6CD5;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#带有Nesterov-Momentum-的RMSProp优化算法"><span class="nav-number">3.3.</span> <span class="nav-text"><a href="#&#x5E26;&#x6709;Nesterov-Momentum-&#x7684;RMSProp&#x4F18;&#x5316;&#x7B97;&#x6CD5;" class="headerlink" title="&#x5E26;&#x6709;Nesterov Momentum &#x7684;RMSProp&#x4F18;&#x5316;&#x7B97;&#x6CD5;"></a>&#x5E26;&#x6709;Nesterov Momentum &#x7684;RMSProp&#x4F18;&#x5316;&#x7B97;&#x6CD5;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Adam优化算法"><span class="nav-number">3.4.</span> <span class="nav-text"><a href="#Adam&#x4F18;&#x5316;&#x7B97;&#x6CD5;" class="headerlink" title="Adam&#x4F18;&#x5316;&#x7B97;&#x6CD5;"></a>Adam&#x4F18;&#x5316;&#x7B97;&#x6CD5;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#牛顿法"><span class="nav-number">3.5.</span> <span class="nav-text"><a href="#&#x725B;&#x987F;&#x6CD5;" class="headerlink" title="&#x725B;&#x987F;&#x6CD5;"></a>&#x725B;&#x987F;&#x6CD5;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2019-04-27"><span class="nav-number">4.</span> <span class="nav-text"><a href="#2019-04-27" class="headerlink" title="2019-04-27"></a>2019-04-27</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#论文：Feature-Selective-Anchor-Free-Module-for-Single-Shot-Object-Detection"><span class="nav-number">4.1.</span> <span class="nav-text"><a href="#&#x8BBA;&#x6587;&#xFF1A;Feature-Selective-Anchor-Free-Module-for-Single-Shot-Object-Detection" class="headerlink" title="&#x8BBA;&#x6587;&#xFF1A;Feature Selective Anchor-Free Module for Single-Shot Object Detection"></a>&#x8BBA;&#x6587;&#xFF1A;Feature Selective Anchor-Free Module for Single-Shot Object Detection</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#论文FCOS-Fully-Convolutional-One-Stage-Object-Detection"><span class="nav-number">4.2.</span> <span class="nav-text"><a href="#&#x8BBA;&#x6587;FCOS-Fully-Convolutional-One-Stage-Object-Detection" class="headerlink" title="&#x8BBA;&#x6587;FCOS: Fully Convolutional One-Stage Object Detection"></a>&#x8BBA;&#x6587;FCOS: Fully Convolutional One-Stage Object Detection</span></a></li></ol></li></ol></div>
             
 
           </div>
