@@ -88,7 +88,7 @@
 <meta property="og:description" content="模型修改方案针对anchor的修改 由于retinanet中原本将与gt的iou大于0.5的作为positive anchor，0.4~0.5之间的anchor直接忽视，小于0.4的作为negative anchor，这样得到的positive anchor还是太少，有些小目标被漏过，因此尝试将0.3的作为positive anchor， 0.2~0.3之间的anchor直接忽视，小于0.2的作为">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://sutomorrow.github.io/2019/03/12/乳腺癌症检测实验日志/anchor匹配统计.png">
-<meta property="og:updated_time" content="2019-04-27T11:52:22.793Z">
+<meta property="og:updated_time" content="2019-07-04T11:41:02.632Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="乳腺癌症检测实验日志">
 <meta name="twitter:description" content="模型修改方案针对anchor的修改 由于retinanet中原本将与gt的iou大于0.5的作为positive anchor，0.4~0.5之间的anchor直接忽视，小于0.4的作为negative anchor，这样得到的positive anchor还是太少，有些小目标被漏过，因此尝试将0.3的作为positive anchor， 0.2~0.3之间的anchor直接忽视，小于0.2的作为">
@@ -399,8 +399,698 @@
 </li>
 </ul>
 <h2 id="针对nms操作的修改"><a href="#针对nms操作的修改" class="headerlink" title="针对nms操作的修改"></a>针对nms操作的修改</h2><p>将常规的nms操作改成soft nms.</p>
-<h2 id="anchor-free分支"><a href="#anchor-free分支" class="headerlink" title="anchor-free分支"></a>anchor-free分支</h2><p>根据Feature Selective Anchor-Free Module for Single-Shot Object Detection论文，对retinanet进行anchor-free分支的修改。</p>
-<p>以下是在离线随机掩码+随机扭曲的增强数据上进行的实验<br>|loss gamma|loss alpha|loss lambda|anchor比例|normal样本|initial lr|fold num|fold|froc|<br>|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|<br>|2.0|0.5|0.5|1|No|1e-5|2|0|82.37|<br>|2.0|0.5|0.5|1|No|1e-5|2|1|90.71|<br>|2.0|0.5|1.0|1|No|1e-5|2|0|86.78|<br>|2.0|0.5|1.0|1|No|1e-5|2|1|91.43|<br>|2.0|0.5|0.5|0.5、1、2|No|1e-5|2|0|83.39|<br>|2.0|0.5|1.0|0.5、1、2|No|1e-5|2|0|83.39|</p>
+<h2 id="anchor-free分支，代码分支：master"><a href="#anchor-free分支，代码分支：master" class="headerlink" title="anchor-free分支，代码分支：master"></a>anchor-free分支，代码分支：master</h2><p>根据Feature Selective Anchor-Free Module for Single-Shot Object Detection论文，对retinanet进行anchor-free分支的修改。</p>
+<p>以下是在离线随机掩码+随机扭曲的增强数据上进行的实验<br>|loss gamma|loss alpha|loss lambda|epsilon_e|epsilon_i|anchor比例|normal样本|initial lr|fold num|fold|froc|<br>|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|<br>|2.0|0.5|0.5|0.2|0.5|1|No|1e-5|2|0|82.37|<br>|2.0|0.5|0.5|0.2|0.5|1|No|1e-5|2|1|90.71|<br>|2.0|0.5|1.0|0.2|0.5|1|No|1e-5|2|0|86.78|<br>|2.0|0.5|1.0|0.2|0.5|1|No|1e-5|2|1|91.43|<br>|2.0|0.5|0.5|0.2|0.5|0.5、1、2|No|1e-5|2|0|83.39|<br>|2.0|0.5|1.0|0.2|0.5|0.5、1、2|No|1e-5|2|0|83.39|<br>|2.0|0.5|1.0|0.4|0.5|1|No|1e-5|2|0|83.78|<br>|2.0|0.5|1.0|0.6|0.8|1|No|1e-5|2|0|81.36|<br>|2.0|0.5|1.0|0.8|1.0|1|No|1e-5|2|0|83.39|<br>|2.0|0.5|1.0|1.0|1.0|1|No|1e-5|2|0|86.78|<br>|2.0|0.5|1.0|1.0|1.0|1|No|1e-5|2|1|88.93|<br>|2.0|0.5|1.5|1.0|1.0|1|No|1e-5|2|0|82.71|</p>
+<p>尝试去掉四个模糊样本之后训练（测试集不去掉）<br>|loss gamma|loss alpha|loss lambda|epsilon_e|epsilon_i|anchor比例|normal样本|initial lr|fold num|fold|froc|<br>|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|<br>|2.0|0.5|1.0|1.0|1.0|1|No|1e-5|2|0|84.41|</p>
+<p>以下是将C5替换成P5之后，在离线随机掩码+随机扭曲的增强数据上进行的实验<br>|loss gamma|loss alpha|loss lambda|epsilon_e|epsilon_i|anchor比例|normal样本|initial lr|fold num|fold|froc|<br>|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|<br>|2.0|0.5|1.0|1.0|1.0|1|No|1e-5|2|0||<br>|2.0|0.5|1.0|1.0|1.0|1|No|1e-5|2|1||</p>
+<p>使用小样本复制+小样本图片过采样训练得到的结果<br>|loss gamma|loss alpha|loss lambda|epsilon_e|epsilon_i|anchor比例|normal样本|initial lr|fold num|fold|froc|<br>|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|:———:|<br>|2.0|0.5|1.0|0.2|0.5|1|No|1e-5|2|0|85.42|</p>
+<h2 id="在分类子网络中加入center-ness分支，代码分支：center-ness"><a href="#在分类子网络中加入center-ness分支，代码分支：center-ness" class="headerlink" title="在分类子网络中加入center-ness分支，代码分支：center_ness"></a>在分类子网络中加入center-ness分支，代码分支：center_ness</h2><p>center-ness分支的初始化，和anchor-based的分类层相同：<br>|epsilon_e|epsilon_i|loss lambda|loss for center-ness|replace C5 with P5|froc|<br>|:———:|:———:|:———:|:———:|:———:|:———:|<br>|1.0|1.0|1.0|binary crossentropy|No|82.03|<br>|1.0|1.0|1.0|huber without negative|No|85.76|<br>|1.0|1.0|1.0|binary crossentropy|Yes|85.76|<br>|1.0|1.0|1.0|binary crossentropy without negative|Yes|84.07|<br>|1.0|1.0|1.0|huber without negative|Yes|82.71|<br>|1.0|1.0|1.0|huber with negative|Yes|center-ness目标类别极度不平衡，训练后center-ness输出全0，导致anchor-free分支无输出|</p>
+<p>center-ness分支的初始化使用keras默认参数：<br>|epsilon_e|epsilon_i|loss lambda|loss for center-ness|replace C5 with P5|froc|<br>|:———:|:———:|:———:|:———:|:———:|:———:|<br>|1.0|1.0|1.0|huber without negative|Yes|83.39|</p>
+<p>使用huber without negative作为center-ness分支的损失函数，同时使用P5替换C5来产生P6，训练损失函数的比例大概如下：</p>
+<p>anchor_regression : anchor_classification : anchor-free : center-ness = 2.5 : 2 : 2: 0.02</p>
+<p>因此尝试在各个损失值以及学习速率上乘上一个常数因子，达到平衡损失值，同时又不改变更新步长的效果。<br>实验如下：<br>|anchor_regression|anchor_classification|anchor-free|center-ness|lr|froc|<br>|:———:|:———:|:———:|:———:|:———:|:———:|<br>|0.4|0.5|1|50|1.5|82.37|<br>|0.4|0.5|1|10|2||</p>
+<p>使用binary crossentropy作为center-ness分支的损失函数，同时使用P5替换C5来产生P6，调整损失函数比例如下：<br>|anchor_regression|anchor_classification|anchor-free|center-ness|lr|froc|<br>|:———:|:———:|:———:|:———:|:———:|:———:|<br>|1|1|1|50|1|84.07|</p>
+<h2 id="在回归子网络中加入center-ness分支，代码分支：center-ness-from-reg-branch"><a href="#在回归子网络中加入center-ness分支，代码分支：center-ness-from-reg-branch" class="headerlink" title="在回归子网络中加入center-ness分支，代码分支：center_ness_from_reg_branch"></a>在回归子网络中加入center-ness分支，代码分支：center_ness_from_reg_branch</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">epsilon_e</th>
+<th style="text-align:center">epsilon_i</th>
+<th style="text-align:center">loss lambda</th>
+<th style="text-align:center">loss for center-ness</th>
+<th style="text-align:center">replace C5 with P5</th>
+<th style="text-align:center">fold</th>
+<th style="text-align:center">froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">huber without negative</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">85.76</td>
+</tr>
+<tr>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">binary crossentropy</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">88.14</td>
+</tr>
+<tr>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">binary crossentropy</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">88.21</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="FCOS论文-anchor-based分支，代码分支：fcos-with-anchor"><a href="#FCOS论文-anchor-based分支，代码分支：fcos-with-anchor" class="headerlink" title="FCOS论文+anchor-based分支，代码分支：fcos_with_anchor"></a>FCOS论文+anchor-based分支，代码分支：fcos_with_anchor</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">loss for center-ness</th>
+<th style="text-align:center">replace C5 with P5</th>
+<th style="text-align:center">fold</th>
+<th style="text-align:center">froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">binary crossentropy</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">82.03</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="尝试完全使用FCOS论文中的想法，不要anchor-free分支，代码分支：fcos"><a href="#尝试完全使用FCOS论文中的想法，不要anchor-free分支，代码分支：fcos" class="headerlink" title="尝试完全使用FCOS论文中的想法，不要anchor-free分支，代码分支：fcos"></a>尝试完全使用FCOS论文中的想法，不要anchor-free分支，代码分支：fcos</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">loss for center-ness</th>
+<th style="text-align:center">replace C5 with P5</th>
+<th style="text-align:center">fold</th>
+<th style="text-align:center">froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">binary crossentropy</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">83.73</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="尝试classification和regression两个分支都进行center-ness预测，最终取平均，代码分支：center-ness-average"><a href="#尝试classification和regression两个分支都进行center-ness预测，最终取平均，代码分支：center-ness-average" class="headerlink" title="尝试classification和regression两个分支都进行center-ness预测，最终取平均，代码分支：center_ness_average"></a>尝试classification和regression两个分支都进行center-ness预测，最终取平均，代码分支：center_ness_average</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">loss for center-ness</th>
+<th style="text-align:center">replace C5 with P5</th>
+<th style="text-align:center">fold</th>
+<th style="text-align:center">froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">binary crossentropy</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">87.46</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="尝试center-ness和classification相乘之后再计算classification-loss-训练目标也是相乘之后的-，代码分支：center-ness-train-with-classification"><a href="#尝试center-ness和classification相乘之后再计算classification-loss-训练目标也是相乘之后的-，代码分支：center-ness-train-with-classification" class="headerlink" title="尝试center-ness和classification相乘之后再计算classification loss(训练目标也是相乘之后的)，代码分支：center_ness_train_with_classification"></a>尝试center-ness和classification相乘之后再计算classification loss(训练目标也是相乘之后的)，代码分支：center_ness_train_with_classification</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">loss for center-ness</th>
+<th style="text-align:center">loss for anchor-free classification</th>
+<th style="text-align:center">replace C5 with P5</th>
+<th style="text-align:center">fold</th>
+<th style="text-align:center">froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">binary crossentropy</td>
+<td style="text-align:center">focal</td>
+<td style="text-align:center">Yes</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">84.07</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="尝试使用局部区域缩放方法进行数据增强，在不加center-ness的网络上实验"><a href="#尝试使用局部区域缩放方法进行数据增强，在不加center-ness的网络上实验" class="headerlink" title="尝试使用局部区域缩放方法进行数据增强，在不加center_ness的网络上实验"></a>尝试使用局部区域缩放方法进行数据增强，在不加center_ness的网络上实验</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">loss gamma</th>
+<th style="text-align:center">loss alpha</th>
+<th style="text-align:center">loss lambda</th>
+<th style="text-align:center">epsilon_e</th>
+<th style="text-align:center">epsilon_i</th>
+<th style="text-align:center">anchor比例</th>
+<th style="text-align:center">normal样本</th>
+<th style="text-align:center">initial lr</th>
+<th style="text-align:center">fold num</th>
+<th style="text-align:center">fold</th>
+<th style="text-align:center">froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">80.00</td>
+</tr>
+<tr>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">90.71</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="发现加随机噪声会对检测有干扰，因此在训练过程中，添加随机擦除，在不加center-ness的网络上实验"><a href="#发现加随机噪声会对检测有干扰，因此在训练过程中，添加随机擦除，在不加center-ness的网络上实验" class="headerlink" title="发现加随机噪声会对检测有干扰，因此在训练过程中，添加随机擦除，在不加center_ness的网络上实验"></a>发现加随机噪声会对检测有干扰，因此在训练过程中，添加随机擦除，在不加center_ness的网络上实验</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">loss gamma</th>
+<th style="text-align:center">loss alpha</th>
+<th style="text-align:center">loss lambda</th>
+<th style="text-align:center">epsilon_e</th>
+<th style="text-align:center">epsilon_i</th>
+<th style="text-align:center">anchor比例</th>
+<th style="text-align:center">normal样本</th>
+<th style="text-align:center">initial lr</th>
+<th style="text-align:center">fold num</th>
+<th style="text-align:center">fold</th>
+<th style="text-align:center">froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">85.42</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="发现扭曲之后的样本可以检测到，扭曲之前的样本检测不到，因此尝试丢弃掉一部分使用了随机扭曲的样本，在不加center-ness的网络上实验"><a href="#发现扭曲之后的样本可以检测到，扭曲之前的样本检测不到，因此尝试丢弃掉一部分使用了随机扭曲的样本，在不加center-ness的网络上实验" class="headerlink" title="发现扭曲之后的样本可以检测到，扭曲之前的样本检测不到，因此尝试丢弃掉一部分使用了随机扭曲的样本，在不加center_ness的网络上实验"></a>发现扭曲之后的样本可以检测到，扭曲之前的样本检测不到，因此尝试丢弃掉一部分使用了随机扭曲的样本，在不加center_ness的网络上实验</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">丢弃方式</th>
+<th style="text-align:center">loss gamma</th>
+<th style="text-align:center">loss alpha</th>
+<th style="text-align:center">loss lambda</th>
+<th style="text-align:center">epsilon_e</th>
+<th style="text-align:center">epsilon_i</th>
+<th style="text-align:center">anchor比例</th>
+<th style="text-align:center">normal样本</th>
+<th style="text-align:center">initial lr</th>
+<th style="text-align:center">fold num</th>
+<th style="text-align:center">fold</th>
+<th style="text-align:center">froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">丢弃只做随机扭曲的1/4样本</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">82.37</td>
+</tr>
+<tr>
+<td style="text-align:center">丢弃只做随机扭曲的1/4样本</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">86.79</td>
+</tr>
+<tr>
+<td style="text-align:center">丢弃所有既有随机掩码又有随机扭曲的样本</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">82.37</td>
+</tr>
+<tr>
+<td style="text-align:center">丢弃所有既有随机掩码又有随机扭曲的样本</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">88.93</td>
+</tr>
+<tr>
+<td style="text-align:center">重新在随机掩码数据上生成数据，只做一次随机扭曲</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">80.68</td>
+</tr>
+<tr>
+<td style="text-align:center">不增强数据，过采样四次原始数据</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">82.37</td>
+</tr>
+<tr>
+<td style="text-align:center">不增强数据，过采样四次原始数据</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">86.07</td>
+</tr>
+<tr>
+<td style="text-align:center">丢弃掉随机扭曲且随机掩码的样本，添加只使用局部缩放的样本</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">81.36</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="加入segment分支，-在离线随机掩码-随机扭曲的增强数据上进行的实验"><a href="#加入segment分支，-在离线随机掩码-随机扭曲的增强数据上进行的实验" class="headerlink" title="加入segment分支， 在离线随机掩码+随机扭曲的增强数据上进行的实验"></a>加入segment分支， 在离线随机掩码+随机扭曲的增强数据上进行的实验</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">方式</th>
+<th style="text-align:center">loss gamma</th>
+<th style="text-align:center">loss alpha</th>
+<th style="text-align:center">loss lambda</th>
+<th style="text-align:center">epsilon_e</th>
+<th style="text-align:center">epsilon_i</th>
+<th style="text-align:center">anchor比例</th>
+<th style="text-align:center">normal样本</th>
+<th style="text-align:center">initial lr</th>
+<th style="text-align:center">fold num</th>
+<th style="text-align:center">fold</th>
+<th style="text-align:center">froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">所有的feature level一起计算dice loss</td>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">85.76</td>
+</tr>
+<tr>
+<td style="text-align:center">所有的feature level一起计算dice loss</td>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">90.00</td>
+</tr>
+<tr>
+<td style="text-align:center">每个feature level单独计算dice loss</td>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">83.05</td>
+</tr>
+<tr>
+<td style="text-align:center">每个feature level单独计算dice loss</td>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">88.21</td>
+</tr>
+<tr>
+<td style="text-align:center">每个feature level单独计算dice loss，新建分割分支</td>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">每个feature level单独计算dice loss，新建分割分支</td>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">只用feature P3分割，新建分割分支</td>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">83.39</td>
+</tr>
+<tr>
+<td style="text-align:center">只用feature P3分割，新建分割分支</td>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">只用feature P3分割</td>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">85.09</td>
+</tr>
+<tr>
+<td style="text-align:center">只用feature P3分割</td>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="使用soft-nms，-在离线随机掩码-随机扭曲的增强数据上进行的实验-代码分支：soft-nms"><a href="#使用soft-nms，-在离线随机掩码-随机扭曲的增强数据上进行的实验-代码分支：soft-nms" class="headerlink" title="使用soft nms， 在离线随机掩码+随机扭曲的增强数据上进行的实验, 代码分支：soft-nms"></a>使用soft nms， 在离线随机掩码+随机扭曲的增强数据上进行的实验, 代码分支：soft-nms</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">方式</th>
+<th style="text-align:center">loss gamma</th>
+<th style="text-align:center">loss alpha</th>
+<th style="text-align:center">loss lambda</th>
+<th style="text-align:center">epsilon_e</th>
+<th style="text-align:center">epsilon_i</th>
+<th style="text-align:center">anchor比例</th>
+<th style="text-align:center">normal样本</th>
+<th style="text-align:center">initial lr</th>
+<th style="text-align:center">fold num</th>
+<th style="text-align:center">fold</th>
+<th style="text-align:center">froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">选score最高的300个预测结果，进行soft-nms</td>
+<td style="text-align:center">2.0</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1.0</td>
+<td style="text-align:center">0.2</td>
+<td style="text-align:center">0.5</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">No</td>
+<td style="text-align:center">1e-5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">83.39</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="尝试在特征金字塔构造时加入Attention-Gate，代码分支：AG"><a href="#尝试在特征金字塔构造时加入Attention-Gate，代码分支：AG" class="headerlink" title="尝试在特征金字塔构造时加入Attention Gate，代码分支：AG"></a>尝试在特征金字塔构造时加入Attention Gate，代码分支：AG</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center">方式</th>
+<th style="text-align:center">fold num</th>
+<th style="text-align:center">fold</th>
+<th style="text-align:center">froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1*1卷积下采样，在add之前进行AG并在Add之后进行concat</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">83.05</td>
+</tr>
+<tr>
+<td style="text-align:center">1*1卷积下采样，在add之后进行AG并concat</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">86.10</td>
+</tr>
+<tr>
+<td style="text-align:center">1*1卷积下采样，在add之后进行AG并作为特征层，不concat</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">84.41</td>
+</tr>
+<tr>
+<td style="text-align:center">3*3卷积下采样，在add之后进行AG并concat</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">84.41</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="尝试将传统方法数据增强程度调小，并去掉y轴翻转，修复负的box坐标问题，代码分支：best-v1-0-fix-neg"><a href="#尝试将传统方法数据增强程度调小，并去掉y轴翻转，修复负的box坐标问题，代码分支：best-v1-0-fix-neg" class="headerlink" title="尝试将传统方法数据增强程度调小，并去掉y轴翻转，修复负的box坐标问题，代码分支：best_v1_0_fix_neg"></a>尝试将传统方法数据增强程度调小，并去掉y轴翻转，修复负的box坐标问题，代码分支：best_v1_0_fix_neg</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">fold num</th>
+<th style="text-align:center">fold</th>
+<th>froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td>87.12</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td>88.57</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="尝试去掉y轴翻转，修复负的box坐标问题，代码分支：best-v1-0-no-flip-y"><a href="#尝试去掉y轴翻转，修复负的box坐标问题，代码分支：best-v1-0-no-flip-y" class="headerlink" title="尝试去掉y轴翻转，修复负的box坐标问题，代码分支：best_v1_0_no_flip_y"></a>尝试去掉y轴翻转，修复负的box坐标问题，代码分支：best_v1_0_no_flip_y</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">fold num</th>
+<th style="text-align:center">fold</th>
+<th>froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td>86.10</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td>90.00</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="预测训练集和测试集的normal样本，将预测概率大于0-3的预测框多于等于1个的normal样本算作错误normal样本，进行hard-negativate-mining，主要代码：predict-train-set-ipynb"><a href="#预测训练集和测试集的normal样本，将预测概率大于0-3的预测框多于等于1个的normal样本算作错误normal样本，进行hard-negativate-mining，主要代码：predict-train-set-ipynb" class="headerlink" title="预测训练集和测试集的normal样本，将预测概率大于0.3的预测框多于等于1个的normal样本算作错误normal样本，进行hard negativate mining，主要代码：predict_train_set.ipynb"></a>预测训练集和测试集的normal样本，将预测概率大于0.3的预测框多于等于1个的normal样本算作错误normal样本，进行hard negativate mining，主要代码：predict_train_set.ipynb</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">fold num</th>
+<th style="text-align:center">fold</th>
+<th>froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td>0.7661</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td>0.8429</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="考虑到只随机扭曲mass区域会被模型学习到随机扭曲的特征，因此尝试在没有mass的区域随机画个圆形进行随机扭曲，并使用上采样p6-p7的模型进行训练，效果非常好，主要代码：分支：p6-p7-upsample-data-process-v1-2-ipynb"><a href="#考虑到只随机扭曲mass区域会被模型学习到随机扭曲的特征，因此尝试在没有mass的区域随机画个圆形进行随机扭曲，并使用上采样p6-p7的模型进行训练，效果非常好，主要代码：分支：p6-p7-upsample-data-process-v1-2-ipynb" class="headerlink" title="考虑到只随机扭曲mass区域会被模型学习到随机扭曲的特征，因此尝试在没有mass的区域随机画个圆形进行随机扭曲，并使用上采样p6 p7的模型进行训练，效果非常好，主要代码：分支：p6_p7_upsample data_process_v1.2.ipynb"></a>考虑到只随机扭曲mass区域会被模型学习到随机扭曲的特征，因此尝试在没有mass的区域随机画个圆形进行随机扭曲，并使用上采样p6 p7的模型进行训练，效果非常好，主要代码：分支：p6_p7_upsample data_process_v1.2.ipynb</h2><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">fold num</th>
+<th style="text-align:center">fold</th>
+<th>froc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td>0.8927</td>
+<td></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td>0.9524</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id="假阳性减少"><a href="#假阳性减少" class="headerlink" title="假阳性减少"></a>假阳性减少</h1><p>使用基于roi的分割模型，预测每一个检测框，预测掩码非零值与检测框的dice &gt; 0.7则将此检测框保留，其score调整为分割掩码的平均值，否则丢弃检测框，这样做有一定效果，recall 0.91时，fppi可以下降到0.37了。</p>
 <h1 id="数据增强"><a href="#数据增强" class="headerlink" title="数据增强"></a>数据增强</h1><h2 id="在线数据增强"><a href="#在线数据增强" class="headerlink" title="在线数据增强"></a>在线数据增强</h2><div class="table-container">
 <table>
 <thead>
@@ -1356,7 +2046,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">19</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1378,7 +2068,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -1411,7 +2101,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#模型修改方案"><span class="nav-number">1.</span> <span class="nav-text"><a href="#&#x6A21;&#x578B;&#x4FEE;&#x6539;&#x65B9;&#x6848;" class="headerlink" title="&#x6A21;&#x578B;&#x4FEE;&#x6539;&#x65B9;&#x6848;"></a>&#x6A21;&#x578B;&#x4FEE;&#x6539;&#x65B9;&#x6848;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#针对anchor的修改"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x9488;&#x5BF9;anchor&#x7684;&#x4FEE;&#x6539;" class="headerlink" title="&#x9488;&#x5BF9;anchor&#x7684;&#x4FEE;&#x6539;"></a>&#x9488;&#x5BF9;anchor&#x7684;&#x4FEE;&#x6539;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#针对nms操作的修改"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#&#x9488;&#x5BF9;nms&#x64CD;&#x4F5C;&#x7684;&#x4FEE;&#x6539;" class="headerlink" title="&#x9488;&#x5BF9;nms&#x64CD;&#x4F5C;&#x7684;&#x4FEE;&#x6539;"></a>&#x9488;&#x5BF9;nms&#x64CD;&#x4F5C;&#x7684;&#x4FEE;&#x6539;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#anchor-free分支"><span class="nav-number">1.3.</span> <span class="nav-text"><a href="#anchor-free&#x5206;&#x652F;" class="headerlink" title="anchor-free&#x5206;&#x652F;"></a>anchor-free&#x5206;&#x652F;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据增强"><span class="nav-number">2.</span> <span class="nav-text"><a href="#&#x6570;&#x636E;&#x589E;&#x5F3A;" class="headerlink" title="&#x6570;&#x636E;&#x589E;&#x5F3A;"></a>&#x6570;&#x636E;&#x589E;&#x5F3A;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#在线数据增强"><span class="nav-number">2.1.</span> <span class="nav-text"><a href="#&#x5728;&#x7EBF;&#x6570;&#x636E;&#x589E;&#x5F3A;" class="headerlink" title="&#x5728;&#x7EBF;&#x6570;&#x636E;&#x589E;&#x5F3A;"></a>&#x5728;&#x7EBF;&#x6570;&#x636E;&#x589E;&#x5F3A;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#离线数据增强"><span class="nav-number">2.2.</span> <span class="nav-text"><a href="#&#x79BB;&#x7EBF;&#x6570;&#x636E;&#x589E;&#x5F3A;" class="headerlink" title="&#x79BB;&#x7EBF;&#x6570;&#x636E;&#x589E;&#x5F3A;"></a>&#x79BB;&#x7EBF;&#x6570;&#x636E;&#x589E;&#x5F3A;</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#模型修改方案"><span class="nav-number">1.</span> <span class="nav-text"><a href="#&#x6A21;&#x578B;&#x4FEE;&#x6539;&#x65B9;&#x6848;" class="headerlink" title="&#x6A21;&#x578B;&#x4FEE;&#x6539;&#x65B9;&#x6848;"></a>&#x6A21;&#x578B;&#x4FEE;&#x6539;&#x65B9;&#x6848;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#针对anchor的修改"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x9488;&#x5BF9;anchor&#x7684;&#x4FEE;&#x6539;" class="headerlink" title="&#x9488;&#x5BF9;anchor&#x7684;&#x4FEE;&#x6539;"></a>&#x9488;&#x5BF9;anchor&#x7684;&#x4FEE;&#x6539;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#针对nms操作的修改"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#&#x9488;&#x5BF9;nms&#x64CD;&#x4F5C;&#x7684;&#x4FEE;&#x6539;" class="headerlink" title="&#x9488;&#x5BF9;nms&#x64CD;&#x4F5C;&#x7684;&#x4FEE;&#x6539;"></a>&#x9488;&#x5BF9;nms&#x64CD;&#x4F5C;&#x7684;&#x4FEE;&#x6539;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#anchor-free分支，代码分支：master"><span class="nav-number">1.3.</span> <span class="nav-text"><a href="#anchor-free&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;master" class="headerlink" title="anchor-free&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;master"></a>anchor-free&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;master</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在分类子网络中加入center-ness分支，代码分支：center-ness"><span class="nav-number">1.4.</span> <span class="nav-text"><a href="#&#x5728;&#x5206;&#x7C7B;&#x5B50;&#x7F51;&#x7EDC;&#x4E2D;&#x52A0;&#x5165;center-ness&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;center-ness" class="headerlink" title="&#x5728;&#x5206;&#x7C7B;&#x5B50;&#x7F51;&#x7EDC;&#x4E2D;&#x52A0;&#x5165;center-ness&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;center_ness"></a>&#x5728;&#x5206;&#x7C7B;&#x5B50;&#x7F51;&#x7EDC;&#x4E2D;&#x52A0;&#x5165;center-ness&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;center_ness</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在回归子网络中加入center-ness分支，代码分支：center-ness-from-reg-branch"><span class="nav-number">1.5.</span> <span class="nav-text"><a href="#&#x5728;&#x56DE;&#x5F52;&#x5B50;&#x7F51;&#x7EDC;&#x4E2D;&#x52A0;&#x5165;center-ness&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;center-ness-from-reg-branch" class="headerlink" title="&#x5728;&#x56DE;&#x5F52;&#x5B50;&#x7F51;&#x7EDC;&#x4E2D;&#x52A0;&#x5165;center-ness&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;center_ness_from_reg_branch"></a>&#x5728;&#x56DE;&#x5F52;&#x5B50;&#x7F51;&#x7EDC;&#x4E2D;&#x52A0;&#x5165;center-ness&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;center_ness_from_reg_branch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FCOS论文-anchor-based分支，代码分支：fcos-with-anchor"><span class="nav-number">1.6.</span> <span class="nav-text"><a href="#FCOS&#x8BBA;&#x6587;-anchor-based&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;fcos-with-anchor" class="headerlink" title="FCOS&#x8BBA;&#x6587;+anchor-based&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;fcos_with_anchor"></a>FCOS&#x8BBA;&#x6587;+anchor-based&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;fcos_with_anchor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#尝试完全使用FCOS论文中的想法，不要anchor-free分支，代码分支：fcos"><span class="nav-number">1.7.</span> <span class="nav-text"><a href="#&#x5C1D;&#x8BD5;&#x5B8C;&#x5168;&#x4F7F;&#x7528;FCOS&#x8BBA;&#x6587;&#x4E2D;&#x7684;&#x60F3;&#x6CD5;&#xFF0C;&#x4E0D;&#x8981;anchor-free&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;fcos" class="headerlink" title="&#x5C1D;&#x8BD5;&#x5B8C;&#x5168;&#x4F7F;&#x7528;FCOS&#x8BBA;&#x6587;&#x4E2D;&#x7684;&#x60F3;&#x6CD5;&#xFF0C;&#x4E0D;&#x8981;anchor-free&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;fcos"></a>&#x5C1D;&#x8BD5;&#x5B8C;&#x5168;&#x4F7F;&#x7528;FCOS&#x8BBA;&#x6587;&#x4E2D;&#x7684;&#x60F3;&#x6CD5;&#xFF0C;&#x4E0D;&#x8981;anchor-free&#x5206;&#x652F;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;fcos</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#尝试classification和regression两个分支都进行center-ness预测，最终取平均，代码分支：center-ness-average"><span class="nav-number">1.8.</span> <span class="nav-text"><a href="#&#x5C1D;&#x8BD5;classification&#x548C;regression&#x4E24;&#x4E2A;&#x5206;&#x652F;&#x90FD;&#x8FDB;&#x884C;center-ness&#x9884;&#x6D4B;&#xFF0C;&#x6700;&#x7EC8;&#x53D6;&#x5E73;&#x5747;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;center-ness-average" class="headerlink" title="&#x5C1D;&#x8BD5;classification&#x548C;regression&#x4E24;&#x4E2A;&#x5206;&#x652F;&#x90FD;&#x8FDB;&#x884C;center-ness&#x9884;&#x6D4B;&#xFF0C;&#x6700;&#x7EC8;&#x53D6;&#x5E73;&#x5747;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;center_ness_average"></a>&#x5C1D;&#x8BD5;classification&#x548C;regression&#x4E24;&#x4E2A;&#x5206;&#x652F;&#x90FD;&#x8FDB;&#x884C;center-ness&#x9884;&#x6D4B;&#xFF0C;&#x6700;&#x7EC8;&#x53D6;&#x5E73;&#x5747;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;center_ness_average</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#尝试center-ness和classification相乘之后再计算classification-loss-训练目标也是相乘之后的-，代码分支：center-ness-train-with-classification"><span class="nav-number">1.9.</span> <span class="nav-text"><a href="#&#x5C1D;&#x8BD5;center-ness&#x548C;classification&#x76F8;&#x4E58;&#x4E4B;&#x540E;&#x518D;&#x8BA1;&#x7B97;classification-loss-&#x8BAD;&#x7EC3;&#x76EE;&#x6807;&#x4E5F;&#x662F;&#x76F8;&#x4E58;&#x4E4B;&#x540E;&#x7684;-&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;center-ness-train-with-classification" class="headerlink" title="&#x5C1D;&#x8BD5;center-ness&#x548C;classification&#x76F8;&#x4E58;&#x4E4B;&#x540E;&#x518D;&#x8BA1;&#x7B97;classification loss(&#x8BAD;&#x7EC3;&#x76EE;&#x6807;&#x4E5F;&#x662F;&#x76F8;&#x4E58;&#x4E4B;&#x540E;&#x7684;)&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;center_ness_train_with_classification"></a>&#x5C1D;&#x8BD5;center-ness&#x548C;classification&#x76F8;&#x4E58;&#x4E4B;&#x540E;&#x518D;&#x8BA1;&#x7B97;classification loss(&#x8BAD;&#x7EC3;&#x76EE;&#x6807;&#x4E5F;&#x662F;&#x76F8;&#x4E58;&#x4E4B;&#x540E;&#x7684;)&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;center_ness_train_with_classification</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#尝试使用局部区域缩放方法进行数据增强，在不加center-ness的网络上实验"><span class="nav-number">1.10.</span> <span class="nav-text"><a href="#&#x5C1D;&#x8BD5;&#x4F7F;&#x7528;&#x5C40;&#x90E8;&#x533A;&#x57DF;&#x7F29;&#x653E;&#x65B9;&#x6CD5;&#x8FDB;&#x884C;&#x6570;&#x636E;&#x589E;&#x5F3A;&#xFF0C;&#x5728;&#x4E0D;&#x52A0;center-ness&#x7684;&#x7F51;&#x7EDC;&#x4E0A;&#x5B9E;&#x9A8C;" class="headerlink" title="&#x5C1D;&#x8BD5;&#x4F7F;&#x7528;&#x5C40;&#x90E8;&#x533A;&#x57DF;&#x7F29;&#x653E;&#x65B9;&#x6CD5;&#x8FDB;&#x884C;&#x6570;&#x636E;&#x589E;&#x5F3A;&#xFF0C;&#x5728;&#x4E0D;&#x52A0;center_ness&#x7684;&#x7F51;&#x7EDC;&#x4E0A;&#x5B9E;&#x9A8C;"></a>&#x5C1D;&#x8BD5;&#x4F7F;&#x7528;&#x5C40;&#x90E8;&#x533A;&#x57DF;&#x7F29;&#x653E;&#x65B9;&#x6CD5;&#x8FDB;&#x884C;&#x6570;&#x636E;&#x589E;&#x5F3A;&#xFF0C;&#x5728;&#x4E0D;&#x52A0;center_ness&#x7684;&#x7F51;&#x7EDC;&#x4E0A;&#x5B9E;&#x9A8C;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发现加随机噪声会对检测有干扰，因此在训练过程中，添加随机擦除，在不加center-ness的网络上实验"><span class="nav-number">1.11.</span> <span class="nav-text"><a href="#&#x53D1;&#x73B0;&#x52A0;&#x968F;&#x673A;&#x566A;&#x58F0;&#x4F1A;&#x5BF9;&#x68C0;&#x6D4B;&#x6709;&#x5E72;&#x6270;&#xFF0C;&#x56E0;&#x6B64;&#x5728;&#x8BAD;&#x7EC3;&#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C;&#x6DFB;&#x52A0;&#x968F;&#x673A;&#x64E6;&#x9664;&#xFF0C;&#x5728;&#x4E0D;&#x52A0;center-ness&#x7684;&#x7F51;&#x7EDC;&#x4E0A;&#x5B9E;&#x9A8C;" class="headerlink" title="&#x53D1;&#x73B0;&#x52A0;&#x968F;&#x673A;&#x566A;&#x58F0;&#x4F1A;&#x5BF9;&#x68C0;&#x6D4B;&#x6709;&#x5E72;&#x6270;&#xFF0C;&#x56E0;&#x6B64;&#x5728;&#x8BAD;&#x7EC3;&#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C;&#x6DFB;&#x52A0;&#x968F;&#x673A;&#x64E6;&#x9664;&#xFF0C;&#x5728;&#x4E0D;&#x52A0;center_ness&#x7684;&#x7F51;&#x7EDC;&#x4E0A;&#x5B9E;&#x9A8C;"></a>&#x53D1;&#x73B0;&#x52A0;&#x968F;&#x673A;&#x566A;&#x58F0;&#x4F1A;&#x5BF9;&#x68C0;&#x6D4B;&#x6709;&#x5E72;&#x6270;&#xFF0C;&#x56E0;&#x6B64;&#x5728;&#x8BAD;&#x7EC3;&#x8FC7;&#x7A0B;&#x4E2D;&#xFF0C;&#x6DFB;&#x52A0;&#x968F;&#x673A;&#x64E6;&#x9664;&#xFF0C;&#x5728;&#x4E0D;&#x52A0;center_ness&#x7684;&#x7F51;&#x7EDC;&#x4E0A;&#x5B9E;&#x9A8C;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发现扭曲之后的样本可以检测到，扭曲之前的样本检测不到，因此尝试丢弃掉一部分使用了随机扭曲的样本，在不加center-ness的网络上实验"><span class="nav-number">1.12.</span> <span class="nav-text"><a href="#&#x53D1;&#x73B0;&#x626D;&#x66F2;&#x4E4B;&#x540E;&#x7684;&#x6837;&#x672C;&#x53EF;&#x4EE5;&#x68C0;&#x6D4B;&#x5230;&#xFF0C;&#x626D;&#x66F2;&#x4E4B;&#x524D;&#x7684;&#x6837;&#x672C;&#x68C0;&#x6D4B;&#x4E0D;&#x5230;&#xFF0C;&#x56E0;&#x6B64;&#x5C1D;&#x8BD5;&#x4E22;&#x5F03;&#x6389;&#x4E00;&#x90E8;&#x5206;&#x4F7F;&#x7528;&#x4E86;&#x968F;&#x673A;&#x626D;&#x66F2;&#x7684;&#x6837;&#x672C;&#xFF0C;&#x5728;&#x4E0D;&#x52A0;center-ness&#x7684;&#x7F51;&#x7EDC;&#x4E0A;&#x5B9E;&#x9A8C;" class="headerlink" title="&#x53D1;&#x73B0;&#x626D;&#x66F2;&#x4E4B;&#x540E;&#x7684;&#x6837;&#x672C;&#x53EF;&#x4EE5;&#x68C0;&#x6D4B;&#x5230;&#xFF0C;&#x626D;&#x66F2;&#x4E4B;&#x524D;&#x7684;&#x6837;&#x672C;&#x68C0;&#x6D4B;&#x4E0D;&#x5230;&#xFF0C;&#x56E0;&#x6B64;&#x5C1D;&#x8BD5;&#x4E22;&#x5F03;&#x6389;&#x4E00;&#x90E8;&#x5206;&#x4F7F;&#x7528;&#x4E86;&#x968F;&#x673A;&#x626D;&#x66F2;&#x7684;&#x6837;&#x672C;&#xFF0C;&#x5728;&#x4E0D;&#x52A0;center_ness&#x7684;&#x7F51;&#x7EDC;&#x4E0A;&#x5B9E;&#x9A8C;"></a>&#x53D1;&#x73B0;&#x626D;&#x66F2;&#x4E4B;&#x540E;&#x7684;&#x6837;&#x672C;&#x53EF;&#x4EE5;&#x68C0;&#x6D4B;&#x5230;&#xFF0C;&#x626D;&#x66F2;&#x4E4B;&#x524D;&#x7684;&#x6837;&#x672C;&#x68C0;&#x6D4B;&#x4E0D;&#x5230;&#xFF0C;&#x56E0;&#x6B64;&#x5C1D;&#x8BD5;&#x4E22;&#x5F03;&#x6389;&#x4E00;&#x90E8;&#x5206;&#x4F7F;&#x7528;&#x4E86;&#x968F;&#x673A;&#x626D;&#x66F2;&#x7684;&#x6837;&#x672C;&#xFF0C;&#x5728;&#x4E0D;&#x52A0;center_ness&#x7684;&#x7F51;&#x7EDC;&#x4E0A;&#x5B9E;&#x9A8C;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#加入segment分支，-在离线随机掩码-随机扭曲的增强数据上进行的实验"><span class="nav-number">1.13.</span> <span class="nav-text"><a href="#&#x52A0;&#x5165;segment&#x5206;&#x652F;&#xFF0C;-&#x5728;&#x79BB;&#x7EBF;&#x968F;&#x673A;&#x63A9;&#x7801;-&#x968F;&#x673A;&#x626D;&#x66F2;&#x7684;&#x589E;&#x5F3A;&#x6570;&#x636E;&#x4E0A;&#x8FDB;&#x884C;&#x7684;&#x5B9E;&#x9A8C;" class="headerlink" title="&#x52A0;&#x5165;segment&#x5206;&#x652F;&#xFF0C; &#x5728;&#x79BB;&#x7EBF;&#x968F;&#x673A;&#x63A9;&#x7801;+&#x968F;&#x673A;&#x626D;&#x66F2;&#x7684;&#x589E;&#x5F3A;&#x6570;&#x636E;&#x4E0A;&#x8FDB;&#x884C;&#x7684;&#x5B9E;&#x9A8C;"></a>&#x52A0;&#x5165;segment&#x5206;&#x652F;&#xFF0C; &#x5728;&#x79BB;&#x7EBF;&#x968F;&#x673A;&#x63A9;&#x7801;+&#x968F;&#x673A;&#x626D;&#x66F2;&#x7684;&#x589E;&#x5F3A;&#x6570;&#x636E;&#x4E0A;&#x8FDB;&#x884C;&#x7684;&#x5B9E;&#x9A8C;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用soft-nms，-在离线随机掩码-随机扭曲的增强数据上进行的实验-代码分支：soft-nms"><span class="nav-number">1.14.</span> <span class="nav-text"><a href="#&#x4F7F;&#x7528;soft-nms&#xFF0C;-&#x5728;&#x79BB;&#x7EBF;&#x968F;&#x673A;&#x63A9;&#x7801;-&#x968F;&#x673A;&#x626D;&#x66F2;&#x7684;&#x589E;&#x5F3A;&#x6570;&#x636E;&#x4E0A;&#x8FDB;&#x884C;&#x7684;&#x5B9E;&#x9A8C;-&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;soft-nms" class="headerlink" title="&#x4F7F;&#x7528;soft nms&#xFF0C; &#x5728;&#x79BB;&#x7EBF;&#x968F;&#x673A;&#x63A9;&#x7801;+&#x968F;&#x673A;&#x626D;&#x66F2;&#x7684;&#x589E;&#x5F3A;&#x6570;&#x636E;&#x4E0A;&#x8FDB;&#x884C;&#x7684;&#x5B9E;&#x9A8C;, &#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;soft-nms"></a>&#x4F7F;&#x7528;soft nms&#xFF0C; &#x5728;&#x79BB;&#x7EBF;&#x968F;&#x673A;&#x63A9;&#x7801;+&#x968F;&#x673A;&#x626D;&#x66F2;&#x7684;&#x589E;&#x5F3A;&#x6570;&#x636E;&#x4E0A;&#x8FDB;&#x884C;&#x7684;&#x5B9E;&#x9A8C;, &#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;soft-nms</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#尝试在特征金字塔构造时加入Attention-Gate，代码分支：AG"><span class="nav-number">1.15.</span> <span class="nav-text"><a href="#&#x5C1D;&#x8BD5;&#x5728;&#x7279;&#x5F81;&#x91D1;&#x5B57;&#x5854;&#x6784;&#x9020;&#x65F6;&#x52A0;&#x5165;Attention-Gate&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;AG" class="headerlink" title="&#x5C1D;&#x8BD5;&#x5728;&#x7279;&#x5F81;&#x91D1;&#x5B57;&#x5854;&#x6784;&#x9020;&#x65F6;&#x52A0;&#x5165;Attention Gate&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;AG"></a>&#x5C1D;&#x8BD5;&#x5728;&#x7279;&#x5F81;&#x91D1;&#x5B57;&#x5854;&#x6784;&#x9020;&#x65F6;&#x52A0;&#x5165;Attention Gate&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;AG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#尝试将传统方法数据增强程度调小，并去掉y轴翻转，修复负的box坐标问题，代码分支：best-v1-0-fix-neg"><span class="nav-number">1.16.</span> <span class="nav-text"><a href="#&#x5C1D;&#x8BD5;&#x5C06;&#x4F20;&#x7EDF;&#x65B9;&#x6CD5;&#x6570;&#x636E;&#x589E;&#x5F3A;&#x7A0B;&#x5EA6;&#x8C03;&#x5C0F;&#xFF0C;&#x5E76;&#x53BB;&#x6389;y&#x8F74;&#x7FFB;&#x8F6C;&#xFF0C;&#x4FEE;&#x590D;&#x8D1F;&#x7684;box&#x5750;&#x6807;&#x95EE;&#x9898;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;best-v1-0-fix-neg" class="headerlink" title="&#x5C1D;&#x8BD5;&#x5C06;&#x4F20;&#x7EDF;&#x65B9;&#x6CD5;&#x6570;&#x636E;&#x589E;&#x5F3A;&#x7A0B;&#x5EA6;&#x8C03;&#x5C0F;&#xFF0C;&#x5E76;&#x53BB;&#x6389;y&#x8F74;&#x7FFB;&#x8F6C;&#xFF0C;&#x4FEE;&#x590D;&#x8D1F;&#x7684;box&#x5750;&#x6807;&#x95EE;&#x9898;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;best_v1_0_fix_neg"></a>&#x5C1D;&#x8BD5;&#x5C06;&#x4F20;&#x7EDF;&#x65B9;&#x6CD5;&#x6570;&#x636E;&#x589E;&#x5F3A;&#x7A0B;&#x5EA6;&#x8C03;&#x5C0F;&#xFF0C;&#x5E76;&#x53BB;&#x6389;y&#x8F74;&#x7FFB;&#x8F6C;&#xFF0C;&#x4FEE;&#x590D;&#x8D1F;&#x7684;box&#x5750;&#x6807;&#x95EE;&#x9898;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;best_v1_0_fix_neg</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#尝试去掉y轴翻转，修复负的box坐标问题，代码分支：best-v1-0-no-flip-y"><span class="nav-number">1.17.</span> <span class="nav-text"><a href="#&#x5C1D;&#x8BD5;&#x53BB;&#x6389;y&#x8F74;&#x7FFB;&#x8F6C;&#xFF0C;&#x4FEE;&#x590D;&#x8D1F;&#x7684;box&#x5750;&#x6807;&#x95EE;&#x9898;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;best-v1-0-no-flip-y" class="headerlink" title="&#x5C1D;&#x8BD5;&#x53BB;&#x6389;y&#x8F74;&#x7FFB;&#x8F6C;&#xFF0C;&#x4FEE;&#x590D;&#x8D1F;&#x7684;box&#x5750;&#x6807;&#x95EE;&#x9898;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;best_v1_0_no_flip_y"></a>&#x5C1D;&#x8BD5;&#x53BB;&#x6389;y&#x8F74;&#x7FFB;&#x8F6C;&#xFF0C;&#x4FEE;&#x590D;&#x8D1F;&#x7684;box&#x5750;&#x6807;&#x95EE;&#x9898;&#xFF0C;&#x4EE3;&#x7801;&#x5206;&#x652F;&#xFF1A;best_v1_0_no_flip_y</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#预测训练集和测试集的normal样本，将预测概率大于0-3的预测框多于等于1个的normal样本算作错误normal样本，进行hard-negativate-mining，主要代码：predict-train-set-ipynb"><span class="nav-number">1.18.</span> <span class="nav-text"><a href="#&#x9884;&#x6D4B;&#x8BAD;&#x7EC3;&#x96C6;&#x548C;&#x6D4B;&#x8BD5;&#x96C6;&#x7684;normal&#x6837;&#x672C;&#xFF0C;&#x5C06;&#x9884;&#x6D4B;&#x6982;&#x7387;&#x5927;&#x4E8E;0-3&#x7684;&#x9884;&#x6D4B;&#x6846;&#x591A;&#x4E8E;&#x7B49;&#x4E8E;1&#x4E2A;&#x7684;normal&#x6837;&#x672C;&#x7B97;&#x4F5C;&#x9519;&#x8BEF;normal&#x6837;&#x672C;&#xFF0C;&#x8FDB;&#x884C;hard-negativate-mining&#xFF0C;&#x4E3B;&#x8981;&#x4EE3;&#x7801;&#xFF1A;predict-train-set-ipynb" class="headerlink" title="&#x9884;&#x6D4B;&#x8BAD;&#x7EC3;&#x96C6;&#x548C;&#x6D4B;&#x8BD5;&#x96C6;&#x7684;normal&#x6837;&#x672C;&#xFF0C;&#x5C06;&#x9884;&#x6D4B;&#x6982;&#x7387;&#x5927;&#x4E8E;0.3&#x7684;&#x9884;&#x6D4B;&#x6846;&#x591A;&#x4E8E;&#x7B49;&#x4E8E;1&#x4E2A;&#x7684;normal&#x6837;&#x672C;&#x7B97;&#x4F5C;&#x9519;&#x8BEF;normal&#x6837;&#x672C;&#xFF0C;&#x8FDB;&#x884C;hard negativate mining&#xFF0C;&#x4E3B;&#x8981;&#x4EE3;&#x7801;&#xFF1A;predict_train_set.ipynb"></a>&#x9884;&#x6D4B;&#x8BAD;&#x7EC3;&#x96C6;&#x548C;&#x6D4B;&#x8BD5;&#x96C6;&#x7684;normal&#x6837;&#x672C;&#xFF0C;&#x5C06;&#x9884;&#x6D4B;&#x6982;&#x7387;&#x5927;&#x4E8E;0.3&#x7684;&#x9884;&#x6D4B;&#x6846;&#x591A;&#x4E8E;&#x7B49;&#x4E8E;1&#x4E2A;&#x7684;normal&#x6837;&#x672C;&#x7B97;&#x4F5C;&#x9519;&#x8BEF;normal&#x6837;&#x672C;&#xFF0C;&#x8FDB;&#x884C;hard negativate mining&#xFF0C;&#x4E3B;&#x8981;&#x4EE3;&#x7801;&#xFF1A;predict_train_set.ipynb</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#考虑到只随机扭曲mass区域会被模型学习到随机扭曲的特征，因此尝试在没有mass的区域随机画个圆形进行随机扭曲，并使用上采样p6-p7的模型进行训练，效果非常好，主要代码：分支：p6-p7-upsample-data-process-v1-2-ipynb"><span class="nav-number">1.19.</span> <span class="nav-text"><a href="#&#x8003;&#x8651;&#x5230;&#x53EA;&#x968F;&#x673A;&#x626D;&#x66F2;mass&#x533A;&#x57DF;&#x4F1A;&#x88AB;&#x6A21;&#x578B;&#x5B66;&#x4E60;&#x5230;&#x968F;&#x673A;&#x626D;&#x66F2;&#x7684;&#x7279;&#x5F81;&#xFF0C;&#x56E0;&#x6B64;&#x5C1D;&#x8BD5;&#x5728;&#x6CA1;&#x6709;mass&#x7684;&#x533A;&#x57DF;&#x968F;&#x673A;&#x753B;&#x4E2A;&#x5706;&#x5F62;&#x8FDB;&#x884C;&#x968F;&#x673A;&#x626D;&#x66F2;&#xFF0C;&#x5E76;&#x4F7F;&#x7528;&#x4E0A;&#x91C7;&#x6837;p6-p7&#x7684;&#x6A21;&#x578B;&#x8FDB;&#x884C;&#x8BAD;&#x7EC3;&#xFF0C;&#x6548;&#x679C;&#x975E;&#x5E38;&#x597D;&#xFF0C;&#x4E3B;&#x8981;&#x4EE3;&#x7801;&#xFF1A;&#x5206;&#x652F;&#xFF1A;p6-p7-upsample-data-process-v1-2-ipynb" class="headerlink" title="&#x8003;&#x8651;&#x5230;&#x53EA;&#x968F;&#x673A;&#x626D;&#x66F2;mass&#x533A;&#x57DF;&#x4F1A;&#x88AB;&#x6A21;&#x578B;&#x5B66;&#x4E60;&#x5230;&#x968F;&#x673A;&#x626D;&#x66F2;&#x7684;&#x7279;&#x5F81;&#xFF0C;&#x56E0;&#x6B64;&#x5C1D;&#x8BD5;&#x5728;&#x6CA1;&#x6709;mass&#x7684;&#x533A;&#x57DF;&#x968F;&#x673A;&#x753B;&#x4E2A;&#x5706;&#x5F62;&#x8FDB;&#x884C;&#x968F;&#x673A;&#x626D;&#x66F2;&#xFF0C;&#x5E76;&#x4F7F;&#x7528;&#x4E0A;&#x91C7;&#x6837;p6 p7&#x7684;&#x6A21;&#x578B;&#x8FDB;&#x884C;&#x8BAD;&#x7EC3;&#xFF0C;&#x6548;&#x679C;&#x975E;&#x5E38;&#x597D;&#xFF0C;&#x4E3B;&#x8981;&#x4EE3;&#x7801;&#xFF1A;&#x5206;&#x652F;&#xFF1A;p6_p7_upsample data_process_v1.2.ipynb"></a>&#x8003;&#x8651;&#x5230;&#x53EA;&#x968F;&#x673A;&#x626D;&#x66F2;mass&#x533A;&#x57DF;&#x4F1A;&#x88AB;&#x6A21;&#x578B;&#x5B66;&#x4E60;&#x5230;&#x968F;&#x673A;&#x626D;&#x66F2;&#x7684;&#x7279;&#x5F81;&#xFF0C;&#x56E0;&#x6B64;&#x5C1D;&#x8BD5;&#x5728;&#x6CA1;&#x6709;mass&#x7684;&#x533A;&#x57DF;&#x968F;&#x673A;&#x753B;&#x4E2A;&#x5706;&#x5F62;&#x8FDB;&#x884C;&#x968F;&#x673A;&#x626D;&#x66F2;&#xFF0C;&#x5E76;&#x4F7F;&#x7528;&#x4E0A;&#x91C7;&#x6837;p6 p7&#x7684;&#x6A21;&#x578B;&#x8FDB;&#x884C;&#x8BAD;&#x7EC3;&#xFF0C;&#x6548;&#x679C;&#x975E;&#x5E38;&#x597D;&#xFF0C;&#x4E3B;&#x8981;&#x4EE3;&#x7801;&#xFF1A;&#x5206;&#x652F;&#xFF1A;p6_p7_upsample data_process_v1.2.ipynb</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#假阳性减少"><span class="nav-number">2.</span> <span class="nav-text"><a href="#&#x5047;&#x9633;&#x6027;&#x51CF;&#x5C11;" class="headerlink" title="&#x5047;&#x9633;&#x6027;&#x51CF;&#x5C11;"></a>&#x5047;&#x9633;&#x6027;&#x51CF;&#x5C11;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据增强"><span class="nav-number">3.</span> <span class="nav-text"><a href="#&#x6570;&#x636E;&#x589E;&#x5F3A;" class="headerlink" title="&#x6570;&#x636E;&#x589E;&#x5F3A;"></a>&#x6570;&#x636E;&#x589E;&#x5F3A;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#在线数据增强"><span class="nav-number">3.1.</span> <span class="nav-text"><a href="#&#x5728;&#x7EBF;&#x6570;&#x636E;&#x589E;&#x5F3A;" class="headerlink" title="&#x5728;&#x7EBF;&#x6570;&#x636E;&#x589E;&#x5F3A;"></a>&#x5728;&#x7EBF;&#x6570;&#x636E;&#x589E;&#x5F3A;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#离线数据增强"><span class="nav-number">3.2.</span> <span class="nav-text"><a href="#&#x79BB;&#x7EBF;&#x6570;&#x636E;&#x589E;&#x5F3A;" class="headerlink" title="&#x79BB;&#x7EBF;&#x6570;&#x636E;&#x589E;&#x5F3A;"></a>&#x79BB;&#x7EBF;&#x6570;&#x636E;&#x589E;&#x5F3A;</span></a></li></ol></li></ol></div>
             
 
           </div>
