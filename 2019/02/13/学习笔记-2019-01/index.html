@@ -93,7 +93,7 @@
 <meta property="og:image" content="http://sutomorrow.github.io/2019/02/13/学习笔记-2019-01/区域建议网络给出的位置.png">
 <meta property="og:image" content="http://sutomorrow.github.io/2019/02/13/学习笔记-2019-01/按照设定的输出大小进行划分.png">
 <meta property="og:image" content="http://sutomorrow.github.io/2019/02/13/学习笔记-2019-01/ROI_Pooling输出.png">
-<meta property="og:updated_time" content="2019-02-13T07:08:46.807Z">
+<meta property="og:updated_time" content="2019-08-05T11:27:31.588Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="学习笔记_2019-01">
 <meta name="twitter:description" content="2019-01-20学习了如何在hexo的markdown中使用数学公式首先修改next的配置文件如下：  mathjax:     enable: true     per_page: true 由于开启了pre_page，因此首先需要在markdown页面中使用：  mathjax: true 写法和latex中的公式差不多，如：     1$\sum_&amp;#123;i=0&amp;#125;^&amp;#12">
@@ -499,7 +499,7 @@ z^L & = W^L \sigma(z^{L-1}) + b^L
 \begin{aligned}
 \frac{\partial J}{\partial W^L} & = \frac{\partial J}{\partial z^L}\frac{\partial z^L}{\partial W^L}\\
 \frac{\partial J}{\partial b^L} & = \frac{\partial J}{\partial z^L}\frac{\partial z^L}{\partial b^L}
-\end{aligned}</script><p>首先要计算的是$\frac{\partial J}{\partial z^L}$，这一项与损失函数和最后一层的激活函数有关，这里不具体讨论，直接计算即可，并将其结果记为$\delta^L$，之后的$\frac{\partial z^L}{\partial W^L}$项和$\frac{\partial z^L}{\partial b^L}$的计算非常简单，其结果分别为$(a^{L-1})^T$和$\delta^L$。</p>
+\end{aligned}</script><p>首先要计算的是$\frac{\partial J}{\partial z^L}$，这一项与损失函数和最后一层的激活函数有关，这里不具体讨论，直接计算即可，并将其结果记为$\delta^L$，之后的$\frac{\partial z^L}{\partial W^L}$项和$\frac{\partial z^L}{\partial b^L}$的计算非常简单，最后计算出的两个偏导结果分别为$\delta^L(a^{L-1})^T$和$\delta^L$。</p>
 <p>到这里，第$L$层的偏导就计算完了，那么$L-1$层同理可以如下计算。</p>
 <script type="math/tex; mode=display">
 \begin{aligned}
@@ -745,7 +745,7 @@ z^L & = W^L \sigma(z^{L-1}) + b^L
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">26</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -820,7 +820,7 @@ z^L & = W^L \sigma(z^{L-1}) + b^L
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
