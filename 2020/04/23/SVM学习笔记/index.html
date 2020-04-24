@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="机器学习," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="线性SVM详细推导首先，一个点$p \in \mathbb{R}^d$到超平面$w^Tx+b=0$的距离可以表示为$\frac{1}{||w||}|w^Tp + b|$。 对于一个两类别数据集$X\in\mathbb{R}^d, Y\in\{0, 1\}$，定义间隔$\gamma=2\min_i\frac{1}{||w||}|w^Tx_i + b|$ 线性支持向量机的目标即找到一组适合的参数$(w">
+<meta name="keywords" content="机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SVM学习笔记">
+<meta property="og:url" content="http://sUtomorrow.github.io/2020/04/23/SVM学习笔记/index.html">
+<meta property="og:site_name" content="SeeYouTomorrow">
+<meta property="og:description" content="线性SVM详细推导首先，一个点$p \in \mathbb{R}^d$到超平面$w^Tx+b=0$的距离可以表示为$\frac{1}{||w||}|w^Tp + b|$。 对于一个两类别数据集$X\in\mathbb{R}^d, Y\in\{0, 1\}$，定义间隔$\gamma=2\min_i\frac{1}{||w||}|w^Tx_i + b|$ 线性支持向量机的目标即找到一组适合的参数$(w">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-04-23T07:59:30.335Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SVM学习笔记">
+<meta name="twitter:description" content="线性SVM详细推导首先，一个点$p \in \mathbb{R}^d$到超平面$w^Tx+b=0$的距离可以表示为$\frac{1}{||w||}|w^Tp + b|$。 对于一个两类别数据集$X\in\mathbb{R}^d, Y\in\{0, 1\}$，定义间隔$\gamma=2\min_i\frac{1}{||w||}|w^Tx_i + b|$ 线性支持向量机的目标即找到一组适合的参数$(w">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://sUtomorrow.github.io/2020/04/23/SVM学习笔记/"/>
+
+
+
+
+
+  <title>SVM学习笔记 | SeeYouTomorrow</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?6c61f4d5090c79efce607febff431083";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">SeeYouTomorrow</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">刘腾营的博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sUtomorrow.github.io/2020/04/23/SVM学习笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="刘腾营">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SeeYouTomorrow">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SVM学习笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-23T15:57:32+08:00">
+                2020-04-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 被阅读
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="线性SVM详细推导"><a href="#线性SVM详细推导" class="headerlink" title="线性SVM详细推导"></a>线性SVM详细推导</h1><p>首先，一个点$p \in \mathbb{R}^d$到超平面$w^Tx+b=0$的距离可以表示为$\frac{1}{||w||}|w^Tp + b|$。</p>
+<p>对于一个两类别数据集$X\in\mathbb{R}^d, Y\in\{0, 1\}$，定义间隔$\gamma=2\min_i\frac{1}{||w||}|w^Tx_i + b|$</p>
+<p>线性支持向量机的目标即找到一组适合的参数$(w, b)$使得</p>
+<script type="math/tex; mode=display">
+\max_{w,b}\gamma = \max_{w,b} 2\min_i\frac{1}{||w||}|w^Tx_i + b|\\
+s.t. \ y_i(w^Tx_i + b) > 0, i = 1,2,...,m</script><p>若一组$(w^<em>, b^</em>)$是支持向量机的一个解，那么对于$\lambda &gt; 0$，$(\lambda w^<em>, \lambda b^</em>)$也是该优化问题的一个解，因为间隔不会变化。</p>
+<p>所以这里添加一个约束条件，让$\min_i |w^T x_i + b| = 1$，因此支持向量机的优化目标可以进一步化成如下，即支持向量机的基本型：</p>
+<script type="math/tex; mode=display">
+\max_{w,b} 2\min_i\frac{1}{||w||}|w^Tx_i + b| \\
+= \max_{w,b} \frac{2}{||w||}\\
+= \min_{w,b} \frac{1}{2}w^T w\\
+s.t. \ y_i(w^Tx_i + b) \ge 1, i = 1,2,...,m</script><p>可以看出，$w^T w$是一个正定二次型，如此一来，支持向量机的可以看做一个凸二次优化问题：</p>
+<script type="math/tex; mode=display">
+\min_{u} \frac{1}{2} u^T Q u + t^T u \\
+s.t. \ c_i^T u \ge d_i, i = 1, 2,...,m</script><p>其中$u=\begin{bmatrix}w\\b\end{bmatrix}$, $Q=\begin{bmatrix}I &amp;\mathbf{0}\\\mathbf{0}&amp;0\end{bmatrix}$, $t=\mathbf{0}$, $c_i = y_i\begin{bmatrix}x_i\\ 1\end{bmatrix}$, $d_i = 1$</p>
+<p>也可以运用拉格朗日法来求解支持向量机，定义其拉格朗日函数$\mathcal{L}(w,b,\alpha) = \frac{1}{2}w^T w + \sum_{i=1}^{m} \alpha_i(1 - y_i(w^T x_i + b))$<br>原问题可以表示为</p>
+<script type="math/tex; mode=display">
+\min_{w,b} \max_\alpha \mathcal{L}(w, b, \alpha)\\
+s.t. \ \alpha_i \ge 0, i=1,2,...,m</script><p>其对偶问题可以表示为:</p>
+<script type="math/tex; mode=display">
+\max_\alpha \min_{w,b} \mathcal{L}(w, b, \alpha)\\
+s.t. \ \alpha_i \ge 0, i=1,2,...,m</script><p>其KKT条件表示为:</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+&1 - y_i(w^T x_i + b) \le 0 \\
+&\alpha_i \ge 0 \\
+&\alpha_i(1 - y_i(w^Tx_i + b)) = 0    
+\end{aligned}</script><p>这里对支持向量机的对偶问题进行第一步求解:$\min_{w,b} \mathcal{L}(w, b, \alpha)$，直接令一阶导数等于0：</p>
+<script type="math/tex; mode=display">
+\frac{\partial\mathcal{L}}{\partial w} = 0 \Rightarrow w = \sum_{i=1}^m \alpha_i y_i x_i \\
+\frac{\partial\mathcal{L}}{\partial b} = 0 \Rightarrow \sum_{i=1}^m \alpha_i y_i = 0</script><p>这里可以看出，$w$仅和$\alpha_i &gt; 0$的样本有关，而根据KKT条件，$\alpha_i &gt; 0$的地方必须满足$(1 - y_i(w^Tx_i + b)) = 0$，即这些$x_i$在最大间隔边界上，这样的样本称为支持向量，支持向量机的解仅仅和支持向量有关。</p>
+<p>将求得结果代入$\mathcal{L}$：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\mathcal{L} &= \frac{1}{2}\sum_{i=1}^m\sum_{j=1}^m \alpha_i \alpha_j y_i y_j x_i^T x_j + \sum_{i=1}^m \alpha_i - \sum_{i=1}^m \alpha_i y_i(w^Tx_i + b)\\
+&= \frac{1}{2}\sum_{i=1}^m\sum_{j=1}^m \alpha_i \alpha_j y_i y_j x_i^T x_j + \sum_{i=1}^m \alpha_i - \sum_{i=1}^m \alpha_i y_iw^Tx_i\\
+&= \sum_{i=1}^m \alpha_i - \frac{1}{2}\sum_{i=1}^m\sum_{j=1}^m \alpha_i \alpha_j y_i y_j x_i^T x_j
+\end{aligned}</script><p>此时，再求解</p>
+<script type="math/tex; mode=display">
+\max_{\alpha} \mathcal{L}(w, b, \alpha)\\
+s.t. \ \alpha_i \ge 0,i=1,2,...,m\\
+\ \sum_{i=1}^m \alpha_i y_i = 0</script><p>这个问题的求解使用SMO(序列最小优化)算法，大致思路和坐标上升法类似，迭代进行，每次选取两个$\alpha$进行更新，同时更新参数$b$，具体步骤后面有时间再详细学习。</p>
+<h1 id="SVM的核技巧"><a href="#SVM的核技巧" class="headerlink" title="SVM的核技巧"></a>SVM的核技巧</h1><p>线性SVM基于一个基本假设：数据在空间$\mathbb{R}^d$中线性可分，但这个假设在实际应用中，基本不满足。</p>
+<p>但是存在一个定理：当$d$有限时，一定存在$\hat{d}$，使得样本在空间$\mathbb{R}^{\hat{d}}$中线性可分。</p>
+<p>因此我们可以构造一种映射：$x_i \rightarrow \phi(x_i)$，然后在这个映射的空间中使用线性SVM进行分类。</p>
+<p>这样最终需要求解的拉格朗日函数可以写成：$\mathcal{L} = \sum_{i=1}^m \alpha_i - \frac{1}{2}\sum_{i=1}^m\sum_{j=1}^m \alpha_i \alpha_j y_i y_j \phi(x_i)^T \phi(x_j)$，看起来很简单，只需要换一种计算方式就行，但是这里存在一个问题：$\hat{d}$可能非常大，导致计算困难。</p>
+<p>针对上述问题，需要使用核技巧：构造一个计算复杂度为$O(d)$的$k(x_i, x_j)$使得：$k(x_i, x_j)=\phi(x_i)^T \phi(x_j)$，即我们只需要一种快速的计算内积的方式，并不关心其他运算。</p>
+<p>核函数的选择：当数据维数$d$超过了样本数量的时候，一般选用线性核，当数据维数$d$较小，而样本量$m$中等时，可以选择RBF核，但是当数据维数$d$较小，而样本量$m$特别大时，不需要选择了，直接使用深度神经网络吧。</p>
+<p>核函数的定义需要满足Mercer条件：核函数矩阵必须是半正定的。可以理解为内积大于等于0。</p>
+<p>核函数有一些性质：如果$k_1$、$k_2$是核函数，那么下列函数也是核函数：</p>
+<p>$c_1k_1(x_i, x_j) + c_2k_2(x_i, x_j), \ c1,c2 &gt; 0$</p>
+<p>$k_1(x_i, x_j)k_2(x_i, x_j)$</p>
+<p>$f(x_i)k_1(x_i, x_j)f(x_j)$</p>
+<h1 id="软间隔SVM"><a href="#软间隔SVM" class="headerlink" title="软间隔SVM"></a>软间隔SVM</h1><p>数据中不能总是找到线性可分的空间，而且数据存在噪声或者错误标注，这个时候我们如果按照SVM的优化方式，很可能造成过拟合的问题，因此可以允许少量分类错误出现，定义松弛变量$\epsilon_i = \begin{cases}<br>    0 &amp; y_i(w^T\phi(x_i) + b) \ge 1\\<br>    1 - y_i(w^T\phi(x_i) + b) &amp; y_i(w^T\phi(x_i) + b) &lt; 1<br>\end{cases}$，由此定义软间隔支持向量机的基本型：</p>
+<script type="math/tex; mode=display">
+\min_{w,b,\epsilon} \frac{1}{2}w^T w + C\sum_{i=1}^m \epsilon_i\\
+s.t. y_i(w^T\phi(x_i) + b) \ge 1 - \epsilon_i, i = 1, 2,...,m\\
+\epsilon_i \ge 0, i=1,2,...,m</script><p>其中$C$是一个可调节参数，用于调节错误分类的惩罚。</p>
+<p>软间隔支持向量机的求解方式和支持向量机类似，不过从一个约束变成了两个约束。</p>
+<p>另外$\epsilon_i$也可以表示成$\max(0, 1 - y_i(w^T\phi(x_i) + b))$，因此软间隔支持向量机的基本型的对偶问题可以表示为$\min_{w, b} \frac{1}{m}\sum_{i=1}^m \max(0, 1 - y_i(w^T\phi(x_i) + b)) + \frac{1}{2mC}w^Tw$，其中第一项称为经验风险，度量模型对数据的拟合程度，第二项称为结构风险，度量模型的复杂程度，也可以称为正则化项。因此还衍生出一种损失函数：hinge loss：$\mathbb{l}(s) = max(0, 1-s)$。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/23/凸优化学习笔记/" rel="next" title="凸优化学习笔记">
+                <i class="fa fa-chevron-left"></i> 凸优化学习笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/23/线性代数杂项/" rel="prev" title="线性代数杂项">
+                线性代数杂项 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNDczOC8xMTI3NQ=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">刘腾营</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#线性SVM详细推导"><span class="nav-number">1.</span> <span class="nav-text"><a href="#&#x7EBF;&#x6027;SVM&#x8BE6;&#x7EC6;&#x63A8;&#x5BFC;" class="headerlink" title="&#x7EBF;&#x6027;SVM&#x8BE6;&#x7EC6;&#x63A8;&#x5BFC;"></a>&#x7EBF;&#x6027;SVM&#x8BE6;&#x7EC6;&#x63A8;&#x5BFC;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SVM的核技巧"><span class="nav-number">2.</span> <span class="nav-text"><a href="#SVM&#x7684;&#x6838;&#x6280;&#x5DE7;" class="headerlink" title="SVM&#x7684;&#x6838;&#x6280;&#x5DE7;"></a>SVM&#x7684;&#x6838;&#x6280;&#x5DE7;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#软间隔SVM"><span class="nav-number">3.</span> <span class="nav-text"><a href="#&#x8F6F;&#x95F4;&#x9694;SVM" class="headerlink" title="&#x8F6F;&#x95F4;&#x9694;SVM"></a>&#x8F6F;&#x95F4;&#x9694;SVM</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘腾营</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 您是第
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      位访客
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 被访问
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('-1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

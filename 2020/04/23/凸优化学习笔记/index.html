@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="凸优化," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="仿射集、凸集、锥集、凸锥集、仿射组合、凸组合、凸锥组合、仿射包、凸包、凸锥包 锥：$C = \{x| \theta x \in C\}, x \in R^n,\theta \ge 0$ 仿射组合：$\theta_1+\theta_2+…=1$ 凸组合：$\theta_1+\theta_2+…=1,\theta_1+\theta_2+… \ge 0$ 凸锥组合：$\theta_1+\theta_2+">
+<meta name="keywords" content="凸优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="凸优化学习笔记">
+<meta property="og:url" content="http://sUtomorrow.github.io/2020/04/23/凸优化学习笔记/index.html">
+<meta property="og:site_name" content="SeeYouTomorrow">
+<meta property="og:description" content="仿射集、凸集、锥集、凸锥集、仿射组合、凸组合、凸锥组合、仿射包、凸包、凸锥包 锥：$C = \{x| \theta x \in C\}, x \in R^n,\theta \ge 0$ 仿射组合：$\theta_1+\theta_2+…=1$ 凸组合：$\theta_1+\theta_2+…=1,\theta_1+\theta_2+… \ge 0$ 凸锥组合：$\theta_1+\theta_2+">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-04-24T08:12:03.729Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="凸优化学习笔记">
+<meta name="twitter:description" content="仿射集、凸集、锥集、凸锥集、仿射组合、凸组合、凸锥组合、仿射包、凸包、凸锥包 锥：$C = \{x| \theta x \in C\}, x \in R^n,\theta \ge 0$ 仿射组合：$\theta_1+\theta_2+…=1$ 凸组合：$\theta_1+\theta_2+…=1,\theta_1+\theta_2+… \ge 0$ 凸锥组合：$\theta_1+\theta_2+">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://sUtomorrow.github.io/2020/04/23/凸优化学习笔记/"/>
+
+
+
+
+
+  <title>凸优化学习笔记 | SeeYouTomorrow</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?6c61f4d5090c79efce607febff431083";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">SeeYouTomorrow</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">刘腾营的博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sUtomorrow.github.io/2020/04/23/凸优化学习笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="刘腾营">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SeeYouTomorrow">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">凸优化学习笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-23T15:52:30+08:00">
+                2020-04-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 被阅读
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="仿射集、凸集、锥集、凸锥集、仿射组合、凸组合、凸锥组合、仿射包、凸包、凸锥包"><a href="#仿射集、凸集、锥集、凸锥集、仿射组合、凸组合、凸锥组合、仿射包、凸包、凸锥包" class="headerlink" title="仿射集、凸集、锥集、凸锥集、仿射组合、凸组合、凸锥组合、仿射包、凸包、凸锥包"></a>仿射集、凸集、锥集、凸锥集、仿射组合、凸组合、凸锥组合、仿射包、凸包、凸锥包</h1><ul>
+<li>锥：$C = \{x| \theta x \in C\}, x \in R^n,\theta \ge 0$</li>
+<li>仿射组合：$\theta_1+\theta_2+…=1$</li>
+<li>凸组合：$\theta_1+\theta_2+…=1,\theta_1+\theta_2+… \ge 0$</li>
+<li>凸锥组合：$\theta_1+\theta_2+… \ge 0$</li>
+</ul>
+<h1 id="一些凸集：超平面、半空间、球、椭球、多面体、单纯形、对称（半）（正定）矩阵"><a href="#一些凸集：超平面、半空间、球、椭球、多面体、单纯形、对称（半）（正定）矩阵" class="headerlink" title="一些凸集：超平面、半空间、球、椭球、多面体、单纯形、对称（半）（正定）矩阵"></a>一些凸集：超平面、半空间、球、椭球、多面体、单纯形、对称（半）（正定）矩阵</h1><ul>
+<li>超平面：$\{x|w^Tx=b\},x \in R^n,w \in R^n, b \in R, w \ne \mathbb{0}$</li>
+<li>半空间：$\{x|w^Tx \ge b\},x \in R^n,w \in R^n, b \in R, w \ne \mathbb{0}$或$\{x|w^Tx \le b\},x \in R^n,w \in R^n, b \in R, w \ne \mathbb{0}$</li>
+<li>球：$B(x_c, r) = \{x |\ ||x-x_c||_2 \le r\}, x_c \in R^n, x \in R^n, r \ge 0$</li>
+<li>椭球：$\epsilon(x_c, P) = \{x |\ (x-x_c)^T P^{-1} (x-x_c) \le 1\}, x_c \in R^n, x \in R^n, P \in S_{++}^n$</li>
+<li>多面体：$P=\{x|a_i^T x \le b_i, c_j^T x = d_j, i = 1,2,…,m, j=1,2,…,n\}$</li>
+<li>单纯形：$R^n$中的$k+1$个点$v_0, v_1, …, v_k$，满足$v_1-v_0, v_2-v_0, …, v_k-v_0$线性无关，则$v_0, v_1, …, v_k$的单纯形为$v_0, v_1, …, v_k$的凸包，单纯形是多面体的一种，证明的时候，可以借助”秩为$k$的矩阵$B$,可以用一个非奇异矩阵$A$转换成$\begin{bmatrix}I_k \\ \mathbb{0} \end{bmatrix}$的形式”这个定理。</li>
+</ul>
+<h1 id="仿射函数、透视函数、线性分数函数"><a href="#仿射函数、透视函数、线性分数函数" class="headerlink" title="仿射函数、透视函数、线性分数函数"></a>仿射函数、透视函数、线性分数函数</h1><ul>
+<li><p>仿射函数：$f:R^n \rightarrow R^m, f(x)=Ax+b, A \in R^{(m \times n)}, b \in R^n$</p>
+</li>
+<li><p>缩放：$\alpha S = \{\alpha x| x \in S\}$、移位：$S+a=\{x+a|x \in S\}$是仿射变换的一种。</p>
+</li>
+<li><p>线性矩阵不等式的解集是凸集：$\{x|A(x) \preceq B\}$</p>
+</li>
+<li><p>透视函数：$P: R^{n+1} \rightarrow R^n, P(x,y) = \{\frac{x}{y}\}\ x \in R^n, y\in R_{++}$</p>
+</li>
+</ul>
+<h1 id="保凸集运算："><a href="#保凸集运算：" class="headerlink" title="保凸集运算："></a>保凸集运算：</h1><ul>
+<li>交集</li>
+<li>集合的和：$S_1 + S_2 = \{x_1 + x_2 | x_1 \in S_1, x_2 \in S_2\}$</li>
+<li>集合的笛卡尔积：$S_1 \times S_2 = \{(x_1 , x_2) | x_1 \in S_1, x_2 \in S_2\}$</li>
+<li>（逆）仿射函数</li>
+<li>透视函数</li>
+<li>线性分数函数：首先定义仿射函数$g:R^n \rightarrow R^{m+1}, g(x)=\begin{bmatrix} A \\ c^T \end{bmatrix} x + \begin{bmatrix} b \\ d \end{bmatrix}, A \in R^{m \times n}, c \in R^n, b \in R^m, d \in R$，再定义透视函数$p:R^{m+1} \rightarrow R^m$，则线性分数函数$f = p \circ g = \frac{Ax + b}{c^T x + d},\ dom f = \{x| c^T x + d &gt; 0\}$</li>
+</ul>
+<h1 id="凸函数"><a href="#凸函数" class="headerlink" title="凸函数"></a>凸函数</h1><h2 id="凸函数定义"><a href="#凸函数定义" class="headerlink" title="凸函数定义"></a>凸函数定义</h2><ul>
+<li><p>$f:R^n \rightarrow R$为凸函数$\Leftrightarrow$$domf$为凸集，且$f(\theta x_1 + (1-\theta)x_2) \le \theta f(x_1) + (1-\theta)f(x_2)$，其中$\theta \in [0, 1]$</p>
+</li>
+<li><p>$f:R^n \rightarrow R$为凸函数$\Leftrightarrow$$domf$为凸集，且$\forall x \in dom f, \forall v, g(t) = f(x + tv)$为凸，$dom g = \{t | x + tv \in dom f\}$</p>
+</li>
+<li><p>$f:R^n \rightarrow R$为凸函数且$f$可微$\Leftrightarrow$$domf$为凸集，$\forall x,y \in dom f, f(y) \ge f(x) + \triangledown f^T(x)(y-x)$</p>
+</li>
+<li><p>$f:R^n \rightarrow R$为凸函数且$f$二阶可微$\Leftrightarrow$$domf$为凸集，$\forall x \in dom f,\triangledown ^2 f(x) \succeq 0$（二阶条件）</p>
+</li>
+</ul>
+<p>如果将上述前三个定义中的$\le$、$\ge$, 改为$&lt;$、$&gt;$，那么$f$就变成了严格凸函数，严格凸函数的二阶导数不能保证$\triangledown ^2 f(x) \succ 0$，但$\triangledown ^2 f(x) \succ 0$可以保证严格凸，但是二次函数$f$严格凸$\Leftrightarrow$Hession矩阵$\triangledown ^2 f(x) \in S^n_{++}$即$\triangledown ^2 f(x) \succeq 0$。</p>
+<h2 id="凸函数的一个重要性质"><a href="#凸函数的一个重要性质" class="headerlink" title="凸函数的一个重要性质"></a>凸函数的一个重要性质</h2><p>$f(x) \ge f(x_0) + f’ (x_0) ^ T(x-x_0)$</p>
+<h2 id="一些常见的凸函数"><a href="#一些常见的凸函数" class="headerlink" title="一些常见的凸函数"></a>一些常见的凸函数</h2><ul>
+<li>仿射函数：$f(x)=Ax+b, \triangledown_2f=0$，是凸函数也是凹函数</li>
+<li>指数函数：$f(x) = e^{ax}, x \in R$</li>
+<li>幂函数：$f(x) = x^a, x \in R_{++}, a \ge 1\ or\ a \le 0$是凸函数，当$0 \le a \le 1$时，是凹函数</li>
+<li>绝对值的幂函数：$f(x)= |x|^p, x \in R, x \ne 0, P \ge 1$</li>
+<li>对数函数：$f(x) = -log(x), x \in R_{++}$</li>
+<li>负熵：$f(x) = xlog(x), x \in R_{++}$</li>
+<li>范数：$p(x), x \in R^n$，满足$p(a)=|a|p(x), p(x+y) \le p(x) + p(y), p(x) = 0 \Leftrightarrow x = 0$</li>
+<li>极大值函数：$f(x) = max(x_1, x_2, …, x_n), x \in R^n$</li>
+<li>极大值函数的逼近-log sum up：$f(x) = log(e^{x_1} + e^{x_2} + … +e^{x_n}), x \in R^n$其中$max(x_1, x_2, …, x_n) \le f(x) \le max(x_1, x_2, …, x_n) + log(n)$</li>
+</ul>
+<h2 id="二次型"><a href="#二次型" class="headerlink" title="二次型"></a>二次型</h2><p>二次型是一种二次齐次函数的统称，可以表示为$f(x_1, x_2, …, x_n) = a_{11}x_1^2 + a_{22}x_2^2 + … + a_{nn}x_n^2 + 2a_{12}x_1x_2 + 2a_{13}x_1x_3 + … +  + 2a_{n-1, n}x_1x_n$</p>
+<p>二次型可以通过一个对称矩阵表示$f(x_1, x_2, …, x_n)=X^T A X$，其中A因为是对称矩阵，有很多很好的分解方式，因此非常方便分析。</p>
+<h2 id="一些常用性质"><a href="#一些常用性质" class="headerlink" title="一些常用性质"></a>一些常用性质</h2><ul>
+<li>$V^TXV \ge 0 \Leftrightarrow X \succeq 0$</li>
+<li>$det(XY) = det(X)det(Y)$，$det$表示求行列式值。</li>
+<li>$(a^Ta)(b^Tb) \ge (a^Tb)^2$</li>
+</ul>
+<h2 id="保凸函数运算"><a href="#保凸函数运算" class="headerlink" title="保凸函数运算"></a>保凸函数运算</h2><ul>
+<li>$f_1, f_2, …, f_m$为凸，则$f = \sum\limits_{i=1}^m w_i f_i,\ \forall i,w_i \ge 0$为凸</li>
+<li>若$f(x,y),\ \forall y \in A,f(x,y)$为凸，对于$\forall y \in A,\ w(y) \ge 0, g(x) = \int_{y \in A}w(y)f(x,y)dy$为凸</li>
+<li>仿射映射$f:R^n \rightarrow R, A\in R^{n \times m}, b\in R^n,g(x) = f(Ax + b), dom g=\{x|Ax+b \in dom f\}$是凸函数。</li>
+<li>对函数的仿射：$f_i: R^n \rightarrow R,i=1,…,m$为凸函数，$A \in R_+^n, b \in R, g(x)=A^T\begin{bmatrix}f_1(x)&amp; \cdots&amp;f_n(x)\end{bmatrix}^T + b$为凸函数</li>
+<li>极大值操作：$f_1,f_2$为凸，则$f(x) = max(f_1(x), f_2(x)), dom f = domf_1 \bigcap domf_2$为凸。</li>
+<li>无限个凸函数的极大值：$f(x,y),\forall y \in A$对于$x$为凸，则$g = \sup\limits_{y \in A}f(x,y)$为凸函数，其中$\sup\limits_{y\in A}$表示$y\in A$时的上确界（可以理解为最大值）。</li>
+</ul>
+<p>向量的最大$r$个分量之和：$f(x) = max\{x_{i1}+x_{i2}\cdots+x_{ir}|i1,i2,…,ir互不相等\}$是个凸函数。</p>
+<p>实对称矩阵的最大特征值函数$f(X) = \lambda_{max}(X)$是个凸函数。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/凸优化/" rel="tag"># 凸优化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/23/非标量求导术/" rel="next" title="非标量求导术">
+                <i class="fa fa-chevron-left"></i> 非标量求导术
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/23/SVM学习笔记/" rel="prev" title="SVM学习笔记">
+                SVM学习笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNDczOC8xMTI3NQ=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">刘腾营</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#仿射集、凸集、锥集、凸锥集、仿射组合、凸组合、凸锥组合、仿射包、凸包、凸锥包"><span class="nav-number">1.</span> <span class="nav-text"><a href="#&#x4EFF;&#x5C04;&#x96C6;&#x3001;&#x51F8;&#x96C6;&#x3001;&#x9525;&#x96C6;&#x3001;&#x51F8;&#x9525;&#x96C6;&#x3001;&#x4EFF;&#x5C04;&#x7EC4;&#x5408;&#x3001;&#x51F8;&#x7EC4;&#x5408;&#x3001;&#x51F8;&#x9525;&#x7EC4;&#x5408;&#x3001;&#x4EFF;&#x5C04;&#x5305;&#x3001;&#x51F8;&#x5305;&#x3001;&#x51F8;&#x9525;&#x5305;" class="headerlink" title="&#x4EFF;&#x5C04;&#x96C6;&#x3001;&#x51F8;&#x96C6;&#x3001;&#x9525;&#x96C6;&#x3001;&#x51F8;&#x9525;&#x96C6;&#x3001;&#x4EFF;&#x5C04;&#x7EC4;&#x5408;&#x3001;&#x51F8;&#x7EC4;&#x5408;&#x3001;&#x51F8;&#x9525;&#x7EC4;&#x5408;&#x3001;&#x4EFF;&#x5C04;&#x5305;&#x3001;&#x51F8;&#x5305;&#x3001;&#x51F8;&#x9525;&#x5305;"></a>&#x4EFF;&#x5C04;&#x96C6;&#x3001;&#x51F8;&#x96C6;&#x3001;&#x9525;&#x96C6;&#x3001;&#x51F8;&#x9525;&#x96C6;&#x3001;&#x4EFF;&#x5C04;&#x7EC4;&#x5408;&#x3001;&#x51F8;&#x7EC4;&#x5408;&#x3001;&#x51F8;&#x9525;&#x7EC4;&#x5408;&#x3001;&#x4EFF;&#x5C04;&#x5305;&#x3001;&#x51F8;&#x5305;&#x3001;&#x51F8;&#x9525;&#x5305;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一些凸集：超平面、半空间、球、椭球、多面体、单纯形、对称（半）（正定）矩阵"><span class="nav-number">2.</span> <span class="nav-text"><a href="#&#x4E00;&#x4E9B;&#x51F8;&#x96C6;&#xFF1A;&#x8D85;&#x5E73;&#x9762;&#x3001;&#x534A;&#x7A7A;&#x95F4;&#x3001;&#x7403;&#x3001;&#x692D;&#x7403;&#x3001;&#x591A;&#x9762;&#x4F53;&#x3001;&#x5355;&#x7EAF;&#x5F62;&#x3001;&#x5BF9;&#x79F0;&#xFF08;&#x534A;&#xFF09;&#xFF08;&#x6B63;&#x5B9A;&#xFF09;&#x77E9;&#x9635;" class="headerlink" title="&#x4E00;&#x4E9B;&#x51F8;&#x96C6;&#xFF1A;&#x8D85;&#x5E73;&#x9762;&#x3001;&#x534A;&#x7A7A;&#x95F4;&#x3001;&#x7403;&#x3001;&#x692D;&#x7403;&#x3001;&#x591A;&#x9762;&#x4F53;&#x3001;&#x5355;&#x7EAF;&#x5F62;&#x3001;&#x5BF9;&#x79F0;&#xFF08;&#x534A;&#xFF09;&#xFF08;&#x6B63;&#x5B9A;&#xFF09;&#x77E9;&#x9635;"></a>&#x4E00;&#x4E9B;&#x51F8;&#x96C6;&#xFF1A;&#x8D85;&#x5E73;&#x9762;&#x3001;&#x534A;&#x7A7A;&#x95F4;&#x3001;&#x7403;&#x3001;&#x692D;&#x7403;&#x3001;&#x591A;&#x9762;&#x4F53;&#x3001;&#x5355;&#x7EAF;&#x5F62;&#x3001;&#x5BF9;&#x79F0;&#xFF08;&#x534A;&#xFF09;&#xFF08;&#x6B63;&#x5B9A;&#xFF09;&#x77E9;&#x9635;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#仿射函数、透视函数、线性分数函数"><span class="nav-number">3.</span> <span class="nav-text"><a href="#&#x4EFF;&#x5C04;&#x51FD;&#x6570;&#x3001;&#x900F;&#x89C6;&#x51FD;&#x6570;&#x3001;&#x7EBF;&#x6027;&#x5206;&#x6570;&#x51FD;&#x6570;" class="headerlink" title="&#x4EFF;&#x5C04;&#x51FD;&#x6570;&#x3001;&#x900F;&#x89C6;&#x51FD;&#x6570;&#x3001;&#x7EBF;&#x6027;&#x5206;&#x6570;&#x51FD;&#x6570;"></a>&#x4EFF;&#x5C04;&#x51FD;&#x6570;&#x3001;&#x900F;&#x89C6;&#x51FD;&#x6570;&#x3001;&#x7EBF;&#x6027;&#x5206;&#x6570;&#x51FD;&#x6570;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#保凸集运算："><span class="nav-number">4.</span> <span class="nav-text"><a href="#&#x4FDD;&#x51F8;&#x96C6;&#x8FD0;&#x7B97;&#xFF1A;" class="headerlink" title="&#x4FDD;&#x51F8;&#x96C6;&#x8FD0;&#x7B97;&#xFF1A;"></a>&#x4FDD;&#x51F8;&#x96C6;&#x8FD0;&#x7B97;&#xFF1A;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#凸函数"><span class="nav-number">5.</span> <span class="nav-text"><a href="#&#x51F8;&#x51FD;&#x6570;" class="headerlink" title="&#x51F8;&#x51FD;&#x6570;"></a>&#x51F8;&#x51FD;&#x6570;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#凸函数定义"><span class="nav-number">5.1.</span> <span class="nav-text"><a href="#&#x51F8;&#x51FD;&#x6570;&#x5B9A;&#x4E49;" class="headerlink" title="&#x51F8;&#x51FD;&#x6570;&#x5B9A;&#x4E49;"></a>&#x51F8;&#x51FD;&#x6570;&#x5B9A;&#x4E49;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#凸函数的一个重要性质"><span class="nav-number">5.2.</span> <span class="nav-text"><a href="#&#x51F8;&#x51FD;&#x6570;&#x7684;&#x4E00;&#x4E2A;&#x91CD;&#x8981;&#x6027;&#x8D28;" class="headerlink" title="&#x51F8;&#x51FD;&#x6570;&#x7684;&#x4E00;&#x4E2A;&#x91CD;&#x8981;&#x6027;&#x8D28;"></a>&#x51F8;&#x51FD;&#x6570;&#x7684;&#x4E00;&#x4E2A;&#x91CD;&#x8981;&#x6027;&#x8D28;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些常见的凸函数"><span class="nav-number">5.3.</span> <span class="nav-text"><a href="#&#x4E00;&#x4E9B;&#x5E38;&#x89C1;&#x7684;&#x51F8;&#x51FD;&#x6570;" class="headerlink" title="&#x4E00;&#x4E9B;&#x5E38;&#x89C1;&#x7684;&#x51F8;&#x51FD;&#x6570;"></a>&#x4E00;&#x4E9B;&#x5E38;&#x89C1;&#x7684;&#x51F8;&#x51FD;&#x6570;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二次型"><span class="nav-number">5.4.</span> <span class="nav-text"><a href="#&#x4E8C;&#x6B21;&#x578B;" class="headerlink" title="&#x4E8C;&#x6B21;&#x578B;"></a>&#x4E8C;&#x6B21;&#x578B;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些常用性质"><span class="nav-number">5.5.</span> <span class="nav-text"><a href="#&#x4E00;&#x4E9B;&#x5E38;&#x7528;&#x6027;&#x8D28;" class="headerlink" title="&#x4E00;&#x4E9B;&#x5E38;&#x7528;&#x6027;&#x8D28;"></a>&#x4E00;&#x4E9B;&#x5E38;&#x7528;&#x6027;&#x8D28;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#保凸函数运算"><span class="nav-number">5.6.</span> <span class="nav-text"><a href="#&#x4FDD;&#x51F8;&#x51FD;&#x6570;&#x8FD0;&#x7B97;" class="headerlink" title="&#x4FDD;&#x51F8;&#x51FD;&#x6570;&#x8FD0;&#x7B97;"></a>&#x4FDD;&#x51F8;&#x51FD;&#x6570;&#x8FD0;&#x7B97;</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘腾营</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 您是第
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      位访客
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 被访问
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('-1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

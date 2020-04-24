@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="SeeYouTomorrow">
 <meta property="og:description" content="2019-07-04几种回归的概念线性回归很简单，就是$y=W^Tx + b$，而广义线性回归则可以用一个单调可微的函数$g(\centerdot)$写成$y=g^{-1}(W^Tx + b)$或者$g(y) = W^Tx + b$,对数回归$ln(y) = W^Tx + b$就是广义线性回归的一个例子。 如果要使用回归来解决分类问题，理想的情况是使用单位阶跃函数将回归值映射为类别标签，但单位阶跃">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-07-05T13:57:30.884Z">
+<meta property="og:updated_time" content="2020-04-23T12:37:20.545Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="学习笔记-2019-07">
 <meta name="twitter:description" content="2019-07-04几种回归的概念线性回归很简单，就是$y=W^Tx + b$，而广义线性回归则可以用一个单调可微的函数$g(\centerdot)$写成$y=g^{-1}(W^Tx + b)$或者$g(y) = W^Tx + b$,对数回归$ln(y) = W^Tx + b$就是广义线性回归的一个例子。 如果要使用回归来解决分类问题，理想的情况是使用单位阶跃函数将回归值映射为类别标签，但单位阶跃">
@@ -382,7 +382,7 @@
 <p>以两类数据$x_1, x_2$为例，设$\mu_1,\mu_2,\Sigma_1,\Sigma_2$分别表示两类数据的均值和方差，则投影之后的均值和方差为$w\mu_1,w\mu_2,w^T\Sigma_1w,w^T\Sigma_2w$，因为直线是一维空间，所以这些均为实数，投影之后的类内距离可以用方差来衡量，这里使用$w^T\Sigma_1w + w^T\Sigma_2w$来度量投影之后的类内距离，而类间距离可以写成$||w\mu_2 - w\mu_1||_2^2$，同时考虑两种距离，给出希望最大化的目标函数如下。</p>
 <script type="math/tex; mode=display">
 \begin{aligned}
-J &= \frac{||w\mu_2 - w\mu_1||_2^2}{w^T\Sigma_1w + w^T\Sigma_2w}\\
+J &= \frac{||w^T\mu_2 - w^T\mu_1||_2^2}{w^T\Sigma_1w + w^T\Sigma_2w}\\
 &= \frac{w^T(\mu_2 - \mu_1)(\mu_2 - \mu_1)^Tw}{w^T(\Sigma_1 + \Sigma_2)w}
 \end{aligned}</script><p>定义类内散度矩阵$S_w = \Sigma_1 + \Sigma_2$，类间散度矩阵$S_b = (\mu_2 - \mu_1)(\mu_2 - \mu_1)^T$，上面的优化目标可以简写为如下。</p>
 <script type="math/tex; mode=display">
@@ -518,7 +518,7 @@ s.t.& \quad w^TS_ww = 1
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-count">33</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -540,7 +540,7 @@ s.t.& \quad w^TS_ww = 1
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-count">14</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
