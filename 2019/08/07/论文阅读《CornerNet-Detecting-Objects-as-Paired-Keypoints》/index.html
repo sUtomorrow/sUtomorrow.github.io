@@ -88,7 +88,7 @@
 <meta property="og:description" content="提出的问题单阶段目标检测大多基于anchor实现，但是用anchor存在两个问题：  为了保证所有ground truth都有匹配的anchor，不得不使用非常多的anchor，例如retinanet anchor个数100K, DSSD anchor个数40K，但是真正与ground truth iou较大的anchor非常少，导致了很严重的正负样本不平衡问题。 设置anchor时需要非常多的超">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://sutomorrow.github.io/2019/08/07/论文阅读《CornerNet-Detecting-Objects-as-Paired-Keypoints》/CornerPooling.png">
-<meta property="og:updated_time" content="2020-04-17T09:19:14.662Z">
+<meta property="og:updated_time" content="2020-04-30T09:31:16.193Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="“论文阅读《CornerNet-Detecting-Objects-as-Paired-Keypoints》”">
 <meta name="twitter:description" content="提出的问题单阶段目标检测大多基于anchor实现，但是用anchor存在两个问题：  为了保证所有ground truth都有匹配的anchor，不得不使用非常多的anchor，例如retinanet anchor个数100K, DSSD anchor个数40K，但是真正与ground truth iou较大的anchor非常少，导致了很严重的正负样本不平衡问题。 设置anchor时需要非常多的超">
@@ -382,7 +382,7 @@
 <li>目标在两个角点之间，因此feature map上的角点位置缺少关于目标的信息，如何准确的进行分类？</li>
 <li>feature map在经过下采样之后，feature map上的点的位置要映射回原图，这个时候存在位置精度的损失，可能造成预测位置的偏差。</li>
 </ul>
-<h2 id="具体做法"><a href="#具体做法" class="headerlink" title="具体做法"></a>具体做法</h2><p>针对第一个角点匹配的问题，这里引用了另外一篇论文的方法（《ssociative embedding: End-to-end learning forjoint detection and grouping》，具体我没看），在模型中，两个角点坐标的feature map都会额外预测一个一维的嵌入向量（embedding vector），希望当两个角点匹配时，两个角点位置预测的嵌入向量的距离尽可能接近，否则尽可能远离（<strong>这里嵌入向量的想法没看得太懂，可能还要看看原论文才能理解，除此之外计算量貌似有点大</strong>），因此定义了两个loss如下所示，其中$e_{t_k}$代表第k个目标左上角点的嵌入向量，$e_{b_k}$代表第k个目标右下角点的嵌入向量，$e_k = \frac{(e_{t_k} + e_{b_k})}{2}$，N代表目标的个数，$\Delta$在论文的所有实验中均为1。</p>
+<h2 id="具体做法"><a href="#具体做法" class="headerlink" title="具体做法"></a>具体做法</h2><p>针对第一个角点匹配的问题，这里引用了另外一篇论文的方法（《ssociative embedding: End-to-end learning forjoint detection and grouping》），在模型中，两个角点坐标的feature map都会额外预测一个一维的嵌入向量（embedding vector），希望当两个角点匹配时，两个角点位置预测的嵌入向量的距离尽可能接近，否则尽可能远离（<strong>这里嵌入向量的想法没看得太懂，可能还要看看原论文才能理解，除此之外计算量貌似有点大</strong>），因此定义了两个loss如下所示，其中$e_{t_k}$代表第k个目标左上角点的嵌入向量，$e_{b_k}$代表第k个目标右下角点的嵌入向量，$e_k = \frac{(e_{t_k} + e_{b_k})}{2}$，N代表目标的个数，$\Delta$在论文的所有实验中均为1。</p>
 <script type="math/tex; mode=display">
 \begin{aligned}
     L_{pull} &= \frac{1}{N}\sum_{k=1}^N[(e_{t_k} - e_k) ^ 2 + (e_{b_k} - e_k) ^ 2]\\
