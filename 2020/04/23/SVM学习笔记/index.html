@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="SeeYouTomorrow">
 <meta property="og:description" content="线性SVM详细推导首先，一个点$p \in \mathbb{R}^d$到超平面$w^Tx+b=0$的距离可以表示为$\frac{1}{||w||}|w^Tp + b|$。 对于一个两类别数据集$X\in\mathbb{R}^d, Y\in\{0, 1\}$，定义间隔$\gamma=2\min_i\frac{1}{||w||}|w^Tx_i + b|$ 线性支持向量机的目标即找到一组适合的参数$(w">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-04-25T09:35:54.229Z">
+<meta property="og:updated_time" content="2020-05-09T06:05:32.090Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SVM学习笔记">
 <meta name="twitter:description" content="线性SVM详细推导首先，一个点$p \in \mathbb{R}^d$到超平面$w^Tx+b=0$的距离可以表示为$\frac{1}{||w||}|w^Tp + b|$。 对于一个两类别数据集$X\in\mathbb{R}^d, Y\in\{0, 1\}$，定义间隔$\gamma=2\min_i\frac{1}{||w||}|w^Tx_i + b|$ 线性支持向量机的目标即找到一组适合的参数$(w">
@@ -393,6 +393,8 @@ s.t. \ \alpha_i \ge 0, i=1,2,...,m</script><p>其对偶问题可以表示为:</p
 s.t. \ \alpha_i \ge 0, i=1,2,...,m</script><p>其KKT条件表示为:</p>
 <script type="math/tex; mode=display">
 \begin{aligned}
+&\triangledown_wL(w,b,\alpha) = 0 \\
+&\triangledown_bL(w,b,\alpha) = 0 \\
 &1 - y_i(w^T x_i + b) \le 0 \\
 &\alpha_i \ge 0 \\
 &\alpha_i(1 - y_i(w^Tx_i + b)) = 0    
@@ -553,7 +555,7 @@ s.t. y_i(w^T\phi(x_i) + b) \ge 1 - \epsilon_i, i = 1, 2,...,m\\
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">31</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -564,7 +566,7 @@ s.t. y_i(w^T\phi(x_i) + b) \ge 1 - \epsilon_i, i = 1, 2,...,m\\
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -575,7 +577,7 @@ s.t. y_i(w^T\phi(x_i) + b) \ge 1 - \epsilon_i, i = 1, 2,...,m\\
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

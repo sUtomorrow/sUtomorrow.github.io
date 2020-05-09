@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="因为需要实现keras版本的refineDet模型，因此考虑从keras-retinanet代码上进行修改，这里记录refineDet模型结构中的一些关键实现方式。 来源于论文 为了获取更高层的信息，在backbone网络中，加深了一层，对于ResNet-101，添加了一个额外的residual block. 在anchor大小选择方面，根据S3FD: Single Shot Scale-inva">
+<meta name="description" content="因为需要实现keras版本的refineDet模型，因此考虑从keras-retinanet代码上进行修改，这里记录refineDet模型结构中的一些关键实现方式。  为了获取更高层的信息，在backbone网络中，加深了一层，对于ResNet-101，添加了一个额外的residual block. 在anchor大小选择方面，根据《S3FD: Single Shot Scale-invarian">
 <meta name="keywords" content="深度学习">
 <meta property="og:type" content="article">
 <meta property="og:title" content="refineDet模型结构要点">
 <meta property="og:url" content="http://sUtomorrow.github.io/2019/04/15/refineDet模型结构要点/index.html">
 <meta property="og:site_name" content="SeeYouTomorrow">
-<meta property="og:description" content="因为需要实现keras版本的refineDet模型，因此考虑从keras-retinanet代码上进行修改，这里记录refineDet模型结构中的一些关键实现方式。 来源于论文 为了获取更高层的信息，在backbone网络中，加深了一层，对于ResNet-101，添加了一个额外的residual block. 在anchor大小选择方面，根据S3FD: Single Shot Scale-inva">
+<meta property="og:description" content="因为需要实现keras版本的refineDet模型，因此考虑从keras-retinanet代码上进行修改，这里记录refineDet模型结构中的一些关键实现方式。  为了获取更高层的信息，在backbone网络中，加深了一层，对于ResNet-101，添加了一个额外的residual block. 在anchor大小选择方面，根据《S3FD: Single Shot Scale-invarian">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-27T11:52:22.777Z">
+<meta property="og:updated_time" content="2020-05-09T09:05:14.771Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="refineDet模型结构要点">
-<meta name="twitter:description" content="因为需要实现keras版本的refineDet模型，因此考虑从keras-retinanet代码上进行修改，这里记录refineDet模型结构中的一些关键实现方式。 来源于论文 为了获取更高层的信息，在backbone网络中，加深了一层，对于ResNet-101，添加了一个额外的residual block. 在anchor大小选择方面，根据S3FD: Single Shot Scale-inva">
+<meta name="twitter:description" content="因为需要实现keras版本的refineDet模型，因此考虑从keras-retinanet代码上进行修改，这里记录refineDet模型结构中的一些关键实现方式。  为了获取更高层的信息，在backbone网络中，加深了一层，对于ResNet-101，添加了一个额外的residual block. 在anchor大小选择方面，根据《S3FD: Single Shot Scale-invarian">
 
 
 
@@ -392,13 +392,13 @@
 
       
         <p>因为需要实现keras版本的refineDet模型，因此考虑从keras-retinanet代码上进行修改，这里记录refineDet模型结构中的一些关键实现方式。</p>
-<h2 id="来源于论文"><a href="#来源于论文" class="headerlink" title="来源于论文"></a>来源于论文</h2><ul>
+<ul>
 <li>为了获取更高层的信息，在backbone网络中，加深了一层，对于ResNet-101，添加了一个额外的residual block.</li>
-<li>在anchor大小选择方面，根据S3FD: Single Shot Scale-invariant Face Detector、Understanding the Effective Receptive Field inDeep Convolutional Neural Networks这两篇论文，anchor大小的选择应该要比理论感受小很多，使用有效感受野来估计每一个检测层的anchor大小，大约使用检测层stride的4倍作为anchor大小，并在anchor基础大小之上使用三种比例0.5,1.0,2.0</li>
+<li>在anchor大小选择方面，根据《S3FD: Single Shot Scale-invariant Face Detector》、《Understanding the Effective Receptive Field inDeep Convolutional Neural Networks》这两篇论文，anchor大小的选择应该要比理论感受小很多，使用有效感受野来估计每一个检测层的anchor大小，大约使用检测层stride的4倍作为anchor大小，并在anchor基础大小之上使用三种比例0.5,1.0,2.0</li>
 <li>anchor匹配时，首先对于每个ground truth，分别匹配一个jaccard overlap最大的anchor，之后再将剩下的每一个anchor分配给jaccard overlap大于0.5的ground truth。</li>
 <li>计算loss时，对anchor进行hard negative mining，保证negative anchor和positive anchor的比例是3：1。</li>
 </ul>
-<h2 id="来源于refineDet作者公布的caffe代码"><a href="#来源于refineDet作者公布的caffe代码" class="headerlink" title="来源于refineDet作者公布的caffe代码"></a>来源于refineDet作者公布的caffe代码</h2>
+
       
     </div>
     
@@ -497,17 +497,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -522,7 +513,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">31</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -533,7 +524,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -544,7 +535,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -567,22 +558,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#来源于论文"><span class="nav-number">1.</span> <span class="nav-text"><a href="#&#x6765;&#x6E90;&#x4E8E;&#x8BBA;&#x6587;" class="headerlink" title="&#x6765;&#x6E90;&#x4E8E;&#x8BBA;&#x6587;"></a>&#x6765;&#x6E90;&#x4E8E;&#x8BBA;&#x6587;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#来源于refineDet作者公布的caffe代码"><span class="nav-number">2.</span> <span class="nav-text"><a href="#&#x6765;&#x6E90;&#x4E8E;refineDet&#x4F5C;&#x8005;&#x516C;&#x5E03;&#x7684;caffe&#x4EE3;&#x7801;" class="headerlink" title="&#x6765;&#x6E90;&#x4E8E;refineDet&#x4F5C;&#x8005;&#x516C;&#x5E03;&#x7684;caffe&#x4EE3;&#x7801;"></a>&#x6765;&#x6E90;&#x4E8E;refineDet&#x4F5C;&#x8005;&#x516C;&#x5E03;&#x7684;caffe&#x4EE3;&#x7801;</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       

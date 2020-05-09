@@ -79,19 +79,19 @@
 
 
 
-<meta name="description" content="CNN中的基本操作卷积层一般的神经网络中，每一层是上层输出到该层输出的全连接，但是对于图像数据，如果使用全连接操作，参数量会变得非常大，难以计算和优化而且容易过拟合。 卷积层有一维卷积、二维卷积、三维卷积几种常见的类型，这里主要讨论二维卷积，其他的卷积只是输入的维度数量不同，并无特殊。 在Pytorch框架下的CNN实现中，卷积层的输入一般是$(B\times C\times H\times W)">
+<meta name="description" content="使用CNN这么久了，最近抽点时间来复习一下CNN相关的一些基础内容。 CNN中的基本操作卷积层一般的神经网络中，每一层是上层输出到该层输出的全连接，但是对于图像数据，如果使用全连接操作，参数量会变得非常大，难以计算和优化而且容易过拟合。 卷积层有一维卷积、二维卷积、三维卷积几种常见的类型，这里主要讨论二维卷积，其他的卷积只是输入的维度数量不同，并无特殊。 在Pytorch框架下的CNN实现中，卷积">
 <meta name="keywords" content="深度学习">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CNN相关知识">
 <meta property="og:url" content="http://sUtomorrow.github.io/2020/05/07/CNN相关知识/index.html">
 <meta property="og:site_name" content="SeeYouTomorrow">
-<meta property="og:description" content="CNN中的基本操作卷积层一般的神经网络中，每一层是上层输出到该层输出的全连接，但是对于图像数据，如果使用全连接操作，参数量会变得非常大，难以计算和优化而且容易过拟合。 卷积层有一维卷积、二维卷积、三维卷积几种常见的类型，这里主要讨论二维卷积，其他的卷积只是输入的维度数量不同，并无特殊。 在Pytorch框架下的CNN实现中，卷积层的输入一般是$(B\times C\times H\times W)">
+<meta property="og:description" content="使用CNN这么久了，最近抽点时间来复习一下CNN相关的一些基础内容。 CNN中的基本操作卷积层一般的神经网络中，每一层是上层输出到该层输出的全连接，但是对于图像数据，如果使用全连接操作，参数量会变得非常大，难以计算和优化而且容易过拟合。 卷积层有一维卷积、二维卷积、三维卷积几种常见的类型，这里主要讨论二维卷积，其他的卷积只是输入的维度数量不同，并无特殊。 在Pytorch框架下的CNN实现中，卷积">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://sutomorrow.github.io/2020/05/07/CNN相关知识/Conv.gif">
-<meta property="og:updated_time" content="2020-05-07T13:00:23.873Z">
+<meta property="og:updated_time" content="2020-05-09T05:45:07.307Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CNN相关知识">
-<meta name="twitter:description" content="CNN中的基本操作卷积层一般的神经网络中，每一层是上层输出到该层输出的全连接，但是对于图像数据，如果使用全连接操作，参数量会变得非常大，难以计算和优化而且容易过拟合。 卷积层有一维卷积、二维卷积、三维卷积几种常见的类型，这里主要讨论二维卷积，其他的卷积只是输入的维度数量不同，并无特殊。 在Pytorch框架下的CNN实现中，卷积层的输入一般是$(B\times C\times H\times W)">
+<meta name="twitter:description" content="使用CNN这么久了，最近抽点时间来复习一下CNN相关的一些基础内容。 CNN中的基本操作卷积层一般的神经网络中，每一层是上层输出到该层输出的全连接，但是对于图像数据，如果使用全连接操作，参数量会变得非常大，难以计算和优化而且容易过拟合。 卷积层有一维卷积、二维卷积、三维卷积几种常见的类型，这里主要讨论二维卷积，其他的卷积只是输入的维度数量不同，并无特殊。 在Pytorch框架下的CNN实现中，卷积">
 <meta name="twitter:image" content="http://sutomorrow.github.io/2020/05/07/CNN相关知识/Conv.gif">
 
 
@@ -371,7 +371,8 @@
       
 
       
-        <h1 id="CNN中的基本操作"><a href="#CNN中的基本操作" class="headerlink" title="CNN中的基本操作"></a>CNN中的基本操作</h1><h2 id="卷积层"><a href="#卷积层" class="headerlink" title="卷积层"></a>卷积层</h2><p>一般的神经网络中，每一层是上层输出到该层输出的全连接，但是对于图像数据，如果使用全连接操作，参数量会变得非常大，难以计算和优化而且容易过拟合。</p>
+        <p>使用CNN这么久了，最近抽点时间来复习一下CNN相关的一些基础内容。</p>
+<h1 id="CNN中的基本操作"><a href="#CNN中的基本操作" class="headerlink" title="CNN中的基本操作"></a>CNN中的基本操作</h1><h2 id="卷积层"><a href="#卷积层" class="headerlink" title="卷积层"></a>卷积层</h2><p>一般的神经网络中，每一层是上层输出到该层输出的全连接，但是对于图像数据，如果使用全连接操作，参数量会变得非常大，难以计算和优化而且容易过拟合。</p>
 <p>卷积层有一维卷积、二维卷积、三维卷积几种常见的类型，这里主要讨论二维卷积，其他的卷积只是输入的维度数量不同，并无特殊。</p>
 <p>在Pytorch框架下的CNN实现中，卷积层的输入一般是$(B\times C\times H\times W)$的形状（其他框架例如Tensorflow，使用的输入形状是$(B\times H\times W\times C)$，只是维度顺序不同），其中$B$是代表batch size，表示不同的图片样本，$C$代表通道数量，例如原始彩色图片一般是三个通道：R、G、B，最后的$H,\ W$是特征图的像素高度和像素宽度。</p>
 <p>卷积层的参数主要有两个：Kernel、Bias。</p>
@@ -380,9 +381,23 @@
 <p>卷积操作如图所示：<br><img src="/2020/05/07/CNN相关知识/Conv.gif" title="卷积操作示意"></p>
 <h3 id="卷积层的参数量和计算量"><a href="#卷积层的参数量和计算量" class="headerlink" title="卷积层的参数量和计算量"></a>卷积层的参数量和计算量</h3><p>参数量即卷积核的大小加上偏置的大小：$H_k\times W_k\times C_o\times C_i + C_o$<br>计算量受到步长，padding方式等影响，从输入的大小来看不好计算，但是可以根据输出的特征图大小来计算：$H’ \times W’ \times (H_k\times W_k\times C_o\times C_i + C_o)$</p>
 <h3 id="对卷积操作的理解"><a href="#对卷积操作的理解" class="headerlink" title="对卷积操作的理解"></a>对卷积操作的理解</h3><p>卷积操作的本质就是在特征图上使用相同的参数滑动进行局部的全连接，这样做能够减少参数量和计算量，并且因为共享权值，在进行优化时更加容易。</p>
+<p>卷积层有一些主要特点：</p>
+<ul>
+<li>权值共享：在图像的不同部分，使用相同的特征提取是有意义的，这也是卷积层具备平移不变性的原因。</li>
+<li>稀疏连接：对于一个输出值只和输入的一部分相关。</li>
+</ul>
 <p>卷积操作可以看做一种局部特征的提取，例如一些边缘检测算子，实际上就是在图片上使用相同的参数滑动进行乘法操作（匹配特征方向），将代表边缘的像素点赋予更大的像素值，从而在结果图片中将边缘表示为亮的线条，这里就是在提取局部的边缘特征并保留其位置信息，最终组成整幅图片的边缘表示。</p>
-<h3 id="CNN的反向传播"><a href="#CNN的反向传播" class="headerlink" title="CNN的反向传播"></a>CNN的反向传播</h3><p>可见我的另一篇文章<a href="/2020/05/07/CNN的反向传播/" title="CNN的反向传播">CNN的反向传播</a></p>
-<h2 id="激活函数"><a href="#激活函数" class="headerlink" title="激活函数"></a>激活函数</h2><h3 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h3><h2 id="池化层"><a href="#池化层" class="headerlink" title="池化层"></a>池化层</h2><h3 id="TODO-1"><a href="#TODO-1" class="headerlink" title="TODO"></a>TODO</h3>
+<h3 id="CNN的反向传播"><a href="#CNN的反向传播" class="headerlink" title="CNN的反向传播"></a>CNN的反向传播</h3><p>这部分内容可见我的另一篇文章<a href="/2020/05/07/CNN的反向传播/" title="CNN的反向传播">CNN的反向传播</a></p>
+<h2 id="激活函数"><a href="#激活函数" class="headerlink" title="激活函数"></a>激活函数</h2><p>激活函数一般是一个非线性的逐元素的函数，例如Sigmoid和ReLU。</p>
+<h3 id="为什么要使用激活函数"><a href="#为什么要使用激活函数" class="headerlink" title="为什么要使用激活函数"></a>为什么要使用激活函数</h3><p>在NN中，如果不使用一些非线性函数作为激活函数，那么模型的深度将毫无意义（仿射变换之后，在进行仿射变换，依旧等效于一个仿射变换）。<br>在CNN中也有类似的问题，如果多层卷积堆叠，中间没有非线性处理，那么完全可以用一个大核卷积层来进行替换，虽然会导致运算量上升，但是由于小核卷积的参数共享更严重，所以多个小核卷积层的表达能力还不如一个大核卷积层。</p>
+<p>激活函数不论是加在NN中还是CNN中，其主要目的是引入非线性操作，提升模型的表达能力。</p>
+<h2 id="池化层"><a href="#池化层" class="headerlink" title="池化层"></a>池化层</h2><p>池化层的本质是采样操作，用于对上一层得到的结果进行压缩，减少模型计算量，同时有助于滤除噪声。</p>
+<p>池化层主要有两类：</p>
+<ul>
+<li>最大池化：保留池化核范围内最大的元素，注重于纹理信息的提取、过滤噪声，更适合浅层特征。</li>
+<li>平均池化：将池化核范围内的元素取平均，注重保留背景信息、混合不同空间位置的信息，更适合深层特征。</li>
+</ul>
+
       
     </div>
     
@@ -506,7 +521,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-count">31</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -517,7 +532,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">2</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -528,7 +543,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-count">15</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -561,7 +576,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CNN中的基本操作"><span class="nav-number">1.</span> <span class="nav-text"><a href="#CNN&#x4E2D;&#x7684;&#x57FA;&#x672C;&#x64CD;&#x4F5C;" class="headerlink" title="CNN&#x4E2D;&#x7684;&#x57FA;&#x672C;&#x64CD;&#x4F5C;"></a>CNN&#x4E2D;&#x7684;&#x57FA;&#x672C;&#x64CD;&#x4F5C;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#卷积层"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x5377;&#x79EF;&#x5C42;" class="headerlink" title="&#x5377;&#x79EF;&#x5C42;"></a>&#x5377;&#x79EF;&#x5C42;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#卷积层的参数量和计算量"><span class="nav-number">1.1.1.</span> <span class="nav-text"><a href="#&#x5377;&#x79EF;&#x5C42;&#x7684;&#x53C2;&#x6570;&#x91CF;&#x548C;&#x8BA1;&#x7B97;&#x91CF;" class="headerlink" title="&#x5377;&#x79EF;&#x5C42;&#x7684;&#x53C2;&#x6570;&#x91CF;&#x548C;&#x8BA1;&#x7B97;&#x91CF;"></a>&#x5377;&#x79EF;&#x5C42;&#x7684;&#x53C2;&#x6570;&#x91CF;&#x548C;&#x8BA1;&#x7B97;&#x91CF;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对卷积操作的理解"><span class="nav-number">1.1.2.</span> <span class="nav-text"><a href="#&#x5BF9;&#x5377;&#x79EF;&#x64CD;&#x4F5C;&#x7684;&#x7406;&#x89E3;" class="headerlink" title="&#x5BF9;&#x5377;&#x79EF;&#x64CD;&#x4F5C;&#x7684;&#x7406;&#x89E3;"></a>&#x5BF9;&#x5377;&#x79EF;&#x64CD;&#x4F5C;&#x7684;&#x7406;&#x89E3;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CNN的反向传播"><span class="nav-number">1.1.3.</span> <span class="nav-text"><a href="#CNN&#x7684;&#x53CD;&#x5411;&#x4F20;&#x64AD;" class="headerlink" title="CNN&#x7684;&#x53CD;&#x5411;&#x4F20;&#x64AD;"></a>CNN&#x7684;&#x53CD;&#x5411;&#x4F20;&#x64AD;</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#激活函数"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#&#x6FC0;&#x6D3B;&#x51FD;&#x6570;" class="headerlink" title="&#x6FC0;&#x6D3B;&#x51FD;&#x6570;"></a>&#x6FC0;&#x6D3B;&#x51FD;&#x6570;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TODO"><span class="nav-number">1.2.1.</span> <span class="nav-text"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#池化层"><span class="nav-number">1.3.</span> <span class="nav-text"><a href="#&#x6C60;&#x5316;&#x5C42;" class="headerlink" title="&#x6C60;&#x5316;&#x5C42;"></a>&#x6C60;&#x5316;&#x5C42;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TODO-1"><span class="nav-number">1.3.1.</span> <span class="nav-text"><a href="#TODO-1" class="headerlink" title="TODO"></a>TODO</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CNN中的基本操作"><span class="nav-number">1.</span> <span class="nav-text"><a href="#CNN&#x4E2D;&#x7684;&#x57FA;&#x672C;&#x64CD;&#x4F5C;" class="headerlink" title="CNN&#x4E2D;&#x7684;&#x57FA;&#x672C;&#x64CD;&#x4F5C;"></a>CNN&#x4E2D;&#x7684;&#x57FA;&#x672C;&#x64CD;&#x4F5C;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#卷积层"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x5377;&#x79EF;&#x5C42;" class="headerlink" title="&#x5377;&#x79EF;&#x5C42;"></a>&#x5377;&#x79EF;&#x5C42;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#卷积层的参数量和计算量"><span class="nav-number">1.1.1.</span> <span class="nav-text"><a href="#&#x5377;&#x79EF;&#x5C42;&#x7684;&#x53C2;&#x6570;&#x91CF;&#x548C;&#x8BA1;&#x7B97;&#x91CF;" class="headerlink" title="&#x5377;&#x79EF;&#x5C42;&#x7684;&#x53C2;&#x6570;&#x91CF;&#x548C;&#x8BA1;&#x7B97;&#x91CF;"></a>&#x5377;&#x79EF;&#x5C42;&#x7684;&#x53C2;&#x6570;&#x91CF;&#x548C;&#x8BA1;&#x7B97;&#x91CF;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对卷积操作的理解"><span class="nav-number">1.1.2.</span> <span class="nav-text"><a href="#&#x5BF9;&#x5377;&#x79EF;&#x64CD;&#x4F5C;&#x7684;&#x7406;&#x89E3;" class="headerlink" title="&#x5BF9;&#x5377;&#x79EF;&#x64CD;&#x4F5C;&#x7684;&#x7406;&#x89E3;"></a>&#x5BF9;&#x5377;&#x79EF;&#x64CD;&#x4F5C;&#x7684;&#x7406;&#x89E3;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CNN的反向传播"><span class="nav-number">1.1.3.</span> <span class="nav-text"><a href="#CNN&#x7684;&#x53CD;&#x5411;&#x4F20;&#x64AD;" class="headerlink" title="CNN&#x7684;&#x53CD;&#x5411;&#x4F20;&#x64AD;"></a>CNN&#x7684;&#x53CD;&#x5411;&#x4F20;&#x64AD;</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#激活函数"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#&#x6FC0;&#x6D3B;&#x51FD;&#x6570;" class="headerlink" title="&#x6FC0;&#x6D3B;&#x51FD;&#x6570;"></a>&#x6FC0;&#x6D3B;&#x51FD;&#x6570;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么要使用激活函数"><span class="nav-number">1.2.1.</span> <span class="nav-text"><a href="#&#x4E3A;&#x4EC0;&#x4E48;&#x8981;&#x4F7F;&#x7528;&#x6FC0;&#x6D3B;&#x51FD;&#x6570;" class="headerlink" title="&#x4E3A;&#x4EC0;&#x4E48;&#x8981;&#x4F7F;&#x7528;&#x6FC0;&#x6D3B;&#x51FD;&#x6570;"></a>&#x4E3A;&#x4EC0;&#x4E48;&#x8981;&#x4F7F;&#x7528;&#x6FC0;&#x6D3B;&#x51FD;&#x6570;</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#池化层"><span class="nav-number">1.3.</span> <span class="nav-text"><a href="#&#x6C60;&#x5316;&#x5C42;" class="headerlink" title="&#x6C60;&#x5316;&#x5C42;"></a>&#x6C60;&#x5316;&#x5C42;</span></a></li></ol></li></ol></div>
             
 
           </div>
