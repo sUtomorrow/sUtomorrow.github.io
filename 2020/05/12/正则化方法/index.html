@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="刘腾营,博客" />
+  <meta name="keywords" content="深度学习," />
 
 
 
@@ -79,13 +79,20 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="SeeYouTomorrow">
-<meta property="og:url" content="http://sUtomorrow.github.io/archives/2019/07/index.html">
+<meta name="description" content="正则化方法是向原始模型引入额外信息的一种方法的统称。 参数范数正则化通过在损失函数中加入参数范数项来降低模型容量，从而达到正则化的效果，形如下式，其中$J$表示原始的损失函数，$\Omega(w)$表示参数的一种范数，$\alpha$参数用于控制正则化程度，$\tilde{J}(w;X,y)$表示添加了正则化之后的损失函数。  \tilde{J}(w;X,y) = J(w;X,y) + \alph">
+<meta name="keywords" content="深度学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="正则化方法">
+<meta property="og:url" content="http://sUtomorrow.github.io/2020/05/12/正则化方法/index.html">
 <meta property="og:site_name" content="SeeYouTomorrow">
+<meta property="og:description" content="正则化方法是向原始模型引入额外信息的一种方法的统称。 参数范数正则化通过在损失函数中加入参数范数项来降低模型容量，从而达到正则化的效果，形如下式，其中$J$表示原始的损失函数，$\Omega(w)$表示参数的一种范数，$\alpha$参数用于控制正则化程度，$\tilde{J}(w;X,y)$表示添加了正则化之后的损失函数。  \tilde{J}(w;X,y) = J(w;X,y) + \alph">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://sutomorrow.github.io/2020/05/12/正则化方法/l1正则化效果示意.png">
+<meta property="og:updated_time" content="2020-05-12T07:01:46.879Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="SeeYouTomorrow">
+<meta name="twitter:title" content="正则化方法">
+<meta name="twitter:description" content="正则化方法是向原始模型引入额外信息的一种方法的统称。 参数范数正则化通过在损失函数中加入参数范数项来降低模型容量，从而达到正则化的效果，形如下式，其中$J$表示原始的损失函数，$\Omega(w)$表示参数的一种范数，$\alpha$参数用于控制正则化程度，$\tilde{J}(w;X,y)$表示添加了正则化之后的损失函数。  \tilde{J}(w;X,y) = J(w;X,y) + \alph">
+<meta name="twitter:image" content="http://sutomorrow.github.io/2020/05/12/正则化方法/l1正则化效果示意.png">
 
 
 
@@ -115,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="http://sUtomorrow.github.io/archives/2019/07/"/>
+  <link rel="canonical" href="http://sUtomorrow.github.io/2020/05/12/正则化方法/"/>
 
 
 
 
 
-  <title>归档 | SeeYouTomorrow</title>
+  <title>正则化方法 | SeeYouTomorrow</title>
   
 
 
@@ -150,7 +157,7 @@
     
   
 
-  <div class="container sidebar-position-left page-archive">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -278,184 +285,271 @@
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+    
+
+  
+
   
   
   
-  <div class="post-block archive">
-    <div id="posts" class="posts-collapse">
-      <span class="archive-move-on"></span>
 
-      <span class="archive-page-counter">
-        
-        
-         
-        
-        OK! 目前共计 34 篇日志。 继续努力。
-      </span>
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sUtomorrow.github.io/2020/05/12/正则化方法/">
 
-      
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="刘腾营">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SeeYouTomorrow">
+    </span>
+
+    
+      <header class="post-header">
 
         
         
+          <h1 class="post-title" itemprop="name headline">正则化方法</h1>
         
 
-        
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-12T10:40:41+08:00">
+                2020-05-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
           
-          <div class="collection-title">
-            <h1 class="archive-year" id="archive-year-2019">2019</h1>
-          </div>
-        
-        
 
-        
+          
+            
+          
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+          
+          
 
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2019/07/31/论文阅读《Improving-neural-networks-by-preventingco-adaptation-of-feature-detectors》/" itemprop="url">
-              
-                <span itemprop="name">论文阅读《Improving-neural-networks-by-preventingco-adaptation-of-feature-detectors》</span>
-              
-            </a>
-        
-      </h2>
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 被阅读
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2019-07-31T10:08:12+08:00"
-              content="2019-07-31" >
-          07-31
-        </time>
-      </div>
+          
 
-    </header>
-  </article>
+          
 
+        </div>
+      </header>
+    
 
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2019/07/29/论文阅读《Multi-Task-Learning-Using-Uncertainty-to-Weigh-Lossesfor-Scene-Geometry-and-Semantics》/" itemprop="url">
-              
-                <span itemprop="name">论文阅读《Multi-Task-Learning-Using-Uncertainty-to-Weigh-Lossesfor-Scene-Geometry-and-Semantics》</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2019-07-29T15:39:55+08:00"
-              content="2019-07-29" >
-          07-29
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
       
 
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2019/07/26/论文阅读《Learning-a-Discriminative-Feature-Network-for-Semantic-Segmentation》/" itemprop="url">
-              
-                <span itemprop="name">论文阅读《Learning-a-Discriminative-Feature-Network-for-Semantic-Segmentation》</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2019-07-26T15:59:06+08:00"
-              content="2019-07-26" >
-          07-26
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
+      
+        <p>正则化方法是向原始模型引入额外信息的一种方法的统称。</p>
+<h1 id="参数范数正则化"><a href="#参数范数正则化" class="headerlink" title="参数范数正则化"></a>参数范数正则化</h1><p>通过在损失函数中加入参数范数项来降低模型容量，从而达到正则化的效果，形如下式，其中$J$表示原始的损失函数，$\Omega(w)$表示参数的一种范数，$\alpha$参数用于控制正则化程度，$\tilde{J}(w;X,y)$表示添加了正则化之后的损失函数。</p>
+<script type="math/tex; mode=display">
+\tilde{J}(w;X,y) = J(w;X,y) + \alpha\Omega(w)</script><h2 id="L2正则化（参数范数正则化的特例，范数使用2范数）"><a href="#L2正则化（参数范数正则化的特例，范数使用2范数）" class="headerlink" title="L2正则化（参数范数正则化的特例，范数使用2范数）"></a>L2正则化（参数范数正则化的特例，范数使用2范数）</h2><p>普通的损失函数可以写成如下：</p>
+<script type="math/tex; mode=display">
+J(w;X,y)</script><p>在权重参数上加上l2正则化项之后，损失函数如下，为方便分析，这里将$\alpha$写成$\frac{\alpha}{2}$：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    &\tilde{J} = \frac{\alpha}{2}w^Tw + J(w;X,y)\\
+    &对w的求导：\\
+    &\nabla_w\tilde{J} = \alpha w + \nabla_w J(w;X,y)
+\end{aligned}</script><p>每次的参数更新可以写成如下，其中$\epsilon$表示学习速率：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    &w \leftarrow w - \epsilon(\alpha w + \nabla_w J(w;X,y))\\
+    &等价于：\\
+    &w \leftarrow (1 - \epsilon\alpha) w + \epsilon\nabla_w J(w;X,y)
+\end{aligned}</script><p>从这里可以看到，学习规则发生了变化，在每次执行普通的梯度更新之前，会首先将原来的参数乘以一个常数项$(1 - \epsilon\alpha)$。</p>
+<p>对于原来的损失函数中存在的鞍点（梯度$\nabla_w J(w;X,y) = 0$），则L2正则化将使得参数在这些点任然会得到更新，从而有助于模型逃离鞍点。（但是这个说法我认为不太对，因为加入$\alpha w$这一项，只是将鞍点的位置进行了偏移，并不是去掉了鞍点。）</p>
+<p>为了分析l2正则化的作用，假定$J(w ^ \ast ; X , y)$是损失函数的极小值。<br>$w^\ast$是使损失函数取得极小值的参数，先简单的对损失函数进行二次近似如下，这里没有一次项是因为在函数极小值的地方，一次导数应该为0。</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \hat{J}(w;X,y) = J(w^\ast;X,y) + \frac{1}{2}(w-w^\ast)^TH(w-w^\ast)
+\end{aligned}</script><p>对加上l2正则化项的损失函数近似形式如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \hat{J}(w;X,y) = J(w^\ast;X,y) + \frac{1}{2}(w-w^\ast)^TH(w-w^\ast) + \frac{\alpha}{2} w^Tw
+\end{aligned}</script><p>对损失函数进行求导如下。</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \nabla_w \hat{J}(w;X,y) = \alpha w + H(w - w^\ast)
+\end{aligned}</script><p>当$\nabla_w\hat{J}(w;X,y) = 0$时，有如下推导：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    \alpha w + H(w - w^\ast) = 0\\
+    (H + \alpha I)w = Hw^\ast\\
+    w = (H + \alpha I)^{-1}Hw^\ast
+\end{aligned}</script><p>可见当$\alpha \rightarrow 0$时，$w \rightarrow w^\ast$，进一步，因为$H$是实对称矩阵，因此必定可以正交对角化，$H=Q \Lambda Q^T$，因此进一步推导如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+    w &= (Q \Lambda Q^T+ \alpha I)^{-1}Q \Lambda Q^Tw^\ast\\
+    &=[Q (\Lambda+ \alpha I) Q^T]^{-1}Q \Lambda Q^Tw^\ast\\
+    &=Q (\Lambda+ \alpha I)^{-1}\Lambda Q^Tw^\ast
+\end{aligned}</script><p>其中，假设$\Lambda$如下：</p>
+<script type="math/tex; mode=display">
+\begin{bmatrix}
+    &\lambda_1 &0 &0 &\cdots &0\\
+    &0 &\lambda_2 &0 &\cdots &0\\
+    &0 &0 &\lambda_3 &\cdots &0\\
+    &\vdots &\vdots &\vdots &\ddots &\vdots\\
+    &0 &0 &0 &\cdots &\lambda_n\\
+\end{bmatrix}</script><p>则$(\Lambda+ \alpha I)^{-1}\Lambda$如下：</p>
+<script type="math/tex; mode=display">
+\begin{bmatrix}
+    &\frac{\lambda_1}{\lambda_1 + \alpha} &0 &0 &\cdots &0\\
+    &0 &\frac{\lambda_2}{\lambda_2 + \alpha} &0 &\cdots &0\\
+    &0 &0 &\frac{\lambda_3}{\lambda_3 + \alpha} &\cdots &0\\
+    &\vdots &\vdots &\vdots &\ddots &\vdots\\
+    &0 &0 &0 &\cdots &\frac{\lambda_n}{\lambda_n + \alpha}\\
+\end{bmatrix}</script><p>这就相当于在原损失函数极小值点的Hession矩阵$H$的特征向量方向上，将$w^\ast$进行了缩放，而且特征值$\lambda_i$越小的方向，$\alpha$对其影响越大，缩小得越大，即加入l2正则化项之后，模型参数倾向于对损失函数影响显著的方向（Hession矩阵特征值大的方向）偏移。</p>
+<p>以最小二乘线性回归为例，其损失函数如下：</p>
+<script type="math/tex; mode=display">
+(Xw-y)^T(Xw-y)</script><p>如果加上l2正则化，则损失函数变成如下形式：</p>
+<script type="math/tex; mode=display">
+(Xw-y)^T(Xw-y) + \frac{1}{2}\alpha w^Tw</script><p>那么线性回归的解就从：</p>
+<script type="math/tex; mode=display">
+w = (X^TX)^{-1}X^Ty</script><p>变成了：</p>
+<script type="math/tex; mode=display">
+w = (X^TX + \alpha I)^{-1}X^Ty</script><p>其中$X$可以写成如下,其中$x_{ij}$表示第i个样本$x_i$的第j维：</p>
+<script type="math/tex; mode=display">
+X=\begin{bmatrix}
+    &x_{11} &x_{12} &\cdots &x_{1m}\\
+    &x_{21} &x_{22} &\cdots &x_{2m}\\
+    &\vdots &\vdots &\ddots &\vdots\\
+    &x_{n1} &x_{n1} &\cdots &x_{nm}\\
+\end{bmatrix}</script><p>则$X^TX$可以表示如下：</p>
+<script type="math/tex; mode=display">
+X^TX=\begin{bmatrix}
+    &\sum_i^nx_{i1}x_{i1} &\sum_i^nx_{i1}x_{i2} &\cdots &\sum_i^nx_{i1}x_{im}\\
+    &\sum_i^nx_{i2}x_{i1} &\sum_i^nx_{i2}x_{i2} &\cdots &\sum_i^nx_{i2}x_{im}\\
+    &\vdots &\vdots &\ddots &\vdots\\
+    &\sum_i^nx_{im}x_{i1} &\sum_i^nx_{im}x_{i2} &\cdots &\sum_i^nx_{im}x_{im}\\
+\end{bmatrix}</script><p>$X^TX$同样可以正交对角化，$X^TX = Q \Lambda Q^T$，这里的$\Lambda$对角线上的值是$X$奇异值的平方，之后的推导和上面相同，可见，加入l2正则化项之后，模型参数倾向于对损失函数影响显著的方向偏移，从而忽略掉数据中的一些干扰，增强模型泛化能力。</p>
+<h2 id="L1正则化（参数范数正则化的特例，范数使用1范数）"><a href="#L1正则化（参数范数正则化的特例，范数使用1范数）" class="headerlink" title="L1正则化（参数范数正则化的特例，范数使用1范数）"></a>L1正则化（参数范数正则化的特例，范数使用1范数）</h2><p>进行l1正则化之后的损失函数如下：</p>
+<script type="math/tex; mode=display">
+\tilde{J} = \alpha ||w||_1 + J(w;X,y)</script><p>对其进行求导：</p>
+<script type="math/tex; mode=display">
+\nabla_w\tilde{J} = \alpha\ sign(w) + \nabla_wJ(w;X,y)</script><p>从这里可以看出l1正则化项对导数的影响是一个固定值，和L2有很大区别（L2是固定的缩放）。</p>
+<p>使用在L2正则化分析中的损失函数近似方法，将原本的损失函数二次近似为$\hat{J}(w;X,y) = J(w^\ast;X,y) + \frac{1}{2}(w-w^\ast)^TH(w-w^\ast)$，其导数如下：</p>
+<script type="math/tex; mode=display">
+\nabla_w\hat{J} = H(w - w^\ast)</script><p>加上正则化项之后，其损失函数的二次近似可以表示为：</p>
+<script type="math/tex; mode=display">
+\hat{J}(w;X,y) = J(w^\ast;X,y) + \frac{1}{2}(w-w^\ast)^T H(w-w^\ast) + \alpha||w||_1</script><p>如果将Hessian矩阵简化成了对角阵（这个类似对数据进行PCA之类的操作，将数据之间的相关性去掉了，因此Hessian矩阵变成对角阵，这样分析要简单一些）。</p>
+<p>则：</p>
+<script type="math/tex; mode=display">
+\hat{J}(w;X,y) = J(w^\ast;X,y) + \sum_i[\frac{1}{2}H_{i,i}(w_i-w_i^\ast)^2 + \alpha|w_i|]</script><p>则对$w_i$进行求导，如下：</p>
+<script type="math/tex; mode=display">
+\nabla_{w_i}\hat{J}(w;X,y) = H_{i,i}(w_i - w_i^\ast) + \alpha\ sign(w_i)</script><p>可以看出，加了L1正则化之后梯度为0的点变成了如下：</p>
+<script type="math/tex; mode=display">
+w_i = sign(w_i^\ast)max\{|w_i^\ast| - \frac{\alpha}{H_{i,i}}, 0\}</script><p>描述成图像大概如下：</p>
+<img src="/2020/05/12/正则化方法/l1正则化效果示意.png" title="L1正则化效果示意">
+<p>可以看出，l1使得权重变得更加稀疏，这在特征选择方面非常有用。</p>
+<h1 id="数据集扩充"><a href="#数据集扩充" class="headerlink" title="数据集扩充"></a>数据集扩充</h1><p>数据集扩充的本质是要求模型对于相似的输入（例如图片的平移、缩放、添加噪声、旋转等不改变图片语义的操作），必须有相似的输出。</p>
+<h1 id="对噪声的鲁棒性"><a href="#对噪声的鲁棒性" class="headerlink" title="对噪声的鲁棒性"></a>对噪声的鲁棒性</h1><p>除了在原始输入上添加噪声之外，还有两种在隐层添加噪声的方法：</p>
+<ul>
+<li>dropout在隐层的输出上添加噪声。</li>
+<li>直接对学习到的权重添加噪声，可以视作模拟贝叶斯方法，认为模型权重有一定的随机性，同时也鼓励模型进入到参数空间中比较稳定的区域。</li>
+</ul>
+<h1 id="输出目标噪声"><a href="#输出目标噪声" class="headerlink" title="输出目标噪声"></a>输出目标噪声</h1><p>数据标签很可能包含一定的错误，而且在分类任务重，由于softmax\sigmoid函数的特点，模型不能拟合绝对的0和1标签，因此标签平滑技术通过把标签进行平滑，可以缓解这样的问题。</p>
+<h1 id="稀疏表示"><a href="#稀疏表示" class="headerlink" title="稀疏表示"></a>稀疏表示</h1><p>类似L1正则化产生的参数稀疏效果，在隐层的输出上，也可以尝试使用L1正则化，让隐层的输出倾向于变得稀疏。</p>
+<h1 id="参数绑定和参数共享"><a href="#参数绑定和参数共享" class="headerlink" title="参数绑定和参数共享"></a>参数绑定和参数共享</h1><ul>
+<li>某些足够相似的任务，其参数也应该相似，因此可以将参数之间相减的范数添加到损失函数中进行训练。</li>
+<li>CNN中的卷积层通过“提取类似特征所需权重相同”的思想，大量的权重共享，显著降低了模型的参数量，同时使得模型更加容易训练。</li>
+</ul>
+<h1 id="训练早停"><a href="#训练早停" class="headerlink" title="训练早停"></a>训练早停</h1><p>验证误差不再下降之后，及时停止训练模型，不需要等到训练集误差最小，这样有助于防止模型过拟合。</p>
+<h1 id="多任务学习"><a href="#多任务学习" class="headerlink" title="多任务学习"></a>多任务学习</h1><p>一些任务需要相同或者相似的特征，让共享大部分参数的多个模型来同时进行多个任务的拟合，可以起到使共享部分的参数学习到更优值的效果。</p>
 
       
-
-        
-        
-        
-
-        
-        
-
-        
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
-        
-            <a class="post-title-link" href="/2019/07/04/学习笔记-2019-07/" itemprop="url">
-              
-                <span itemprop="name">学习笔记-2019-07</span>
-              
-            </a>
-        
-      </h2>
-
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2019-07-04T20:16:54+08:00"
-              content="2019-07-04" >
-          07-04
-        </time>
-      </div>
-
-    </header>
-  </article>
-
-
-
-      
-
     </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/深度学习/" rel="tag"># 深度学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/11/CNN权重初始化/" rel="next" title="CNN权重初始化">
+                <i class="fa fa-chevron-left"></i> CNN权重初始化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/05/12/各种优化算法总结/" rel="prev" title="各种优化算法总结">
+                各种优化算法总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
 
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -463,6 +557,15 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNDczOC8xMTI3NQ=="></div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -483,8 +586,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -544,6 +656,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参数范数正则化"><span class="nav-number">1.</span> <span class="nav-text"><a href="#&#x53C2;&#x6570;&#x8303;&#x6570;&#x6B63;&#x5219;&#x5316;" class="headerlink" title="&#x53C2;&#x6570;&#x8303;&#x6570;&#x6B63;&#x5219;&#x5316;"></a>&#x53C2;&#x6570;&#x8303;&#x6570;&#x6B63;&#x5219;&#x5316;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#L2正则化（参数范数正则化的特例，范数使用2范数）"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#L2&#x6B63;&#x5219;&#x5316;&#xFF08;&#x53C2;&#x6570;&#x8303;&#x6570;&#x6B63;&#x5219;&#x5316;&#x7684;&#x7279;&#x4F8B;&#xFF0C;&#x8303;&#x6570;&#x4F7F;&#x7528;2&#x8303;&#x6570;&#xFF09;" class="headerlink" title="L2&#x6B63;&#x5219;&#x5316;&#xFF08;&#x53C2;&#x6570;&#x8303;&#x6570;&#x6B63;&#x5219;&#x5316;&#x7684;&#x7279;&#x4F8B;&#xFF0C;&#x8303;&#x6570;&#x4F7F;&#x7528;2&#x8303;&#x6570;&#xFF09;"></a>L2&#x6B63;&#x5219;&#x5316;&#xFF08;&#x53C2;&#x6570;&#x8303;&#x6570;&#x6B63;&#x5219;&#x5316;&#x7684;&#x7279;&#x4F8B;&#xFF0C;&#x8303;&#x6570;&#x4F7F;&#x7528;2&#x8303;&#x6570;&#xFF09;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#L1正则化（参数范数正则化的特例，范数使用1范数）"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#L1&#x6B63;&#x5219;&#x5316;&#xFF08;&#x53C2;&#x6570;&#x8303;&#x6570;&#x6B63;&#x5219;&#x5316;&#x7684;&#x7279;&#x4F8B;&#xFF0C;&#x8303;&#x6570;&#x4F7F;&#x7528;1&#x8303;&#x6570;&#xFF09;" class="headerlink" title="L1&#x6B63;&#x5219;&#x5316;&#xFF08;&#x53C2;&#x6570;&#x8303;&#x6570;&#x6B63;&#x5219;&#x5316;&#x7684;&#x7279;&#x4F8B;&#xFF0C;&#x8303;&#x6570;&#x4F7F;&#x7528;1&#x8303;&#x6570;&#xFF09;"></a>L1&#x6B63;&#x5219;&#x5316;&#xFF08;&#x53C2;&#x6570;&#x8303;&#x6570;&#x6B63;&#x5219;&#x5316;&#x7684;&#x7279;&#x4F8B;&#xFF0C;&#x8303;&#x6570;&#x4F7F;&#x7528;1&#x8303;&#x6570;&#xFF09;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据集扩充"><span class="nav-number">2.</span> <span class="nav-text"><a href="#&#x6570;&#x636E;&#x96C6;&#x6269;&#x5145;" class="headerlink" title="&#x6570;&#x636E;&#x96C6;&#x6269;&#x5145;"></a>&#x6570;&#x636E;&#x96C6;&#x6269;&#x5145;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对噪声的鲁棒性"><span class="nav-number">3.</span> <span class="nav-text"><a href="#&#x5BF9;&#x566A;&#x58F0;&#x7684;&#x9C81;&#x68D2;&#x6027;" class="headerlink" title="&#x5BF9;&#x566A;&#x58F0;&#x7684;&#x9C81;&#x68D2;&#x6027;"></a>&#x5BF9;&#x566A;&#x58F0;&#x7684;&#x9C81;&#x68D2;&#x6027;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#输出目标噪声"><span class="nav-number">4.</span> <span class="nav-text"><a href="#&#x8F93;&#x51FA;&#x76EE;&#x6807;&#x566A;&#x58F0;" class="headerlink" title="&#x8F93;&#x51FA;&#x76EE;&#x6807;&#x566A;&#x58F0;"></a>&#x8F93;&#x51FA;&#x76EE;&#x6807;&#x566A;&#x58F0;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#稀疏表示"><span class="nav-number">5.</span> <span class="nav-text"><a href="#&#x7A00;&#x758F;&#x8868;&#x793A;" class="headerlink" title="&#x7A00;&#x758F;&#x8868;&#x793A;"></a>&#x7A00;&#x758F;&#x8868;&#x793A;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参数绑定和参数共享"><span class="nav-number">6.</span> <span class="nav-text"><a href="#&#x53C2;&#x6570;&#x7ED1;&#x5B9A;&#x548C;&#x53C2;&#x6570;&#x5171;&#x4EAB;" class="headerlink" title="&#x53C2;&#x6570;&#x7ED1;&#x5B9A;&#x548C;&#x53C2;&#x6570;&#x5171;&#x4EAB;"></a>&#x53C2;&#x6570;&#x7ED1;&#x5B9A;&#x548C;&#x53C2;&#x6570;&#x5171;&#x4EAB;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#训练早停"><span class="nav-number">7.</span> <span class="nav-text"><a href="#&#x8BAD;&#x7EC3;&#x65E9;&#x505C;" class="headerlink" title="&#x8BAD;&#x7EC3;&#x65E9;&#x505C;"></a>&#x8BAD;&#x7EC3;&#x65E9;&#x505C;</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多任务学习"><span class="nav-number">8.</span> <span class="nav-text"><a href="#&#x591A;&#x4EFB;&#x52A1;&#x5B66;&#x4E60;" class="headerlink" title="&#x591A;&#x4EFB;&#x52A1;&#x5B66;&#x4E60;"></a>&#x591A;&#x4EFB;&#x52A1;&#x5B66;&#x4E60;</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -691,6 +819,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
@@ -719,6 +851,17 @@
 
 
 
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
   
 
 
