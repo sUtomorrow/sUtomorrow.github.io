@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="机器学习," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="决策树基础知识信息熵如果某个事件，有$C$种可能，其中第$k$中可能状态发生概率为$p_k$，那么该事件的信息熵定义为$Ent(D) = -\sum\limits_{k=1}^C p_k\log_2p_k$，表示的是所有状态的信息的期望，以2为底数这样的定义的信息熵单位是bit。 在决策树方法中，也类似的定义信息熵：样本集合$D$中第$k$类样本所占比例为$p_k$，则信息熵定义为$Ent(D)">
+<meta name="keywords" content="机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="决策树总结">
+<meta property="og:url" content="http://sUtomorrow.github.io/2020/05/29/决策树总结/index.html">
+<meta property="og:site_name" content="SeeYouTomorrow">
+<meta property="og:description" content="决策树基础知识信息熵如果某个事件，有$C$种可能，其中第$k$中可能状态发生概率为$p_k$，那么该事件的信息熵定义为$Ent(D) = -\sum\limits_{k=1}^C p_k\log_2p_k$，表示的是所有状态的信息的期望，以2为底数这样的定义的信息熵单位是bit。 在决策树方法中，也类似的定义信息熵：样本集合$D$中第$k$类样本所占比例为$p_k$，则信息熵定义为$Ent(D)">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-06-03T07:20:31.546Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="决策树总结">
+<meta name="twitter:description" content="决策树基础知识信息熵如果某个事件，有$C$种可能，其中第$k$中可能状态发生概率为$p_k$，那么该事件的信息熵定义为$Ent(D) = -\sum\limits_{k=1}^C p_k\log_2p_k$，表示的是所有状态的信息的期望，以2为底数这样的定义的信息熵单位是bit。 在决策树方法中，也类似的定义信息熵：样本集合$D$中第$k$类样本所占比例为$p_k$，则信息熵定义为$Ent(D)">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://sUtomorrow.github.io/2020/05/29/决策树总结/"/>
+
+
+
+
+
+  <title>决策树总结 | SeeYouTomorrow</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?6c61f4d5090c79efce607febff431083";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">SeeYouTomorrow</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">刘腾营的博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sUtomorrow.github.io/2020/05/29/决策树总结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="刘腾营">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SeeYouTomorrow">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">决策树总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-29T16:57:57+08:00">
+                2020-05-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i> 被阅读
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>次
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="决策树基础知识"><a href="#决策树基础知识" class="headerlink" title="决策树基础知识"></a>决策树基础知识</h1><h2 id="信息熵"><a href="#信息熵" class="headerlink" title="信息熵"></a>信息熵</h2><p>如果某个事件，有$C$种可能，其中第$k$中可能状态发生概率为$p_k$，那么该事件的信息熵定义为$Ent(D) = -\sum\limits_{k=1}^C p_k\log_2p_k$，表示的是所有状态的信息的期望，以2为底数这样的定义的信息熵单位是bit。</p>
+<p>在决策树方法中，也类似的定义信息熵：样本集合$D$中第$k$类样本所占比例为$p_k$，则信息熵定义为$Ent(D) = -\sum\limits_{k=1}^C p_k\log_2p_k$，其中$C$为类别个数，其刻画了样本集合的纯度。</p>
+<h2 id="信息增益"><a href="#信息增益" class="headerlink" title="信息增益"></a>信息增益</h2><p>假设离散属性$a$有$v$个取值：$a_1, a_2, …, a_v$，可以将当前数据集合分成$V$个子集：$D^1, D^2, …, D^V$，那么使用属性$a$划分样本集的信息增益定义为$Gain(D,a)=Ent(D)-\sum\limits_{v=1}^V\frac{|D^v|}{|D|}Ent(D^v)$</p>
+<h2 id="增益率"><a href="#增益率" class="headerlink" title="增益率"></a>增益率</h2><p>信息增益的定义导致其对数量较多的$D^v$更加敏感，因此又提出了信息增益率的概念：$Gain_ratio(D,a)=\frac{Gain(D,a)}{IV(a)}$，其中，$IV(a)=-\sum\limits_{v=1}^V \frac{|D^v|}{|D|} \log_2\frac{|D^v|}{|D|}$称为属性$a$的固有值（或者叫内在价值）。</p>
+<h2 id="基尼指数"><a href="#基尼指数" class="headerlink" title="基尼指数"></a>基尼指数</h2><p>基尼值定义为$Gini(D) = \sum\limits_{k=1}^C\sum\limits_{k’ \ne k}p_k p_{k’} = 1-\sum\limits_{k=1}^Cp_k^2$，其反映了在$D$中随机抽取两个样本，属于同一类别的概率。<br>和信息熵增益类似，对于在属性$a$上划分出$V$个区间的操作，定义划分后的基尼指数为$Gini_index(D, a) = \sum\limits_{v=1}^V\frac{|D^v|}{|D|}Gini(D^v)$，构造决策树时的最优划分属性选择也可以使用能够使基尼指数最小的属性。</p>
+<h1 id="决策树的构造算法"><a href="#决策树的构造算法" class="headerlink" title="决策树的构造算法"></a>决策树的构造算法</h1><h2 id="ID3算法"><a href="#ID3算法" class="headerlink" title="ID3算法"></a>ID3算法</h2><p>每次选择一个信息增益最大的属性$a$构造节点，这个节点将数据划分为$V$个子集，然后在每个子集中进行同样的操作（不能选择已经使用过的属性），若无属性可用或者当前子集类别相同，则当前子集标记为类别数量最多的类别，停止继续划分。</p>
+<h2 id="C4-5算法"><a href="#C4-5算法" class="headerlink" title="C4.5算法"></a>C4.5算法</h2><p>由于ID3算法在选择属性时使用信息增益最大值来选取，因此这样构造的决策树偏向于先选择特征取值更多的属性，另外ID3算法还有一个问题是处理连续值属性，这两个问题在C4.5算法中都给出了解决方案。</p>
+<p>C4.5算法则是对ID3算法的一个改进版本，其中使用增益率来进行属性选择。</p>
+<h3 id="对连续值属性的处理"><a href="#对连续值属性的处理" class="headerlink" title="对连续值属性的处理"></a>对连续值属性的处理</h3><p>在遇到连续值时，如果连续属性$a$在$D$中出现$n$个取值，则将其从小到大排序为$\begin{bmatrix}a_1, a_2, … a_n\end{bmatrix}$，这样产生$n-1$个离散值$T_a = \{\frac{a_i + a_{i+1}}{2}|1 \le i \le n-1\}$则$Gain(D,a)= \max\limits_{t \in T_a}Gain(D, a, t)$，其中$Gain(D, a, t)$表示将$a$属性使用$t$划分为两部分，这样连续值的决策树构造和离散值类似了，不过连续值属性在构造决策树的过程中可以使用多次。</p>
+<h2 id="分类回归树-Classification-And-Regression-Tree-CART-算法"><a href="#分类回归树-Classification-And-Regression-Tree-CART-算法" class="headerlink" title="分类回归树(Classification And Regression Tree, CART)算法"></a>分类回归树(Classification And Regression Tree, CART)算法</h2><p>对于分类树，CART算法使用基尼指数最小化准则进行特征选择，CART的主要思想是每次将数据划分成两个单元，例如，对于当前的数据集合$D$，根据属性$a$上的取值$s$数据划分成$D^1$和$D^2$两个子集（对于连续变量，划分数据就用大于和小于关系，对于离散变量就是用等于或不等于关系），对于这样的划分，可以得到基尼指数$Gini_index(D, a, s) = \frac{|D^1|}{|D|}Gini(D^1) + \frac{|D^2|}{|D|}Gini(D^2)$，每次划分都选择使得$Gini_index(D, a, s)$最小的$a$和$s$。如此循环，即得到了CART分类树。</p>
+<p>不同于ID3和C4.5算法，CART算法还能够处理回归树。对于回归树，其样本标签是连续值，回归树的一般形式表示如下，其中$H(x)$表示回归树的预测函数，$\mathbf{1}$表示指示函数，其基本思想是根据数据的属性，将数据划分成$M$个部分$R_m, m=1,2,…,M$，每个部分对应一个输出值。</p>
+<script type="math/tex; mode=display">
+H(x) = \sum\limits_{i=1}^M c_i \mathbf{1}(X \in R_i)</script><p>CART回归树使用平方误差作为每个部分的损失函数，每次利用属性$a$上的取值$s$将数据划分成两个部分：$R^1(a, s)$和$R^2(a, s)$，按照下式的规则来选择每次划分的$a$和$s$：</p>
+<script type="math/tex; mode=display">
+\min\limits_{a, s}[\min\limits_{c_1} \sum\limits_{x_i \in R^1(a,s)} (y_i - c_1)^2 + \min\limits_{c_2} \sum\limits_{x_j \in R^2(a,s)} (y_j - c_2)^2]</script><p>其中c的值非常好计算，直接使用该数据子集对应标签的平均数即可。</p>
+<h2 id="属性缺失的处理"><a href="#属性缺失的处理" class="headerlink" title="属性缺失的处理"></a>属性缺失的处理</h2><p>令$\tilde{D}$是所有没有缺失属性a的样本集合，对于样本$x$，有样本权重$w_x$，定义如下参数。</p>
+<script type="math/tex; mode=display">
+\rho = \frac{\sum_{x\in \tilde{D}} w_x}{\sum_{x\in D}w_x}\\
+\tilde{p}_k = \frac{\sum_{x\in \tilde{D}_k w_x}}{\sum_{x\in \tilde{D}}w_x}, (1\le k \le C)\\
+\tilde{r}_v = \frac{\sum_{x\in \tilde{D}^v}w_x}{\sum_{x \in \tilde{D}} w_x}, (1 \le v \le V)</script><p>显然，$\rho$表示属性无缺失样本所占比例，$\tilde{p}_k$表示属性无缺失样本中第$k$类所占比例，$\tilde{r}_v$表示属性无缺失样本中在属性$a$上取值$a^v$的样本比例。</p>
+<p>由此推广信息增益为：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+Gain(D, a) &= \rho \times Gain(\tilde{D}, a)\\
+&=\rho \times (Ent(\tilde{D}) - \sum\limits_{v=1}^V \tilde{r}_v Ent(\tilde{D}^v))
+\end{aligned}</script><p>其中：</p>
+<script type="math/tex; mode=display">
+Ent(\tilde{D}) = -\sum\limits_{k=1}^C \tilde{p}_k log_2 \tilde{p}_k</script><p>这样解决了最优划分的属性选择问题，在构造子树时，如果样本$x$在属性$a$上的取值已知，那么$x$划分到相应子节点，且权重保持为$w_x$，如果属性$a$未知，则将$s$划分入所有的子节点，且权重调整为$\tilde{r}_v w_x$。</p>
+<h2 id="多变量决策树"><a href="#多变量决策树" class="headerlink" title="多变量决策树"></a>多变量决策树</h2><p>叶节点不再针对某个属性，而是针对属性的线性组合进行划分。</p>
+<h1 id="决策树的剪枝"><a href="#决策树的剪枝" class="headerlink" title="决策树的剪枝"></a>决策树的剪枝</h1><h2 id="预剪枝"><a href="#预剪枝" class="headerlink" title="预剪枝"></a>预剪枝</h2><p>在生成决策树的过程中，利用验证集验证当前划分是否能提升泛化效果，如果不能，则停止继续划分，直接将当前样本集作为决策树叶节点，并指定数量最多的类别做为叶节点类别。预剪枝训练时间短，但是由于其是贪心策略，容易引起欠拟合。</p>
+<h2 id="后剪枝"><a href="#后剪枝" class="headerlink" title="后剪枝"></a>后剪枝</h2><p>在决策树生成完成之后，自底向上的对非叶节点进行考察，观察将该节点直接指定为叶节点是否能提升验证集泛化效果，如果能则将此节点的子树一起合并为一个叶节点。后剪枝的训练时间比预剪枝长很多，但是其欠拟合风险小，而且泛化性能往往优于预剪枝。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/28/Boosting总结/" rel="next" title="Boosting总结">
+                <i class="fa fa-chevron-left"></i> Boosting总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zNDczOC8xMTI3NQ=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">刘腾营</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">39</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">16</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#决策树基础知识"><span class="nav-number">1.</span> <span class="nav-text"><a href="#&#x51B3;&#x7B56;&#x6811;&#x57FA;&#x7840;&#x77E5;&#x8BC6;" class="headerlink" title="&#x51B3;&#x7B56;&#x6811;&#x57FA;&#x7840;&#x77E5;&#x8BC6;"></a>&#x51B3;&#x7B56;&#x6811;&#x57FA;&#x7840;&#x77E5;&#x8BC6;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#信息熵"><span class="nav-number">1.1.</span> <span class="nav-text"><a href="#&#x4FE1;&#x606F;&#x71B5;" class="headerlink" title="&#x4FE1;&#x606F;&#x71B5;"></a>&#x4FE1;&#x606F;&#x71B5;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#信息增益"><span class="nav-number">1.2.</span> <span class="nav-text"><a href="#&#x4FE1;&#x606F;&#x589E;&#x76CA;" class="headerlink" title="&#x4FE1;&#x606F;&#x589E;&#x76CA;"></a>&#x4FE1;&#x606F;&#x589E;&#x76CA;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增益率"><span class="nav-number">1.3.</span> <span class="nav-text"><a href="#&#x589E;&#x76CA;&#x7387;" class="headerlink" title="&#x589E;&#x76CA;&#x7387;"></a>&#x589E;&#x76CA;&#x7387;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基尼指数"><span class="nav-number">1.4.</span> <span class="nav-text"><a href="#&#x57FA;&#x5C3C;&#x6307;&#x6570;" class="headerlink" title="&#x57FA;&#x5C3C;&#x6307;&#x6570;"></a>&#x57FA;&#x5C3C;&#x6307;&#x6570;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#决策树的构造算法"><span class="nav-number">2.</span> <span class="nav-text"><a href="#&#x51B3;&#x7B56;&#x6811;&#x7684;&#x6784;&#x9020;&#x7B97;&#x6CD5;" class="headerlink" title="&#x51B3;&#x7B56;&#x6811;&#x7684;&#x6784;&#x9020;&#x7B97;&#x6CD5;"></a>&#x51B3;&#x7B56;&#x6811;&#x7684;&#x6784;&#x9020;&#x7B97;&#x6CD5;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ID3算法"><span class="nav-number">2.1.</span> <span class="nav-text"><a href="#ID3&#x7B97;&#x6CD5;" class="headerlink" title="ID3&#x7B97;&#x6CD5;"></a>ID3&#x7B97;&#x6CD5;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C4-5算法"><span class="nav-number">2.2.</span> <span class="nav-text"><a href="#C4-5&#x7B97;&#x6CD5;" class="headerlink" title="C4.5&#x7B97;&#x6CD5;"></a>C4.5&#x7B97;&#x6CD5;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#对连续值属性的处理"><span class="nav-number">2.2.1.</span> <span class="nav-text"><a href="#&#x5BF9;&#x8FDE;&#x7EED;&#x503C;&#x5C5E;&#x6027;&#x7684;&#x5904;&#x7406;" class="headerlink" title="&#x5BF9;&#x8FDE;&#x7EED;&#x503C;&#x5C5E;&#x6027;&#x7684;&#x5904;&#x7406;"></a>&#x5BF9;&#x8FDE;&#x7EED;&#x503C;&#x5C5E;&#x6027;&#x7684;&#x5904;&#x7406;</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分类回归树-Classification-And-Regression-Tree-CART-算法"><span class="nav-number">2.3.</span> <span class="nav-text"><a href="#&#x5206;&#x7C7B;&#x56DE;&#x5F52;&#x6811;-Classification-And-Regression-Tree-CART-&#x7B97;&#x6CD5;" class="headerlink" title="&#x5206;&#x7C7B;&#x56DE;&#x5F52;&#x6811;(Classification And Regression Tree, CART)&#x7B97;&#x6CD5;"></a>&#x5206;&#x7C7B;&#x56DE;&#x5F52;&#x6811;(Classification And Regression Tree, CART)&#x7B97;&#x6CD5;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#属性缺失的处理"><span class="nav-number">2.4.</span> <span class="nav-text"><a href="#&#x5C5E;&#x6027;&#x7F3A;&#x5931;&#x7684;&#x5904;&#x7406;" class="headerlink" title="&#x5C5E;&#x6027;&#x7F3A;&#x5931;&#x7684;&#x5904;&#x7406;"></a>&#x5C5E;&#x6027;&#x7F3A;&#x5931;&#x7684;&#x5904;&#x7406;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多变量决策树"><span class="nav-number">2.5.</span> <span class="nav-text"><a href="#&#x591A;&#x53D8;&#x91CF;&#x51B3;&#x7B56;&#x6811;" class="headerlink" title="&#x591A;&#x53D8;&#x91CF;&#x51B3;&#x7B56;&#x6811;"></a>&#x591A;&#x53D8;&#x91CF;&#x51B3;&#x7B56;&#x6811;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#决策树的剪枝"><span class="nav-number">3.</span> <span class="nav-text"><a href="#&#x51B3;&#x7B56;&#x6811;&#x7684;&#x526A;&#x679D;" class="headerlink" title="&#x51B3;&#x7B56;&#x6811;&#x7684;&#x526A;&#x679D;"></a>&#x51B3;&#x7B56;&#x6811;&#x7684;&#x526A;&#x679D;</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#预剪枝"><span class="nav-number">3.1.</span> <span class="nav-text"><a href="#&#x9884;&#x526A;&#x679D;" class="headerlink" title="&#x9884;&#x526A;&#x679D;"></a>&#x9884;&#x526A;&#x679D;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后剪枝"><span class="nav-number">3.2.</span> <span class="nav-text"><a href="#&#x540E;&#x526A;&#x679D;" class="headerlink" title="&#x540E;&#x526A;&#x679D;"></a>&#x540E;&#x526A;&#x679D;</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘腾营</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 您是第
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      位访客
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 被访问
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('-1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

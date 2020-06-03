@@ -79,22 +79,22 @@
 
 
 
-<meta name="description" content="感受野（Receptive Filed, RF）由于卷积层是一种局部连接操作，对于卷积层的输入和输出，在输出的特征图上，一个像素的值，只取决于输入特征图上的一部分区域，如图所示： 感受野的大小从原始输入图像开始，如果第一层卷积的卷积核是$3\times 3$大小，那么第一层卷积层的输出特征图上，左上角第一个像素点连接了原始输入图像左上角的$3\times3$大小的范围（这个范围被称作这个像素对于输">
+<meta name="description" content="感受野（Receptive Filed, RF）由于卷积层是一种局部连接操作，对于卷积层的输入和输出，在输出的特征图上，一个像素的值，只取决于输入特征图上的一部分区域，如图所示：  感受野的大小从原始输入图像开始，如果第一层卷积的卷积核是$3\times 3$大小，那么第一层卷积层的输出特征图上，左上角第一个像素点连接了原始输入图像左上角的$3\times3$大小的范围（这个范围被称作这个像素对于">
 <meta name="keywords" content="深度学习">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CNN感受野">
 <meta property="og:url" content="http://sUtomorrow.github.io/2020/05/09/CNN感受野/index.html">
 <meta property="og:site_name" content="SeeYouTomorrow">
-<meta property="og:description" content="感受野（Receptive Filed, RF）由于卷积层是一种局部连接操作，对于卷积层的输入和输出，在输出的特征图上，一个像素的值，只取决于输入特征图上的一部分区域，如图所示： 感受野的大小从原始输入图像开始，如果第一层卷积的卷积核是$3\times 3$大小，那么第一层卷积层的输出特征图上，左上角第一个像素点连接了原始输入图像左上角的$3\times3$大小的范围（这个范围被称作这个像素对于输">
+<meta property="og:description" content="感受野（Receptive Filed, RF）由于卷积层是一种局部连接操作，对于卷积层的输入和输出，在输出的特征图上，一个像素的值，只取决于输入特征图上的一部分区域，如图所示：  感受野的大小从原始输入图像开始，如果第一层卷积的卷积核是$3\times 3$大小，那么第一层卷积层的输出特征图上，左上角第一个像素点连接了原始输入图像左上角的$3\times3$大小的范围（这个范围被称作这个像素对于">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://sutomorrow.github.io/2020/05/09/CNN感受野/CNN操作示意.png">
 <meta property="og:image" content="http://sutomorrow.github.io/2020/05/09/CNN感受野/VGG模型配置.png">
 <meta property="og:image" content="http://sutomorrow.github.io/2020/05/09/CNN感受野/感受野权重示意图.png">
 <meta property="og:image" content="http://sutomorrow.github.io/2020/05/09/CNN感受野/有效感受野示意.png">
-<meta property="og:updated_time" content="2020-05-09T08:58:55.407Z">
+<meta property="og:updated_time" content="2020-05-15T06:58:04.326Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CNN感受野">
-<meta name="twitter:description" content="感受野（Receptive Filed, RF）由于卷积层是一种局部连接操作，对于卷积层的输入和输出，在输出的特征图上，一个像素的值，只取决于输入特征图上的一部分区域，如图所示： 感受野的大小从原始输入图像开始，如果第一层卷积的卷积核是$3\times 3$大小，那么第一层卷积层的输出特征图上，左上角第一个像素点连接了原始输入图像左上角的$3\times3$大小的范围（这个范围被称作这个像素对于输">
+<meta name="twitter:description" content="感受野（Receptive Filed, RF）由于卷积层是一种局部连接操作，对于卷积层的输入和输出，在输出的特征图上，一个像素的值，只取决于输入特征图上的一部分区域，如图所示：  感受野的大小从原始输入图像开始，如果第一层卷积的卷积核是$3\times 3$大小，那么第一层卷积层的输出特征图上，左上角第一个像素点连接了原始输入图像左上角的$3\times3$大小的范围（这个范围被称作这个像素对于">
 <meta name="twitter:image" content="http://sutomorrow.github.io/2020/05/09/CNN感受野/CNN操作示意.png">
 
 
@@ -374,7 +374,8 @@
       
 
       
-        <h1 id="感受野（Receptive-Filed-RF）"><a href="#感受野（Receptive-Filed-RF）" class="headerlink" title="感受野（Receptive Filed, RF）"></a>感受野（Receptive Filed, RF）</h1><p>由于卷积层是一种局部连接操作，对于卷积层的输入和输出，在输出的特征图上，一个像素的值，只取决于输入特征图上的一部分区域，如图所示：<br><img src="CNN操作示意.png" alt="CNN操作示意"></p>
+        <h1 id="感受野（Receptive-Filed-RF）"><a href="#感受野（Receptive-Filed-RF）" class="headerlink" title="感受野（Receptive Filed, RF）"></a>感受野（Receptive Filed, RF）</h1><p>由于卷积层是一种局部连接操作，对于卷积层的输入和输出，在输出的特征图上，一个像素的值，只取决于输入特征图上的一部分区域，如图所示：</p>
+<p><img src="CNN操作示意.png" alt="CNN操作示意"></p>
 <h2 id="感受野的大小"><a href="#感受野的大小" class="headerlink" title="感受野的大小"></a>感受野的大小</h2><p>从原始输入图像开始，如果第一层卷积的卷积核是$3\times 3$大小，那么第一层卷积层的输出特征图上，左上角第一个像素点连接了原始输入图像左上角的$3\times3$大小的范围（这个范围被称作这个像素对于输入图像的感受野），即这个特征图上，每个像素对于输入图像的的感受野大小是$3\times 3$，如果第二层卷积也是$3\times 3$大小的卷积核，那么第二层输出的特征图上的一个像素对于第一层输出的特征图的感受野是$3\times 3$，但是对应到原图上的感受野大小和范围就要依赖于第一层卷积层的卷积步长参数了，如果第一层卷积的卷积步长为1，那么可以得出第二层输出的特征图上，一个像素对应于原始输入图像上$5\times 5$的区域，即这层特征图上每个像素对于输入图像的感受野大小是$5\times 5$。</p>
 <p>对于特征图上的一个像素，其感受野之外的区域不影响该像素的值，因此对于该像素，不能从其值上获取其感受野之外的信息。</p>
 <h2 id="感受野的步长"><a href="#感受野的步长" class="headerlink" title="感受野的步长"></a>感受野的步长</h2><p>从原始输入图像开始，如果第一层卷积的卷积核是$3\times 3$大小，卷积步长是1，那么在第一层卷积层的输出特征图上坐标为$(0, 0)$的第一个像素的感受野是输入图像的左上角从$(0,0)$坐标开始的$3\times 3$的区域，而第一层卷积层的输出特征图上坐标为$(0, 1)$的像素则对应输入图像的左上角从$(0,1)$坐标开始的$3\times 3$的区域，这两个区域之间的步长为1，也称为第一层卷积层的输出特征图对于输入图像的感受野步长为1。</p>
@@ -549,7 +550,7 @@ P^{13}_0 &= P^{13}_1 * s_1 + p_1\\
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-count">39</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -571,7 +572,7 @@ P^{13}_0 &= P^{13}_1 * s_1 + p_1\\
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">16</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

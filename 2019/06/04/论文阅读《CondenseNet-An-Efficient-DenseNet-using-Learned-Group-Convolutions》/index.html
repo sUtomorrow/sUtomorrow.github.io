@@ -92,7 +92,7 @@
 <meta property="og:image" content="http://sutomorrow.github.io/2019/06/04/论文阅读《CondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions》/特征凝聚因子实验.png">
 <meta property="og:image" content="http://sutomorrow.github.io/2019/06/04/论文阅读《CondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions》/分组个数实验.png">
 <meta property="og:image" content="http://sutomorrow.github.io/2019/06/04/论文阅读《CondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions》/特征凝聚因子效率对比.png">
-<meta property="og:updated_time" content="2019-06-07T03:42:53.222Z">
+<meta property="og:updated_time" content="2020-05-15T05:06:58.011Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="论文阅读《CondenseNet: An Efficient DenseNet using Learned Group Convolutions》">
 <meta name="twitter:description" content="主要工作本文主要贡献是提出了一种比ShuffleNets还要高效很多的CondenseNets。 主要思想该论文认为普通的卷积模型:layer-by-layer的连接模式，模型需要在每一层都去重复最前面层的特征，因此DenseNet的短连接所引导的特征重用对这个问题有一定的缓解，但论文中猜想对于DenseNet这样的密集短连接，会引入一些冗余的浅层特征，因此论文提出了一种方法来减少这种冗余，并形成">
@@ -384,7 +384,7 @@
 <p>在筛选的过程中，第$j$输入特征的重要程度由$\sum_{i=1}^{O/G}|F^g_{ij}|$来衡量，丢弃的过程可以简单描述为：对于矩阵$F^g$，如果其某一列的$L_1$正则项较小，则把这一列的全都置0。</p>
 <p>为了激励同一组的卷积倾向于同样的一组输入特征，作者没有使用逐元素的$L_1$正则化，而是使用其提出的一种group-lasso正则化，其正则化项计算如下：</p>
 <script type="math/tex; mode=display">
-\sum_{g=1}^G \sum_{j=1}^R \sqrt{sum_{i=1}^{O/G}{F^g_{ij}}^2}</script><p>这样的的正则化项由于其值由每个$F^g$中的每一列的最大值来主导，因此会倾向于把$F^g$中某一列整体变小，满足要求。</p>
+\sum_{g=1}^G \sum_{j=1}^R \sqrt{\sum_{i=1}^{O/G}{F^g_{ij}}^2}</script><p>这样的的正则化项由于其值由每个$F^g$中的每一列的最大值来主导，因此会倾向于把$F^g$中某一列整体变小，满足要求。</p>
 <h3 id="特征凝聚因子-Condensation-Factor"><a href="#特征凝聚因子-Condensation-Factor" class="headerlink" title="特征凝聚因子(Condensation Factor)"></a>特征凝聚因子(Condensation Factor)</h3><p>一组输出所连接到的输入个数比例不一定是$\frac{1}{G}$，这里定义特征凝聚因子$C$，允许每一组输出连接到$\lfloor\frac{R}{C}\rfloor$个输入特征。</p>
 <h3 id="特征凝聚过程-Condensation-Procedure"><a href="#特征凝聚过程-Condensation-Procedure" class="headerlink" title="特征凝聚过程(Condensation Procedure)"></a>特征凝聚过程(Condensation Procedure)</h3><p>在上面的Learn Group Convolution的学习和预测示意图中，在经过$C - 1$个Condensing stage之后，只有$1 - (C - 1) \times \frac{1}{C}=\frac{1}{C}$比例的输入特征保留下来。</p>
 <p>epoch设置：Condensing stage $C-1$的训练epoch设置为$\frac{M}{2(C-1)}$,其中M表示总共的训练epoch数。</p>
@@ -526,7 +526,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">34</span>
+                  <span class="site-state-item-count">39</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -548,7 +548,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-count">16</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
