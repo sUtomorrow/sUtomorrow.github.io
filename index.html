@@ -293,6 +293,133 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://sUtomorrow.github.io/2020/06/09/attention机制总结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="刘腾营">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="SeeYouTomorrow">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/06/09/attention机制总结/" itemprop="url">attention机制总结</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-09T14:50:26+08:00">
+                2020-06-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          Attention机制最初是在自然语言处理领域取得了巨大成功，现在CNN中也在越来越多的使用Attention机制，这里就CNN中使用的Soft Attention（其中Attention weight是模型产生，可微可学习）做一些总结。
+对Attention的理解Attention使得神经网络（N
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2020/06/09/attention机制总结/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://sUtomorrow.github.io/2020/05/29/决策树总结/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -618,8 +745,8 @@
         
           
           目标检测任务简单来说就是给定一张图片，模型需要根据图片找到感兴趣的目标，将其位置、大小标注出来。
-从RCNN到Faster-RCNN目前的目标检测方法主要分为：两阶段的检测器、单阶段检测器两种，RCNN到Faster RCNN系列检测器是典型的两阶段检测器的代表。
-RCNN论文《Rich featu
+两阶段检测算法，从RCNN到Faster R-CNN目前的目标检测方法主要分为：两阶段的检测器、单阶段检测器两种，RCNN到Faster RCNN系列检测器是典型的两阶段检测器的代表。
+R-CNN论文《
           ...
           <!--noindex-->
           <div class="post-button text-center">
@@ -1425,134 +1552,6 @@ ResNet的主要特点在于其残差块（Residual Block）结构，如下图所
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://sUtomorrow.github.io/2020/05/07/CNN的反向传播/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="刘腾营">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="SeeYouTomorrow">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/05/07/CNN的反向传播/" itemprop="url">CNN的反向传播</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-07T13:47:45+08:00">
-                2020-05-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          在卷积神经网络中，主要由三种层结构构成：卷积层、池化层、全连接层。
-全连接层的反向传播全连接层的反向传播比较简单，使用单纯的BP算法即可，这里先来复习一下全连接层的BP算法：
-对于$l$层神经网络,输入$x \in R^n$，标签$y \in R^c$，第$i$层权重表示为$w_i \in R^{O
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2020/05/07/CNN的反向传播/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1603,7 +1602,7 @@ ResNet的主要特点在于其残差块（Residual Block）结构，如下图所
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">39</span>
+                  <span class="site-state-item-count">40</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
