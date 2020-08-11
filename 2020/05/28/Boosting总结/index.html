@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="SeeYouTomorrow">
 <meta property="og:description" content="BoostingBoosting是集成学习的一类算法的总称，这类算法的流程可以概括为：首先从初始训练集中训练出一个基学习器，然后根据基学习器的表现对训练样本分布进行调整，使得之前做错的样本在后面受到更多的关注，然后基于调整后的样本分布来训练下一个基学习器，如此逐步增加基学习器，直到基学习器的数目达到了指定值T。 AdaBoostAdaBoost是Boosting方法中的一个代表，主要应用在二分类任">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-06-09T06:54:11.612Z">
+<meta property="og:updated_time" content="2020-07-02T07:48:57.098Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Boosting总结">
 <meta name="twitter:description" content="BoostingBoosting是集成学习的一类算法的总称，这类算法的流程可以概括为：首先从初始训练集中训练出一个基学习器，然后根据基学习器的表现对训练样本分布进行调整，使得之前做错的样本在后面受到更多的关注，然后基于调整后的样本分布来训练下一个基学习器，如此逐步增加基学习器，直到基学习器的数目达到了指定值T。 AdaBoostAdaBoost是Boosting方法中的一个代表，主要应用在二分类任">
@@ -376,7 +376,7 @@ H(x) = \sum\limits_{t=1}^T \alpha_t h_t(x)</script><p>AdaBoost使用指数损失
 <script type="math/tex; mode=display">
 l(H|D) = E_{x \sim D}[e^{-f(x)H(x)}]</script><p>因此AdaBoost的目标可以表示为：</p>
 <script type="math/tex; mode=display">
-\mathop{\arg\min}\limits_{\alpha, h} E_{x \sim D}[e^{-f(x)(\sum\limits_{t=1}^T \alpha_t h_t(x))}]</script><p>但是这个问题的直接求解非常困难，因此这里使用一种<strong>前向分布算法</strong>来解决这个问题，其思路是：每增加一个基学习器，就让损失函数减小一些，这样来逐步逼近最优解。</p>
+\mathop{\arg\min}\limits_{\alpha, h} E_{x \sim D}[e^{-f(x)(\sum\limits_{t=1}^T \alpha_t h_t(x))}]</script><p>但是这个问题的直接求解非常困难，因此这里使用一种<strong>前向分步算法</strong>来解决这个问题，其思路是：每增加一个基学习器，就让损失函数减小一些，这样来逐步逼近最优解。</p>
 <p>假设现在已经得到$m$个基学习器组成的集成学习器：$H_m(x)$，现在下一个学习器（$\alpha_{m+1}, h_{m+1}$）的目标可以表示为：</p>
 <script type="math/tex; mode=display">
 \begin{aligned}

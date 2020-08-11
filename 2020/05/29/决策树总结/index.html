@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="SeeYouTomorrow">
 <meta property="og:description" content="决策树基础知识信息熵如果某个事件，有$C$种可能，其中第$k$中可能状态发生概率为$p_k$，那么该事件的信息熵定义为$Ent(D) = -\sum\limits_{k=1}^C p_k\log_2p_k$，表示的是所有状态的信息的期望，以2为底数这样的定义的信息熵单位是bit。 在决策树方法中，也类似的定义信息熵：样本集合$D$中第$k$类样本所占比例为$p_k$，则信息熵定义为$Ent(D)">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-06-03T07:20:31.546Z">
+<meta property="og:updated_time" content="2020-07-11T02:03:50.436Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="决策树总结">
 <meta name="twitter:description" content="决策树基础知识信息熵如果某个事件，有$C$种可能，其中第$k$中可能状态发生概率为$p_k$，那么该事件的信息熵定义为$Ent(D) = -\sum\limits_{k=1}^C p_k\log_2p_k$，表示的是所有状态的信息的期望，以2为底数这样的定义的信息熵单位是bit。 在决策树方法中，也类似的定义信息熵：样本集合$D$中第$k$类样本所占比例为$p_k$，则信息熵定义为$Ent(D)">
@@ -373,7 +373,7 @@
 <p>在决策树方法中，也类似的定义信息熵：样本集合$D$中第$k$类样本所占比例为$p_k$，则信息熵定义为$Ent(D) = -\sum\limits_{k=1}^C p_k\log_2p_k$，其中$C$为类别个数，其刻画了样本集合的纯度。</p>
 <h2 id="信息增益"><a href="#信息增益" class="headerlink" title="信息增益"></a>信息增益</h2><p>假设离散属性$a$有$v$个取值：$a_1, a_2, …, a_v$，可以将当前数据集合分成$V$个子集：$D^1, D^2, …, D^V$，那么使用属性$a$划分样本集的信息增益定义为$Gain(D,a)=Ent(D)-\sum\limits_{v=1}^V\frac{|D^v|}{|D|}Ent(D^v)$</p>
 <h2 id="增益率"><a href="#增益率" class="headerlink" title="增益率"></a>增益率</h2><p>信息增益的定义导致其对数量较多的$D^v$更加敏感，因此又提出了信息增益率的概念：$Gain_ratio(D,a)=\frac{Gain(D,a)}{IV(a)}$，其中，$IV(a)=-\sum\limits_{v=1}^V \frac{|D^v|}{|D|} \log_2\frac{|D^v|}{|D|}$称为属性$a$的固有值（或者叫内在价值）。</p>
-<h2 id="基尼指数"><a href="#基尼指数" class="headerlink" title="基尼指数"></a>基尼指数</h2><p>基尼值定义为$Gini(D) = \sum\limits_{k=1}^C\sum\limits_{k’ \ne k}p_k p_{k’} = 1-\sum\limits_{k=1}^Cp_k^2$，其反映了在$D$中随机抽取两个样本，属于同一类别的概率。<br>和信息熵增益类似，对于在属性$a$上划分出$V$个区间的操作，定义划分后的基尼指数为$Gini_index(D, a) = \sum\limits_{v=1}^V\frac{|D^v|}{|D|}Gini(D^v)$，构造决策树时的最优划分属性选择也可以使用能够使基尼指数最小的属性。</p>
+<h2 id="基尼指数"><a href="#基尼指数" class="headerlink" title="基尼指数"></a>基尼指数</h2><p>基尼值定义为$Gini(D) = \sum\limits_{k=1}^C\sum\limits_{k’ \ne k}p_k p_{k’} = 1-\sum\limits_{k=1}^Cp_k^2$，其反映了在$D$中随机抽取两个样本，不属于同一类别的概率。<br>和信息熵增益类似，对于在属性$a$上划分出$V$个区间的操作，定义划分后的基尼指数为$Gini_index(D, a) = \sum\limits_{v=1}^V\frac{|D^v|}{|D|}Gini(D^v)$，构造决策树时的最优划分属性选择也可以使用能够使基尼指数最小的属性。</p>
 <h1 id="决策树的构造算法"><a href="#决策树的构造算法" class="headerlink" title="决策树的构造算法"></a>决策树的构造算法</h1><h2 id="ID3算法"><a href="#ID3算法" class="headerlink" title="ID3算法"></a>ID3算法</h2><p>每次选择一个信息增益最大的属性$a$构造节点，这个节点将数据划分为$V$个子集，然后在每个子集中进行同样的操作（不能选择已经使用过的属性），若无属性可用或者当前子集类别相同，则当前子集标记为类别数量最多的类别，停止继续划分。</p>
 <h2 id="C4-5算法"><a href="#C4-5算法" class="headerlink" title="C4.5算法"></a>C4.5算法</h2><p>由于ID3算法在选择属性时使用信息增益最大值来选取，因此这样构造的决策树偏向于先选择特征取值更多的属性，另外ID3算法还有一个问题是处理连续值属性，这两个问题在C4.5算法中都给出了解决方案。</p>
 <p>C4.5算法则是对ID3算法的一个改进版本，其中使用增益率来进行属性选择。</p>
