@@ -88,7 +88,7 @@
 <meta property="og:description" content="BatchNormalization的作用机制推理过程对于深度神经网络中的一层，可以表示为$o = g(x),\ x=wl + b$，其中$w,b$是该层的参数，$l$是该层的输入，$g$表示激活函数，$o$表示该层输出。 在提出BN的原始论文《Batch Normalization: Accelerating Deep Network Training byReducing Internal C">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://sutomorrow.github.io/2020/05/04/BatchNormalization学习笔记/normalization.png">
-<meta property="og:updated_time" content="2020-08-11T02:21:52.844Z">
+<meta property="og:updated_time" content="2020-08-11T02:28:24.008Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="BatchNormalization学习笔记">
 <meta name="twitter:description" content="BatchNormalization的作用机制推理过程对于深度神经网络中的一层，可以表示为$o = g(x),\ x=wl + b$，其中$w,b$是该层的参数，$l$是该层的输入，$g$表示激活函数，$o$表示该层输出。 在提出BN的原始论文《Batch Normalization: Accelerating Deep Network Training byReducing Internal C">
@@ -417,7 +417,7 @@
 <h1 id="BatchNormalization的变种"><a href="#BatchNormalization的变种" class="headerlink" title="BatchNormalization的变种"></a>BatchNormalization的变种</h1><p>除了BatchNormalization，还有一些Normalization方式，其对比如下图所示。</p>
 <p><img src="normalization.png" alt="各种normalization对比"></p>
 <h2 id="LayerNormalization"><a href="#LayerNormalization" class="headerlink" title="LayerNormalization"></a>LayerNormalization</h2><p>LN对每个样本计算一个标量均值和方差，计算过程不受batch size的影响，常用在RNN中，但是如果同一个样本的特征区别较大，则不适合使用统一的均值和方差。</p>
-<h2 id="InstanceNormalization"><a href="#InstanceNormalization" class="headerlink" title="InstanceNormalization"></a>InstanceNormalization</h2><p>对每个样本计算C个均值和方差，</p>
+<h2 id="InstanceNormalization"><a href="#InstanceNormalization" class="headerlink" title="InstanceNormalization"></a>InstanceNormalization</h2><p>对每个样本计算C个均值和方差，不受batch size和通道数的影响，常用于风格化迁移，如果通道之间有相关性，则不适合使用IN。</p>
 <h2 id="GroupNormalization"><a href="#GroupNormalization" class="headerlink" title="GroupNormalization"></a>GroupNormalization</h2><p>作为BatchNormalization的变种之一，GroupNormalization主要解决的问题是BatchNormalization对batch大小的依赖性。</p>
 <p>在CNN中，对于$N\times H\times W\times C$大小的特征图，BatchNormalization将其中每一个大小为$1\times 1\times 1\times C$看做一个样本，而GroupNormalization首先将$N\times H\times W\times C$大小的特征图拆分成$N\times H\times W\times \frac{C}{G}\times G$，然后在$H\times W\times \frac{C}{G}$范围内求方差和均值，得到$N \times G$个均值和方差，可以理解为样本个数为$H\times W\times \frac{C}{G}$，每个样本的维度为$N \times G$，这样做的好处是样本个数不依赖batch size，原论文中作者还解释说使用GroupNormalization将特征分组处理，更加符合特征之间的依赖性，对模型性能有提升。</p>
 <p>训练时GroupNormalization的方差和均值都是$N\times 1\times 1\times 1\times G$大小，在测试时，Batch size基本上不会和训练时一样，不能和BN一样保存均值和方差参数，因此GN在模型保存时，只保存$\gamma$和$\beta$的值，均值和方差在预测过程中是每个样本计算一次的。</p>
@@ -547,7 +547,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-count">42</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
