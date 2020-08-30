@@ -90,7 +90,7 @@
 <meta property="og:image" content="http://sutomorrow.github.io/2020/08/22/GAN概述/GAN模型结构.png">
 <meta property="og:image" content="http://sutomorrow.github.io/2020/08/22/GAN概述/AdaIN模型结构示意图.png">
 <meta property="og:image" content="http://sutomorrow.github.io/2020/08/22/GAN概述/基于联合双边学习的图像风格转换模型结构示意图.png">
-<meta property="og:updated_time" content="2020-08-28T06:02:54.571Z">
+<meta property="og:updated_time" content="2020-08-28T06:29:03.731Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="GAN概述">
 <meta name="twitter:description" content="GAN在深度学习领域是生成对抗网络（Generative Adversarial Network）的简称，第一次是在论文《Generative Adversarial Nets》中提出，论文Abstract中第一句话就点出了GAN的本质“a new framework for estimating grnerative models via an adversarial process”，即GAN">
@@ -398,7 +398,7 @@
 W(P_R, P_G) = \inf\limits_{\gamma \sim \prod(P_R, P_G)} E_{\{x,y\}\sim \gamma}||x - y||</script><p>这里$\prod(P_R, P_G)$表示$P_G$、$P_R$的联合分布，对于所有的联合分布，求$\{x,y\}$的距离期望的最小值，就是Wasserstein距离，这里可以仔细理解下为什么Wasserstein距离不存在KL散度的那种无法适用于无交集的两个分布的问题。</p>
 <p>这里有个问题是Wassertein距离在模型中是无法计算的，因此WGAN论文中用一些近似手段，将Wassertein距离近似表示为如下计算方式。</p>
 <script type="math/tex; mode=display">
-K \times W(P_R, P_G) \approx \max\limits_{|f_w|_L \le K} E_{x \sim P_R}f_w(x) - E_{x \sim P_G}f_w(x)</script><p>这里$f_w$表示一个神经网络或者CNN所构成的判别器所表示的函数，$|f_w|_L$表示这个函数的Lipschitz常数（如果$\exist K, \forall x_1, x_2 \ |f(x_1) - f(x_2)| \le K|x_1 - x_2|$那么$K$就是函数$f$的Lipschitz常数）。</p>
+K \times W(P_R, P_G) \approx \max\limits_{|f_w|_L \le K} E_{x \sim P_R}f_w(x) - E_{x \sim P_G}f_w(x)</script><p>这里$f_w$表示一个神经网络或者CNN所构成的判别器所表示的函数，$|f_w|_L$表示这个函数的Lipschitz常数（如果$\exists K, \forall x_1, x_2 \ |f(x_1) - f(x_2)| \le K|x_1 - x_2|$那么$K$就是函数$f$的Lipschitz常数）。</p>
 <p>因此我们将GAN的判别器损失改为$-E_{x \sim P_R}f_w(x) + E_{x \sim P_G}f_w(x)$，这样一来，判别器的目标不再是一个分类问题，而是求$\max\limits_{|f_w|_L \le K} E_{x \sim P_R}f_w(x) - E_{x \sim P_G}f_w(x)$以近似Wasserstein距离，因此需要去掉判别器中的sigmoid层，同时为了保证$|f_w|_L \le K$，这里需要将判别器模型中的参数值限定在一定范围内，这可以通过参数的clip操作来实现。</p>
 <p>判别器训练好之后，训练生成器时，损失函数使用$-E_{x \sim P_G}f_w(x)$（这个意思是将近似的Wasserstein距离作为损失函数来优化，缩小Wasserstein距离）即可。</p>
 <p>和之前的GAN loss相比的话，WGAN相当于仅仅做了三个修改：</p>
