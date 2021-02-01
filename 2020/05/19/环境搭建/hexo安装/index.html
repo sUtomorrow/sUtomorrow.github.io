@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="杂项,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="hexo安装过程 参考资料 https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;187435941 ## nodejs 版本：12.19.0，安装过程略 安装hexo命令 运行命令:  npm install -g hexo-cli 查看hexo版本 运行命令:  hexo --version 得到以下输出  hexo: 5.3.0  hexo-cli: 4.2.0">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hexo安装记录">
+<meta property="og:url" content="https://sutomorrow.github.io/2020/05/19/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/hexo%E5%AE%89%E8%A3%85/index.html">
+<meta property="og:site_name" content="Tengying Liu&#39;s Blog">
+<meta property="og:description" content="hexo安装过程 参考资料 https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;187435941 ## nodejs 版本：12.19.0，安装过程略 安装hexo命令 运行命令:  npm install -g hexo-cli 查看hexo版本 运行命令:  hexo --version 得到以下输出  hexo: 5.3.0  hexo-cli: 4.2.0">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-05-19T07:21:29.000Z">
+<meta property="article:modified_time" content="2021-02-01T03:00:51.153Z">
+<meta property="article:author" content="Tengying Liu">
+<meta property="article:tag" content="杂项">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://sUtomorrow.github.io/2020/05/19/环境搭建/hexo安装/">
+
+
+
+
+
+  <title>hexo安装记录 | Tengying Liu's Blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Tengying Liu's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://sUtomorrow.github.io/2020/05/19/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/hexo%E5%AE%89%E8%A3%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content>
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tengying Liu's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">hexo安装记录</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-19T15:21:29+08:00">
+                2020-05-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="hexo安装过程">hexo安装过程</h1>
+<p>参考资料 https://zhuanlan.zhihu.com/p/187435941 ## nodejs 版本：12.19.0，安装过程略</p>
+<h2 id="安装hexo命令">安装hexo命令</h2>
+<p>运行命令:</p>
+<pre><code> npm install -g hexo-cli</code></pre>
+<h2 id="查看hexo版本">查看hexo版本</h2>
+<p>运行命令:</p>
+<pre><code> hexo --version</code></pre>
+<p>得到以下输出</p>
+<pre><code> hexo: 5.3.0
+ hexo-cli: 4.2.0
+ os: Windows_NT 10.0.19041 win32 x64
+ node: 12.19.0
+ v8: 7.8.279.23-node.44
+ uv: 1.39.0
+ zlib: 1.2.11
+ brotli: 1.0.9
+ ares: 1.16.0
+ modules: 72
+ nghttp2: 1.41.0
+ napi: 7
+ llhttp: 2.1.2
+ http_parser: 2.9.3
+ openssl: 1.1.1g
+ cldr: 37.0
+ icu: 67.1
+ tz: 2019c
+ unicode: 13.0</code></pre>
+<h2 id="初始化博客文件夹">初始化博客文件夹</h2>
+<p>运行命令:</p>
+<pre><code> hexo init blogDev</code></pre>
+<h2 id="安装package.json中的依赖">安装package.json中的依赖</h2>
+<p>运行命令：</p>
+<pre><code> cd blogDev
+ npm install</code></pre>
+<h2 id="修改_config.yml文件">修改_config.yml文件</h2>
+<p>使用hexo-autonofollow插件来给外链添加nofollow属性</p>
+<p>在站点根目录下执行下列命令：</p>
+<pre><code> npm install hexo-autonofollow --save</code></pre>
+<h2 id="修改git-init文件">修改git init文件</h2>
+<p>去掉以下三项：</p>
+<pre><code> db.json,
+ Thumbs.db
+ node-modules/</code></pre>
+<h2 id="支持latex">支持latex</h2>
+<p>卸载hexo自带的makrdown渲染工具：</p>
+<pre><code> npm uninstall hexo-renderer-markded --save</code></pre>
+<p>安装hexo-renderer-pandoc：</p>
+<pre><code> npm install hexo-renderer-pandoc --save</code></pre>
+<p>下载next主题：</p>
+<pre><code> git clone https://github.com/iissnan/hexo-theme-next themes/next</code></pre>
+<p>在_config.yml中将主题修改为next</p>
+<p>修改next主题下的_config.yml文件中mathjax部分。</p>
+<pre><code> mathjax:
+    enable: true
+    per_page: false
+    cdn: //cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML</code></pre>
+<p>在执行hexo s时遇到报错：</p>
+<pre><code> pandoc exited with code null</code></pre>
+<p>因此在 https://github.com/jgm/pandoc/releases 重新下载pandoc安装，这个问题解决后，访问网页时又遇到输出代码的问题，于是又安装swig：</p>
+<pre><code> npm i hexo-renderer-swig</code></pre>
+<p>网页可以正常访问，但是不能加载图片，又安装asset-image:</p>
+<pre><code> npm install hexo-asset-image --save</code></pre>
+<p>还需要在package.json中手动修改asset-image版本如下，并重新执行npm install：</p>
+<pre><code> &quot;hexo-asset-image&quot;: &quot;^0.0.1&quot;</code></pre>
+<h2 id="侧边栏中文乱码">侧边栏中文乱码</h2>
+<p>是hexo-asset-image导致的，删除掉就好</p>
+<h2 id="设置首页不显示全文">设置首页不显示全文</h2>
+<p>在next的配置文件中，将下面的enable改成true</p>
+<pre><code> auto_excerpt:
+    enable: false
+    length: 150</code></pre>
+<h2 id="设置导航栏">设置导航栏</h2>
+<p>除了修改next主题下的config文件menu字段之外，还需要执行以下命令：</p>
+<pre><code> hexo new page &quot;about&quot;
+ hexo new page &quot;tags&quot;
+ hexo new page &quot;categories&quot;</code></pre>
+<h2 id="翻页按钮显示不正常">翻页按钮显示不正常</h2>
+<p>修改代码的位置: themes_partials.swig</p>
+<h2 id="hexo-next-主题配置右侧栏的分类和标签打开的是空白">Hexo next 主题配置右侧栏的分类和标签打开的是空白</h2>
+<p>categories 文件夹里面的 index.md 文件打开，修改（即添加一行）为：</p>
+<pre><code> ---
+ title: categories
+ date: 2018-01-23 17:14:51
+ type: &quot;categories&quot;   #新添加的
+ ---</code></pre>
+<p>同理，tags</p>
+<pre><code> ---
+ title: tags
+ date: 2018-01-23 17:14:51
+ type: &quot;tags&quot;     #新添加的
+ ---</code></pre>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E6%9D%82%E9%A1%B9/" rel="tag"># 杂项</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/19/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" rel="next" title="目标检测">
+                <i class="fa fa-chevron-left"></i> 目标检测
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/05/28/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Boosting%E6%80%BB%E7%BB%93/" rel="prev" title="Boosting总结">
+                Boosting总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">47</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#hexo%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">hexo安装过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85hexo%E5%91%BD%E4%BB%A4"><span class="nav-number">1.1.</span> <span class="nav-text">安装hexo命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8Bhexo%E7%89%88%E6%9C%AC"><span class="nav-number">1.2.</span> <span class="nav-text">查看hexo版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8D%9A%E5%AE%A2%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="nav-number">1.3.</span> <span class="nav-text">初始化博客文件夹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85package.json%E4%B8%AD%E7%9A%84%E4%BE%9D%E8%B5%96"><span class="nav-number">1.4.</span> <span class="nav-text">安装package.json中的依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9_config.yml%E6%96%87%E4%BB%B6"><span class="nav-number">1.5.</span> <span class="nav-text">修改_config.yml文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9git-init%E6%96%87%E4%BB%B6"><span class="nav-number">1.6.</span> <span class="nav-text">修改git init文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%AF%E6%8C%81latex"><span class="nav-number">1.7.</span> <span class="nav-text">支持latex</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%A7%E8%BE%B9%E6%A0%8F%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81"><span class="nav-number">1.8.</span> <span class="nav-text">侧边栏中文乱码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E9%A6%96%E9%A1%B5%E4%B8%8D%E6%98%BE%E7%A4%BA%E5%85%A8%E6%96%87"><span class="nav-number">1.9.</span> <span class="nav-text">设置首页不显示全文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%AF%BC%E8%88%AA%E6%A0%8F"><span class="nav-number">1.10.</span> <span class="nav-text">设置导航栏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BF%BB%E9%A1%B5%E6%8C%89%E9%92%AE%E6%98%BE%E7%A4%BA%E4%B8%8D%E6%AD%A3%E5%B8%B8"><span class="nav-number">1.11.</span> <span class="nav-text">翻页按钮显示不正常</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-next-%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE%E5%8F%B3%E4%BE%A7%E6%A0%8F%E7%9A%84%E5%88%86%E7%B1%BB%E5%92%8C%E6%A0%87%E7%AD%BE%E6%89%93%E5%BC%80%E7%9A%84%E6%98%AF%E7%A9%BA%E7%99%BD"><span class="nav-number">1.12.</span> <span class="nav-text">Hexo next 主题配置右侧栏的分类和标签打开的是空白</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tengying Liu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io" rel="external nofollow noopener noreferrer">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next" rel="external nofollow noopener noreferrer">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
