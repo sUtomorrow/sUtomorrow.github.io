@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
@@ -26,7 +26,7 @@
 <meta property="og:url" content="https://sutomorrow.github.io/2018/03/10/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/%E5%9C%A8win10%E4%B8%8A%E6%90%AD%E5%BB%BApython3%E5%92%8Ctensorflow-gpu%E7%8E%AF%E5%A2%83/index.html">
 <meta property="og:site_name" content="Tennen&#39;s Blog">
 <meta property="og:description" content="安装Anaconda2和Anaconda3 因为需要用到一些python2的代码，因此决定同时安装Anaconda2和3，搭建python2和3共存的环境。 首先安装Anaconda3作为主要环境，安装文件可以在Anaconda官网上下载，我把它安装在C盘下的Anaconda目录下，一路上没有什么特别需要注意的，两个选项都选中就好了，安装完后在Anaconda3安装目录下的envs文件夹下新建py">
-<meta property="og:locale">
+<meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://sutomorrow.github.io/2018/03/10/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/%E5%9C%A8win10%E4%B8%8A%E6%90%AD%E5%BB%BApython3%E5%92%8Ctensorflow-gpu%E7%8E%AF%E5%A2%83/Anaconda_install.png">
 <meta property="og:image" content="https://sutomorrow.github.io/2018/03/10/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/%E5%9C%A8win10%E4%B8%8A%E6%90%AD%E5%BB%BApython3%E5%92%8Ctensorflow-gpu%E7%8E%AF%E5%A2%83/cuda_dir.png">
 <meta property="og:image" content="https://sutomorrow.github.io/2018/03/10/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/%E5%9C%A8win10%E4%B8%8A%E6%90%AD%E5%BB%BApython3%E5%92%8Ctensorflow-gpu%E7%8E%AF%E5%A2%83/cuda_version.png">
@@ -50,7 +50,7 @@
     sidebar: "",
     isHome : false,
     isPost : true,
-    lang   : 'zh-Hans'
+    lang   : 'zh-CN'
   };
 </script>
 
@@ -94,7 +94,7 @@
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
+    <div class="toggle" aria-label="切换导航栏">
       <span class="toggle-line toggle-line-first"></span>
       <span class="toggle-line toggle-line-middle"></span>
       <span class="toggle-line toggle-line-last"></span>
@@ -123,17 +123,17 @@
   <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
 
   </li>
   </ul>
@@ -163,7 +163,7 @@
     
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2018/03/10/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/%E5%9C%A8win10%E4%B8%8A%E6%90%AD%E5%BB%BApython3%E5%92%8Ctensorflow-gpu%E7%8E%AF%E5%A2%83/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -185,22 +185,22 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2018-03-10 17:15:35" itemprop="dateCreated datePublished" datetime="2018-03-10T17:15:35+08:00">2018-03-10</time>
+              <time title="创建时间：2018-03-10 17:15:35" itemprop="dateCreated datePublished" datetime="2018-03-10T17:15:35+08:00">2018-03-10</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 20:17:23" itemprop="dateModified" datetime="2023-10-12T20:17:23+08:00">2023-10-12</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 20:17:23" itemprop="dateModified" datetime="2023-10-12T20:17:23+08:00">2023-10-12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
-              <span class="post-meta-item-text">In</span>
+              <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" itemprop="url" rel="index"><span itemprop="name">环境搭建</span></a>
                 </span>
@@ -320,10 +320,10 @@
 
       <ul class="sidebar-nav motion-element">
         <li class="sidebar-nav-toc">
-          Table of Contents
+          文章目录
         </li>
         <li class="sidebar-nav-overview">
-          Overview
+          站点概览
         </li>
       </ul>
 
@@ -342,21 +342,21 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">47</span>
-          <span class="site-state-item-name">posts</span>
+          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
         <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">categories</span></a>
+        <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
         <span class="site-state-item-count">17</span>
-        <span class="site-state-item-name">tags</span></a>
+        <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
 </div>
@@ -388,7 +388,7 @@
   </span>
   <span class="author" itemprop="copyrightHolder">Tennen</span>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a> 强力驱动
   </div>
 
         

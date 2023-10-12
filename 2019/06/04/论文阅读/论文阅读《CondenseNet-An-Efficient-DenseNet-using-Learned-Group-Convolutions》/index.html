@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
@@ -26,7 +26,7 @@
 <meta property="og:url" content="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/index.html">
 <meta property="og:site_name" content="Tennen&#39;s Blog">
 <meta property="og:description" content="主要工作 本文主要贡献是提出了一种比ShuffleNets还要高效很多的CondenseNets。 主要思想 该论文认为普通的卷积模型:layer-by-layer的连接模式，模型需要在每一层都去重复最前面层的特征，因此DenseNet的短连接所引导的特征重用对这个问题有一定的缓解，但论文中猜想对于DenseNet这样的密集短连接，会引入一些冗余的浅层特征，因此论文提出了一种方法来减少这种冗余，并">
-<meta property="og:locale">
+<meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/GroupConv_Learn_Test.png">
 <meta property="og:image" content="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/训练loss和学习速率.png">
 <meta property="og:image" content="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/特征凝聚因子实验.png">
@@ -48,7 +48,7 @@
     sidebar: "",
     isHome : false,
     isPost : true,
-    lang   : 'zh-Hans'
+    lang   : 'zh-CN'
   };
 </script>
 
@@ -92,7 +92,7 @@
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
+    <div class="toggle" aria-label="切换导航栏">
       <span class="toggle-line toggle-line-first"></span>
       <span class="toggle-line toggle-line-middle"></span>
       <span class="toggle-line toggle-line-last"></span>
@@ -121,17 +121,17 @@
   <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
 
   </li>
   </ul>
@@ -161,7 +161,7 @@
     
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -183,16 +183,16 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2019-06-04 14:27:49" itemprop="dateCreated datePublished" datetime="2019-06-04T14:27:49+08:00">2019-06-04</time>
+              <time title="创建时间：2019-06-04 14:27:49" itemprop="dateCreated datePublished" datetime="2019-06-04T14:27:49+08:00">2019-06-04</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
               </span>
 
           
@@ -350,10 +350,10 @@ Design)</h3>
 
       <ul class="sidebar-nav motion-element">
         <li class="sidebar-nav-toc">
-          Table of Contents
+          文章目录
         </li>
         <li class="sidebar-nav-overview">
-          Overview
+          站点概览
         </li>
       </ul>
 
@@ -376,21 +376,21 @@ Design)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">47</span>
-          <span class="site-state-item-name">posts</span>
+          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
         <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">categories</span></a>
+        <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
         <span class="site-state-item-count">17</span>
-        <span class="site-state-item-name">tags</span></a>
+        <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
 </div>
@@ -422,7 +422,7 @@ Design)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-
   </span>
   <span class="author" itemprop="copyrightHolder">Tennen</span>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a> 强力驱动
   </div>
 
         

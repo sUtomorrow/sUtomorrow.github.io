@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
@@ -26,7 +26,7 @@
 <meta property="og:url" content="https://sutomorrow.github.io/page/4/index.html">
 <meta property="og:site_name" content="Tennen&#39;s Blog">
 <meta property="og:description" content="record something">
-<meta property="og:locale">
+<meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="Tennen">
 <meta name="twitter:card" content="summary">
 
@@ -39,7 +39,7 @@
     sidebar: "",
     isHome : true,
     isPost : false,
-    lang   : 'zh-Hans'
+    lang   : 'zh-CN'
   };
 </script>
 
@@ -83,7 +83,7 @@
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
+    <div class="toggle" aria-label="切换导航栏">
       <span class="toggle-line toggle-line-first"></span>
       <span class="toggle-line toggle-line-middle"></span>
       <span class="toggle-line toggle-line-last"></span>
@@ -112,17 +112,17 @@
   <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
 
   </li>
   </ul>
@@ -151,7 +151,88 @@
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/12/31/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AACNet%E2%80%94%E2%80%94Strengthening-the-Kernel-Skeletons-for-Powerful-CNN-via-AsymmetricConvolution-Blocks%E3%80%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2019/12/31/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AACNet%E2%80%94%E2%80%94Strengthening-the-Kernel-Skeletons-for-Powerful-CNN-via-AsymmetricConvolution-Blocks%E3%80%8B/" class="post-title-link" itemprop="url">论文阅读《ACNet——Strengthening the Kernel Skeletons for Powerful CNN via AsymmetricConvolution Blocks》</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-31 15:02:12" itemprop="dateCreated datePublished" datetime="2019-12-31T15:02:12+08:00">2019-12-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="主要工作">主要工作</h2>
+<p>提出了一种非对称卷积块（Asymmetric Convolution
+Block），使用一维的非对称卷积来加强方形卷积。</p>
+<h2 id="具体实现">具体实现</h2>
+<p>在训练过程中，将原始的<span class="math inline">\(3 \times
+3\)</span>卷积替换为一种非对称卷积块的结构，如下图所示。</p>
+<figure>
+<img src="ACB_training.png" alt="训练时的ACB模块">
+<figcaption aria-hidden="true">训练时的ACB模块</figcaption>
+</figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2019/12/31/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AACNet%E2%80%94%E2%80%94Strengthening-the-Kernel-Skeletons-for-Powerful-CNN-via-AsymmetricConvolution-Blocks%E3%80%8B/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/09/03/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ADeformable-Convolutional-Networks%E3%80%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -174,16 +255,16 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2019-09-03 09:59:56" itemprop="dateCreated datePublished" datetime="2019-09-03T09:59:56+08:00">2019-09-03</time>
+              <time title="创建时间：2019-09-03 09:59:56" itemprop="dateCreated datePublished" datetime="2019-09-03T09:59:56+08:00">2019-09-03</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
               </span>
 
           
@@ -205,7 +286,7 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/09/03/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ADeformable-Convolutional-Networks%E3%80%8B/#more" rel="contents">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           <!--/noindex-->
@@ -227,7 +308,7 @@
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/08/07/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACornerNet-Detecting-Objects-as-Paired-Keypoints%E3%80%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -250,16 +331,16 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2019-08-07 20:17:13" itemprop="dateCreated datePublished" datetime="2019-08-07T20:17:13+08:00">2019-08-07</time>
+              <time title="创建时间：2019-08-07 20:17:13" itemprop="dateCreated datePublished" datetime="2019-08-07T20:17:13+08:00">2019-08-07</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
               </span>
 
           
@@ -289,7 +370,7 @@ map上的点，只有为目标角点的时候才进行激活预测其目标类�
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/08/07/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACornerNet-Detecting-Objects-as-Paired-Keypoints%E3%80%8B/#more" rel="contents">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           <!--/noindex-->
@@ -311,7 +392,7 @@ map上的点，只有为目标角点的时候才进行激活预测其目标类�
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/08/01/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AReducing-the-Dimensionality-of-Data-with-Neural-Networks%E3%80%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -334,16 +415,16 @@ map上的点，只有为目标角点的时候才进行激活预测其目标类�
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2019-08-01 17:09:54" itemprop="dateCreated datePublished" datetime="2019-08-01T17:09:54+08:00">2019-08-01</time>
+              <time title="创建时间：2019-08-01 17:09:54" itemprop="dateCreated datePublished" datetime="2019-08-01T17:09:54+08:00">2019-08-01</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
               </span>
 
           
@@ -366,7 +447,7 @@ map上的点，只有为目标角点的时候才进行激活预测其目标类�
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/08/01/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AReducing-the-Dimensionality-of-Data-with-Neural-Networks%E3%80%8B/#more" rel="contents">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           <!--/noindex-->
@@ -388,7 +469,7 @@ map上的点，只有为目标角点的时候才进行激活预测其目标类�
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/07/31/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AImproving-neural-networks-by-preventingco-adaptation-of-feature-detectors%E3%80%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -411,16 +492,16 @@ map上的点，只有为目标角点的时候才进行激活预测其目标类�
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2019-07-31 10:08:12" itemprop="dateCreated datePublished" datetime="2019-07-31T10:08:12+08:00">2019-07-31</time>
+              <time title="创建时间：2019-07-31 10:08:12" itemprop="dateCreated datePublished" datetime="2019-07-31T10:08:12+08:00">2019-07-31</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
               </span>
 
           
@@ -449,7 +530,7 @@ overfitting》有更多的描述，其中提到了Dropout可以让feature激活�
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/07/31/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AImproving-neural-networks-by-preventingco-adaptation-of-feature-detectors%E3%80%8B/#more" rel="contents">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           <!--/noindex-->
@@ -471,7 +552,7 @@ overfitting》有更多的描述，其中提到了Dropout可以让feature激活�
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/07/29/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AMulti-Task-Learning-Using-Uncertainty-to-Weigh-Lossesfor-Scene-Geometry-and-Semantics%E3%80%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -494,16 +575,16 @@ overfitting》有更多的描述，其中提到了Dropout可以让feature激活�
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2019-07-29 15:39:55" itemprop="dateCreated datePublished" datetime="2019-07-29T15:39:55+08:00">2019-07-29</time>
+              <time title="创建时间：2019-07-29 15:39:55" itemprop="dateCreated datePublished" datetime="2019-07-29T15:39:55+08:00">2019-07-29</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
               </span>
 
           
@@ -525,7 +606,7 @@ overfitting》有更多的描述，其中提到了Dropout可以让feature激活�
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/07/29/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AMulti-Task-Learning-Using-Uncertainty-to-Weigh-Lossesfor-Scene-Geometry-and-Semantics%E3%80%8B/#more" rel="contents">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           <!--/noindex-->
@@ -547,7 +628,7 @@ overfitting》有更多的描述，其中提到了Dropout可以让feature激活�
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/07/26/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ALearning-a-Discriminative-Feature-Network-for-Semantic-Segmentation%E3%80%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -570,16 +651,16 @@ overfitting》有更多的描述，其中提到了Dropout可以让feature激活�
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2019-07-26 15:59:06" itemprop="dateCreated datePublished" datetime="2019-07-26T15:59:06+08:00">2019-07-26</time>
+              <time title="创建时间：2019-07-26 15:59:06" itemprop="dateCreated datePublished" datetime="2019-07-26T15:59:06+08:00">2019-07-26</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
               </span>
 
           
@@ -608,7 +689,7 @@ Block(CAB)逐步利用高级特征来选择低级特征。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/07/26/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ALearning-a-Discriminative-Feature-Network-for-Semantic-Segmentation%E3%80%8B/#more" rel="contents">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           <!--/noindex-->
@@ -630,7 +711,7 @@ Block(CAB)逐步利用高级特征来选择低级特征。</p>
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/07/04/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-07/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -653,16 +734,16 @@ Block(CAB)逐步利用高级特征来选择低级特征。</p>
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2019-07-04 20:16:54" itemprop="dateCreated datePublished" datetime="2019-07-04T20:16:54+08:00">2019-07-04</time>
+              <time title="创建时间：2019-07-04 20:16:54" itemprop="dateCreated datePublished" datetime="2019-07-04T20:16:54+08:00">2019-07-04</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
               </span>
 
           
@@ -696,7 +777,7 @@ regressoion)，就是用线性回归去逼近对数几率，如下： <span clas
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/07/04/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-07/#more" rel="contents">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           <!--/noindex-->
@@ -718,7 +799,7 @@ regressoion)，就是用线性回归去逼近对数几率，如下： <span clas
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/06/20/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-06/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -741,16 +822,16 @@ regressoion)，就是用线性回归去逼近对数几率，如下： <span clas
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2019-06-20 19:13:39" itemprop="dateCreated datePublished" datetime="2019-06-20T19:13:39+08:00">2019-06-20</time>
+              <time title="创建时间：2019-06-20 19:13:39" itemprop="dateCreated datePublished" datetime="2019-06-20T19:13:39+08:00">2019-06-20</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
               </span>
 
           
@@ -773,7 +854,7 @@ WebVision图片分类竞赛冠军的技术分享，大致整理其主要思路�
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/06/20/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-06/#more" rel="contents">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           <!--/noindex-->
@@ -795,7 +876,7 @@ WebVision图片分类竞赛冠军的技术分享，大致整理其主要思路�
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -818,16 +899,16 @@ WebVision图片分类竞赛冠军的技术分享，大致整理其主要思路�
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2019-06-04 14:27:49" itemprop="dateCreated datePublished" datetime="2019-06-04T14:27:49+08:00">2019-06-04</time>
+              <time title="创建时间：2019-06-04 14:27:49" itemprop="dateCreated datePublished" datetime="2019-06-04T14:27:49+08:00">2019-06-04</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
               </span>
 
           
@@ -849,84 +930,7 @@ WebVision图片分类竞赛冠军的技术分享，大致整理其主要思路�
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/05/08/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85emacs%E8%AE%B0%E5%BD%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Tennen">
-      <meta itemprop="description" content="record something">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tennen's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2019/05/08/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85emacs%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">编译安装emacs记录</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2019-05-08 11:02:55" itemprop="dateCreated datePublished" datetime="2019-05-08T11:02:55+08:00">2019-05-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>最近需要实现一些tensorflow OP，所以先找一个ubuntu下的C++
-IDE，决定用emacs，下面是安装过程。</p>
-<h2 id="文件下载">文件下载</h2>
-<p>使用镜像站: http://mirrors.kernel.org/gnu/emacs/，下载26.2版本</p>
-<h2 id="安装流程">安装流程</h2>
-<p>按照安装说明，首先解包之后运行</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2019/05/08/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85emacs%E8%AE%B0%E5%BD%95/#more" rel="contents">
-                Read more &raquo;
+                阅读全文 &raquo;
               </a>
             </div>
           <!--/noindex-->
@@ -948,7 +952,7 @@ IDE，决定用emacs，下面是安装过程。</p>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -992,10 +996,10 @@ IDE，决定用emacs，下面是安装过程。</p>
 
       <ul class="sidebar-nav motion-element">
         <li class="sidebar-nav-toc">
-          Table of Contents
+          文章目录
         </li>
         <li class="sidebar-nav-overview">
-          Overview
+          站点概览
         </li>
       </ul>
 
@@ -1013,21 +1017,21 @@ IDE，决定用emacs，下面是安装过程。</p>
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">47</span>
-          <span class="site-state-item-name">posts</span>
+          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
         <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">categories</span></a>
+        <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
         <span class="site-state-item-count">17</span>
-        <span class="site-state-item-name">tags</span></a>
+        <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
 </div>
@@ -1059,7 +1063,7 @@ IDE，决定用emacs，下面是安装过程。</p>
   </span>
   <span class="author" itemprop="copyrightHolder">Tennen</span>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a> 强力驱动
   </div>
 
         

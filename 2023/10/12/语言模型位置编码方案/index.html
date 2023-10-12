@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="语言模型外推相关论文和方案">
+<meta property="og:type" content="article">
+<meta property="og:title" content="语言模型外推和位置编码方案">
+<meta property="og:url" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="语言模型外推相关论文和方案">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/1.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/2.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/3.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/4.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/5.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/7.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/8.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/9.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/10.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/11.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/12.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/13.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/14.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/15.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/16.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/17.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/18.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/19.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/20.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/21.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/22.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/23.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/24.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/25.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/26.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/27.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/28.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/29.png">
+<meta property="article:published_time" content="2023-10-12T13:09:41.000Z">
+<meta property="article:modified_time" content="2023-10-12T13:29:35.042Z">
+<meta property="article:author" content="Tennen">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/1.png">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>语言模型外推和位置编码方案 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2023/10/12/%E8%AF%AD%E8%A8%80%E6%A8%A1%E5%9E%8B%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81%E6%96%B9%E6%A1%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          语言模型外推和位置编码方案
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-10-12 21:09:41 / 修改时间：21:29:35" itemprop="dateCreated datePublished" datetime="2023-10-12T21:09:41+08:00">2023-10-12</time>
+            </span>
+
+          
+            <div class="post-description">语言模型外推相关论文和方案</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="roformer-enhanced-transformer-with-rotary-position-embedding">RoFormer:
+Enhanced Transformer with Rotary Position Embedding</h1>
+<p>论文地址：<a target="_blank" rel="external nofollow noopener noreferrer" href="https://arxiv.org/abs/2104.09864">https://arxiv.org/abs/2104.09864</a></p>
+<p>代码地址：<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/ZhuiyiTechnology/roformer">https://github.com/ZhuiyiTechnology/roformer</a></p>
+<p>总结：提出了一种基于旋转角度的相对位置编码方案:RoPE，将d维的embeddiing拆分成d/2个2维向量来看待，之后对不同的二维向量施加频率不同且和位置相关的旋转角度，从而将位置信息编码到embedding中，其好处在于进行编码后的embedding内积得到的attention
+score就包含了相对位置信息、无需学习额外的embeddiing参数且可适用于linear
+self-attention。</p>
+<figure>
+<img src="1.png" alt="实现原理">
+<figcaption aria-hidden="true">实现原理</figcaption>
+</figure>
+<figure>
+<img src="2.png" alt="实现示例">
+<figcaption aria-hidden="true">实现示例</figcaption>
+</figure>
+<p>编码后的embedding内积的相对上界随相对距离的变化如下图：基本满足远程衰减的趋势</p>
+<figure>
+<img src="3.png" alt="实现示例">
+<figcaption aria-hidden="true">实现示例</figcaption>
+</figure>
+<p>实验结果：</p>
+<ul>
+<li><p>在翻译任务上训练得到的指标略优 <img src="4.png" alt="实现示例"></p></li>
+<li><p>收敛速度更快，且在使用linear
+self-attention机制的Performer上也有一致的提升 <img src="5.png" alt="实现示例"></p></li>
+<li><p>在下游任务上finetune之后，在一些任务上效果显著优于BERT <img src="6.png" alt="实现示例"></p></li>
+<li><p>预训练好后，可以增加输入长度，在中文数据集上测试，有显著的提升
+<img src="7.png" alt="实现示例"></p></li>
+</ul>
+<h1 id="extending-context-window-of-large-language-models-via-positional-interpolation">Extending
+Context Window of Large Language Models via Positional
+Interpolation</h1>
+<p>论文地址：<a target="_blank" rel="external nofollow noopener noreferrer" href="https://arxiv.org/abs/2306.15595">https://arxiv.org/abs/2306.15595</a></p>
+<p>代码地址：暂无</p>
+<p>总结：提出使用内插RoPE的方式来代替外推RoPE以扩展语言模型的输入长度，并通过理论和实验证明该方式相比于外推在finetune时有更快的收敛性和更好的效果，外推方式训练10000
+step之后的效果还不如内插方式训练1000 step。
+论文提出：足够多（维度足够大）三角函数的组合可以逼近任意函数，因此总是存在合适的系数导致外推RoPE之后的attention
+score变得很大（论文中证明：相比于外推之后的score上限，内插之后的score上限大概是1/600），这是导致外推难以训练的潜在原因。</p>
+<p>内插方法很简单，就是对位置id进行内插 <img src="8.png" alt="实现示例"></p>
+<p>内插和外推的对比如下，直接外推之后，在没有训练过的长度上会导致attention
+score异常（中间图） <img src="9.png" alt="实现示例"></p>
+<p>在PG19和Arxiv Math
+Proof-pile数据集上，内插+finetune的方式均能看到困惑度指标的下降，并且大致是随着window
+size增加而变好 <img src="10.png" alt="实现示例"></p>
+<figure>
+<img src="11.png" alt="实现示例">
+<figcaption aria-hidden="true">实现示例</figcaption>
+</figure>
+<p>内插方式的finetune时的收敛速度很快： <img src="12.png" alt="实现示例"></p>
+<p>内插+finetune和外推+finetune的收敛速度对比： <img src="13.png" alt="实现示例"></p>
+<p>内插方式增加window
+size微调之后，相比于原始模型，在一些任务上指标有轻微下降，但在在需要仔细判别短句单词顺序的场景下降很明显，例如BoolQ数据集
+<img src="14.png" alt="实现示例"></p>
+<p>在长文档总结的任务上，finetune
+10个epoch就能做到和其他模型相当的得分，说明内插确实能够有效扩展window
+size <img src="15.png" alt="实现示例"></p>
+<h1 id="ntk-aware-scaled-rope-allows-llama-models-to-have-extended-8k-context-size-without-any-fine-tuning-and-minimal-perplexity-degradation">NTK-Aware
+Scaled RoPE allows LLaMA models to have extended (8k+) context size
+without any fine-tuning and minimal perplexity degradation</h1>
+<p>地址：<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/">https://www.reddit.com/r/LocalLLaMA/comments/14lz7j5/ntkaware_scaled_rope_allows_llama_models_to_have/</a></p>
+<p>这不是论文，而是reddit上的一篇文章，针对上面的内插RoPE+finetune的方法，提出了无需finetune的NTK-Aware
+Scaled RoPE方法</p>
+<p>引入NTK理论只是说明神经网络模型无法很好的学习高频特征，而线性内插的方式对特征进行了较多的下采样，导致模型无法很好的区分位置很近的token，因此作者提出了非线性的内插方法，不再对位置id进行线性内插，而是对其傅里叶特征进行高频外推、低频内插的非线性方式，最终代码修改很少，无需finetune，但效果非常好，RoPE的作者在博客中有相关解读：<a target="_blank" rel="external nofollow noopener noreferrer" href="https://kexue.fm/archives/9675">https://kexue.fm/archives/9675</a>，在该博客中还提到，在attention中更换缩放因子能够缓解窗口大小增大后的注意力不集中问题：
+<span class="math display">\[\frac{1}{\sqrt{d}} \rightarrow \frac{\log_{512}^{n}}{\sqrt{d}} \]</span>(训练时使用的是512的窗口大小，预测窗口大小为n，该参数是从熵不变的角度推理得到的)，从而在没有finetune的NTK-Aware
+Scaled RoPE上带类更好的性能，如下右上图所示，带log
+n项的实验普遍有更好的效果</p>
+<p><img src="16.png" alt="实现示例"> <img src="17.png" alt="实现示例"> <img src="18.png" alt="实现示例"> <img src="19.png" alt="实现示例"></p>
+<h1 id="longlora-efficient-fine-tuning-of-long-context-large-language-models">LongLoRA:
+Efficient Fine-tuning of Long-Context Large Language Models</h1>
+<p>论文地址：<a target="_blank" rel="external nofollow noopener noreferrer" href="https://arxiv.org/abs/2309.12307">https://arxiv.org/abs/2309.12307</a></p>
+<p>代码地址：<a target="_blank" rel="external nofollow noopener noreferrer" href="https://github.com/dvlab-research/longlora">https://github.com/dvlab-research/longlora</a></p>
+<p>总结：提出通过shift short attention + 带有可训练embedding layer和norm
+layer的LoRA微调方式(LoRA+)来对语言模型的输入序列长度进行扩展，8张A100上可以实现LLaMA2-7B模型100k
+Context
+Length的训练。另外，论文中构建了一个长上下文的QA数据集：LongQA，用于支持有监督的finetune，主要是为了提升LLM在长上下文下的对话能力。
+<img src="20.png" alt="实现示例"></p>
+<figure>
+<img src="21.png" alt="实现示例">
+<figcaption aria-hidden="true">实现示例</figcaption>
+</figure>
+<figure>
+<img src="22.png" alt="实现示例">
+<figcaption aria-hidden="true">实现示例</figcaption>
+</figure>
+<p>相比于Train-free的基于编码的长度外推，该论文方案可以在其基础上进一步提升效果：
+<img src="23.png" alt="实现示例"></p>
+<p>实验证明单独使用LoRA效果不佳，而带上Norm和embedding层参数可学习之后有明显提升：
+<img src="24.png" alt="实现示例"></p>
+<p>Shift short attention相比于其他高效attention结构（dilate
+attention、stride sparse
+attention）有明显优势，且即使在训练过程中使用short
+attention，在预测过程中照样可以使用full
+attention，另外，实验证明shift在head之间实现最佳，在layer之间实现效果略差。
+<img src="25.png" alt="实现示例"></p>
+<p>全参数finetune和LoRA+的效果对比，区别很小： <img src="26.png" alt="实现示例"></p>
+<p>shift short attention对FlOPs的减少较大： <img src="27.png" alt="实现示例"></p>
+<p>消融实验以及不同训练和推理长度的对比： <img src="28.png" alt="实现示例"></p>
+<figure>
+<img src="29.png" alt="实现示例">
+<figcaption aria-hidden="true">实现示例</figcaption>
+</figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/01/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Rodrigues%E6%97%8B%E8%BD%AC%E5%85%AC%E5%BC%8F/" rel="prev" title="Rodrigues旋转公式">
+      <i class="fa fa-chevron-left"></i> Rodrigues旋转公式
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#roformer-enhanced-transformer-with-rotary-position-embedding"><span class="nav-number">1.</span> <span class="nav-text">RoFormer:
+Enhanced Transformer with Rotary Position Embedding</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#extending-context-window-of-large-language-models-via-positional-interpolation"><span class="nav-number">2.</span> <span class="nav-text">Extending
+Context Window of Large Language Models via Positional
+Interpolation</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ntk-aware-scaled-rope-allows-llama-models-to-have-extended-8k-context-size-without-any-fine-tuning-and-minimal-perplexity-degradation"><span class="nav-number">3.</span> <span class="nav-text">NTK-Aware
+Scaled RoPE allows LLaMA models to have extended (8k+) context size
+without any fine-tuning and minimal perplexity degradation</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#longlora-efficient-fine-tuning-of-long-context-large-language-models"><span class="nav-number">4.</span> <span class="nav-text">LongLoRA:
+Efficient Fine-tuning of Long-Context Large Language Models</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

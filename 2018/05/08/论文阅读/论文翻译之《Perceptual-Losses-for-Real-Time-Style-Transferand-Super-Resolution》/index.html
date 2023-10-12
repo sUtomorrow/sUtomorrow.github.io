@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hans">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
@@ -26,7 +26,7 @@
 <meta property="og:url" content="https://sutomorrow.github.io/2018/05/08/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E4%B9%8B%E3%80%8APerceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution%E3%80%8B/index.html">
 <meta property="og:site_name" content="Tennen&#39;s Blog">
 <meta property="og:description" content="在实时风格转换和超分辨率上使用感知损失函数 作者：Justin Johnson, Alexandre Alahi, and Li Fei-Fei 摘要 本文研究图像转换问题，即将一个输入图像转化到一个输出图像，最近在这个问题上使用的典型方法是训练一个使用在输出和目标图像上逐像素计算损失函数（per-pixel loss）的卷积神经网络。有研究表明高质量的图像可以通过基于预训练网络提取的高级特征定义">
-<meta property="og:locale">
+<meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://sutomorrow.github.io/2018/05/08/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E4%B9%8B%E3%80%8APerceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution%E3%80%8B/fig1.png">
 <meta property="og:image" content="https://sutomorrow.github.io/2018/05/08/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E4%B9%8B%E3%80%8APerceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution%E3%80%8B/fig2.png">
 <meta property="article:published_time" content="2018-05-08T12:24:09.000Z">
@@ -45,7 +45,7 @@
     sidebar: "",
     isHome : false,
     isPost : true,
-    lang   : 'zh-Hans'
+    lang   : 'zh-CN'
   };
 </script>
 
@@ -89,7 +89,7 @@
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
+    <div class="toggle" aria-label="切换导航栏">
       <span class="toggle-line toggle-line-first"></span>
       <span class="toggle-line toggle-line-middle"></span>
       <span class="toggle-line toggle-line-last"></span>
@@ -118,17 +118,17 @@
   <ul id="menu" class="main-menu menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
 
   </li>
   </ul>
@@ -158,7 +158,7 @@
     
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2018/05/08/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E4%B9%8B%E3%80%8APerceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution%E3%80%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -180,16 +180,16 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-calendar"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
 
-              <time title="Created: 2018-05-08 20:24:09" itemprop="dateCreated datePublished" datetime="2018-05-08T20:24:09+08:00">2018-05-08</time>
+              <time title="创建时间：2018-05-08 20:24:09" itemprop="dateCreated datePublished" datetime="2018-05-08T20:24:09+08:00">2018-05-08</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-12 20:19:45" itemprop="dateModified" datetime="2023-10-12T20:19:45+08:00">2023-10-12</time>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-10-12 20:19:45" itemprop="dateModified" datetime="2023-10-12T20:19:45+08:00">2023-10-12</time>
               </span>
 
           
@@ -325,10 +325,10 @@ estimation）方法[6,19]都是相似的，依靠使用一个前向的用逐像�
 
       <ul class="sidebar-nav motion-element">
         <li class="sidebar-nav-toc">
-          Table of Contents
+          文章目录
         </li>
         <li class="sidebar-nav-overview">
-          Overview
+          站点概览
         </li>
       </ul>
 
@@ -348,21 +348,21 @@ Johnson, Alexandre Alahi, and Li Fei-Fei</span></a></li><li class="nav-item nav-
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">47</span>
-          <span class="site-state-item-name">posts</span>
+          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
         <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">categories</span></a>
+        <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
         <span class="site-state-item-count">17</span>
-        <span class="site-state-item-name">tags</span></a>
+        <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
 </div>
@@ -394,7 +394,7 @@ Johnson, Alexandre Alahi, and Li Fei-Fei</span></a></li><li class="nav-item nav-
   </span>
   <span class="author" itemprop="copyrightHolder">Tennen</span>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a> 强力驱动
   </div>
 
         
