@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="2019-02-13 支持向量机 首先复习了数学上的一个小知识，如果有一个超平面可以表达为如下线性方程： \[ \begin{aligned}     w^Tx+b &#x3D; 0 \end{aligned} \] 则空间中任意一点\(x_0\)到该超平面的距离可以表示为如下： \[ \begin{aligned}     r &#x3D; \frac{|w^Tx_0+b|}{||w||} \end{aligned">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习笔记_2019-02">
+<meta property="og:url" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-02/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="2019-02-13 支持向量机 首先复习了数学上的一个小知识，如果有一个超平面可以表达为如下线性方程： \[ \begin{aligned}     w^Tx+b &#x3D; 0 \end{aligned} \] 则空间中任意一点\(x_0\)到该超平面的距离可以表示为如下： \[ \begin{aligned}     r &#x3D; \frac{|w^Tx_0+b|}{||w||} \end{aligned">
+<meta property="og:locale">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-02/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E8%B6%85%E5%B9%B3%E9%9D%A2%E7%A4%BA%E6%84%8F.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-02/%E7%BA%A6%E6%9D%9F%E6%9D%A1%E4%BB%B6%E5%92%8C%E7%9B%AE%E6%A0%87%E5%87%BD%E6%95%B0%E7%9A%84%E7%AD%89%E5%80%BC%E7%BA%BF.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-02/l1%E6%AD%A3%E5%88%99%E5%8C%96%E6%95%88%E6%9E%9C%E7%A4%BA%E6%84%8F.png">
+<meta property="article:published_time" content="2019-02-13T07:16:58.000Z">
+<meta property="article:modified_time" content="2023-10-12T11:15:02.035Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="学习笔记，杂项">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-02/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E8%B6%85%E5%B9%B3%E9%9D%A2%E7%A4%BA%E6%84%8F.png">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-02/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>学习笔记_2019-02 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-02/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          学习笔记_2019-02
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-02-13 15:16:58" itemprop="dateCreated datePublished" datetime="2019-02-13T15:16:58+08:00">2019-02-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="section">2019-02-13</h1>
+<h2 id="支持向量机">支持向量机</h2>
+<p>首先复习了数学上的一个小知识，如果有一个超平面可以表达为如下线性方程：
+<span class="math display">\[
+\begin{aligned}
+    w^Tx+b = 0
+\end{aligned}
+\]</span> 则空间中任意一点<span class="math inline">\(x_0\)</span>到该超平面的距离可以表示为如下： <span class="math display">\[
+\begin{aligned}
+    r = \frac{|w^Tx_0+b|}{||w||}
+\end{aligned}
+\]</span></p>
+<p>在分类问题的样本空间中，令<span class="math inline">\(x_i\)</span>和<span class="math inline">\(y_i\)</span>分别表示某个样本和其对应的标签，支持向量机的基本思想是求出一个满足如下条件的超平面：
+<span class="math display">\[
+\begin{cases}
+    w^Tx_i + b \ge 1 &amp; y_i = 1\\
+    w^Tx_i + b \le 1 &amp; y_i = -1
+\end{cases}
+\]</span>
+示意图如下,这里z展示的样本的特征空间为2维，图中被圈出来的满足上式等号条件一个正样本和两个负样本被称为支持向量，<span class="math inline">\(\gamma=\frac{2}{||w||}\)</span>称为间隔。</p>
+<img src="/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-02/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA%E8%B6%85%E5%B9%B3%E9%9D%A2%E7%A4%BA%E6%84%8F.png" class title="支持向量机超平面示意">
+<p>找分类超平面的问题就可以转化为如下： <span class="math display">\[
+\begin{aligned}
+    &amp;\max_{w,b}\frac{2}{||w||}\\
+    &amp;s.t.\quad y_i(w^Tx_i + b) \ge 1, i = 1,2,...,m\\
+    等价为\\
+    &amp;\min_{w,b}\frac{||w||^2}{2}\\
+    &amp;s.t.\quad y_i(w^Tx_i + b) \ge 1, i = 1,2,...,m
+\end{aligned}
+\]</span>
+这里可以使用不等式约束下的拉格朗日乘子法转换为对偶问题进行求解。</p>
+<p>支持向量机的基本型就是希望找到一个间隔最大的超平面，但是这里有个问题，在原始的特征空间中，样本不一定线性可分，因此引入一个函数，将原始特征空间映射到一个高维的特征空间，使得在这个高维空间中线性可分，这样即可将任何分类问题转换成线性可分的形式，但是这样也有一个问题，设映射后的特征向量为<span class="math inline">\(\phi(x)\)</span>，求解超平面的过程中，会遇到<span class="math inline">\({\phi(x)}^T\phi(x)\)</span>的情况，因为<span class="math inline">\(\phi(x)\)</span>的维数可以为无穷，所以这里的计算无法进行，因此需要设想一个这样的函数：<span class="math inline">\(k(x_i,x_j)={\phi(x_i)}^T\phi(x_j)\)</span>使得不需要通过<span class="math inline">\(\phi(x)\)</span>来计算<span class="math inline">\({\phi(x)}^T\phi(x)\)</span>，而是直接通过<span class="math inline">\(k(x_i,x_j)\)</span>来表示，这个函数即称为核函数。</p>
+<p>核函数可以用一个核矩阵来表示如下，任何一个对称的半正定矩阵，都可以作为核矩阵。
+<span class="math display">\[
+k=\begin{bmatrix}
+    k(x_1,x_1) &amp;\cdots &amp;k(x_1,x_j) &amp;\cdots &amp;k(x_1,x_n)\\
+    \vdots &amp;\ddots &amp;\vdots &amp;\ddots &amp;\vdots\\
+    k(x_j,x_1) &amp;\cdots &amp;k(x_j,x_j) &amp;\cdots &amp;k(x_j,x_n)\\
+    \vdots &amp;\ddots &amp;\vdots &amp;\ddots &amp;\vdots\\
+    k(x_n,x_1) &amp;\cdots &amp;k(x_n,x_j) &amp;\cdots &amp;k(x_n,x_n)\\
+\end{bmatrix}
+\]</span></p>
+<p>选择一个核函数，就隐式的确定了映射的特征空间，因此核函数的选择非常重要。</p>
+<p>但是在实际使用中，选出一个合适的特征空间恰好让这个样本线性可分非常不容易，因此将优化目标重写为：
+<span class="math display">\[
+\min_{w,b}\frac{1}{2}{||w||}^2+C\sum_{i=1}^ml(y_i(w^Tx_i+b) - 1)
+\]</span> 这里的<span class="math inline">\(C\)</span>为一个设定好的常数，决定模型的偏好，<span class="math inline">\(l\)</span>为一种损失函数。这样的支持向量机被称为软间隔支持向量机。</p>
+<h1 id="section-1">2019-02-19</h1>
+<h2 id="对拉格朗日乘子法的理解">对拉格朗日乘子法的理解</h2>
+<p>前置知识：梯度的方向是当前等值平面的法线方向。约束函数和目标函数相切时，约束函数和目标函数的梯度方向相同。</p>
+<p>如下图所示，其中<span class="math inline">\(f(x,y)\)</span>是目标函数，<span class="math inline">\(f(x,y) = d_1,f(x,y) = d_2,f(x,y) =
+d_3\)</span>都是目标函数的等值线， <span class="math inline">\(g(x,y) =
+c\)</span>是约束条件，在约束条件和等值线相切的地方，有<span class="math inline">\(\nabla f = \lambda \nabla g\)</span>,这里假设<span class="math inline">\(d_1 &lt; d_2 &lt; d_3\)</span>且所求问题为 <span class="math display">\[
+\min f(x,y) \\
+s.t. g(x,y)=c
+\]</span>
+那么其最优解一定出现在相切的地方，即只要求如下联立方程即可得到最优解的可能位置。</p>
+<p><span class="math display">\[
+\begin{cases}
+    \nabla f = \lambda \nabla g \\
+    g(x,y) = 0
+\end{cases}
+\]</span></p>
+<p>但是一般看到的拉格朗日乘子法是下面的形式： <span class="math display">\[
+\begin{aligned}
+    &amp;首先定义F(x,y,\lambda) = f(x,y) + \lambda g(x,y)\\
+    &amp;之后求解\nabla F = \mathbf{0}
+\end{aligned}
+\]</span></p>
+<p>其实是一样的，展开<span class="math inline">\(\nabla
+F\)</span>即可，如下： <span class="math display">\[
+\begin{aligned}
+    \begin{pmatrix}
+        \frac{\partial F}{\partial x}\\
+        \\
+        \frac{\partial F}{\partial y}\\
+        \\
+        \frac{\partial F}{\partial \lambda}\\
+    \end{pmatrix} &amp;= \begin{pmatrix}
+        0\\
+        \\
+        0\\
+        \\
+        0\\
+    \end{pmatrix}\\
+    &amp;即\\
+    \nabla f &amp;= -\lambda \nabla g \\
+    \frac{\partial F}{\partial \lambda} &amp;= g(x,y)\\
+    &amp;= 0\\
+\end{aligned}
+\]</span></p>
+<img src="/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-02/%E7%BA%A6%E6%9D%9F%E6%9D%A1%E4%BB%B6%E5%92%8C%E7%9B%AE%E6%A0%87%E5%87%BD%E6%95%B0%E7%9A%84%E7%AD%89%E5%80%BC%E7%BA%BF.png" class title="约束条件和目标函数的等值线">
+<p>上面只是单个约束时且约束为等式的情况，如果是多个等式约束，则可以写成</p>
+<p><span class="math inline">\(F(x,y,\lambda_1, \lambda_2,...,\lambda_m)
+= f(x,y) + \lambda_i g_i(x,y);i = 1, 2, ..., m\)</span></p>
+<p>同理求解如下： <span class="math display">\[
+\begin{cases}
+    \nabla f = \lambda_i \nabla g_i &amp;i=1,2,...m\\
+    g_i(x,y) = 0&amp;i=1,2,...m
+\end{cases}
+\]</span> 也可以写成 <span class="math display">\[
+\begin{aligned}
+    \begin{pmatrix}
+        \frac{\partial F}{\partial x}\\
+        \\
+        \frac{\partial F}{\partial y}\\
+        \\
+        \frac{\partial F}{\partial \lambda_1}\\
+        \vdots\\
+        \frac{\partial F}{\partial \lambda_m}\\
+    \end{pmatrix} = \begin{pmatrix}
+        0\\
+        \\
+        0\\
+        \\
+        0\\
+        \vdots\\
+        0\\
+    \end{pmatrix}
+\end{aligned}
+\]</span></p>
+<p>如果是不等式约束，如下描述： <span class="math display">\[
+\begin{aligned}
+    \min f(x,y)\\
+    s.t.\quad h(x,y) \le 0
+\end{aligned}\]</span>
+可以分成两种情况讨论，第一种情况是内部解，第二种情况是边界解，如果最优解在约束条件内部，那么约束条件不起作用，
+退化为无约束问题，<span class="math inline">\(\nabla f = 0 且 \lambda =
+0\)</span>，如果在边界上，则满足<span class="math inline">\(h(x,y)=0\)</span>因此不论哪种情况，<span class="math inline">\(\lambda h(x,y) = 0\)</span>恒成立。</p>
+<p>这里依旧定义一个如下形式的函数： <span class="math display">\[
+\begin{aligned}
+    F(x,y,\mu) = f(x,y) + \mu h(x,y)
+\end{aligned}
+\]</span></p>
+<p>因此可以提出KKT条件的基本形式： <span class="math display">\[
+\begin{aligned}
+    \begin{cases}
+        \begin{pmatrix}
+        \frac{\partial F}{\partial x}\\
+        \\
+        \frac{\partial F}{\partial y}
+    \end{pmatrix} &amp;= \begin{pmatrix}
+        0\\
+        \\
+        0
+    \end{pmatrix}\\
+    h(x,y) &amp;\le 0\\
+    \lambda &amp;\ge 0 \\
+    \lambda h(x,y) &amp;= 0
+    \end{cases}
+\end{aligned}
+\]</span> 这里的<span class="math inline">\(\lambda \ge
+0\)</span>是因为要求的是<span class="math inline">\(\min
+f(x,y)\)</span>，如果要求的是<span class="math inline">\(\max
+f(x,y)\)</span>,则使用<span class="math inline">\(\lambda \le
+0\)</span></p>
+<p>对于多个等式约束和多个不等式约束的情况： <span class="math display">\[
+\begin{aligned}
+    &amp;\min f(\mathbf{x})\\
+    s.t.\quad &amp;g_j(\mathbf{x}) = 0, j=1,2,...m\\
+    s.t.\quad &amp;h_k(\mathbf{x}) \le 0, k=1,2,...n
+\end{aligned}
+\]</span> 首先定义拉格朗日函数： <span class="math display">\[
+L(\mathbf{x},\lambda_1,\lambda_2,...,\lambda_m,\mu_1,\mu_2,...,\mu_n) =
+f(\mathbf{x}) + \sum_{j=1}^m \lambda_j g_j(\mathbf{x}) + \sum_{k=1}^n
+\mu_k h_k(\mathbf{x})
+\]</span>
+关于对偶问题的分析略过，结论是如果满足KKT条件，则原问题的最优解和对偶问题最优解相同，计算KKT条件，即可得到候选解，然后对比不同的候选解，即可得出最优解，这里直接给出完整的KKT条件：
+<span class="math display">\[
+\begin{cases}
+    \nabla_{\mathbf{x}}L = \mathbf{0}\\
+    g_j(\mathbf{x})=0 \quad j=1,2,...,m\\
+    h_k(\mathbf{x})\le 0 \quad k=1,2,...,n\\
+    \mu_k \ge 0 \quad k=1,2,...,n\\
+    \mu_k h_k(\mathbf{x})=0 \quad k=1,2,...,n
+\end{cases}
+\]</span> 求解KKT条件，即可找到约束优化问题的解。</p>
+<h1 id="section-2">2019-02-20</h1>
+<h2 id="git的常用操作复习">git的常用操作复习</h2>
+<p>查看仓库当前状态</p>
+<pre><code> git status </code></pre>
+<p>查看修改内容</p>
+<pre><code> git diff &lt;file&gt;</code></pre>
+<p>查看最近的提交</p>
+<pre><code> git log</code></pre>
+<p>恢复最近提交</p>
+<pre><code> git reset --[soft|mixed|hard] HEAD~
+ soft:仅仅修改HEAD指向
+ mixed:在修改HEAD之后，修改暂存区内容
+ hard:在修改暂存区内容之后，修改工作区内容
+ HEAD~:等效于HEAD^，代表HEAD的上一次提交，可以使用HEAD~100代表HEAD之前100次提交
+ HEAD~也可替换为commit id</code></pre>
+<p>如果指定恢复文件，则只从最后一次提交恢复暂存区文件。</p>
+<pre><code> git reset file
+ 等价于 git reset --mixed HEAD file</code></pre>
+<p>查看版本库历史和commit id，可以用</p>
+<pre><code> git log</code></pre>
+<p>修改最后一次commit的信息</p>
+<pre><code> git commit --amend</code></pre>
+<p>查看版本库所有的改动，可以用</p>
+<pre><code> git reflog</code></pre>
+<p>创建和切换分支</p>
+<pre><code> git branch &lt;branch_name&gt; #创建分支
+ git chechout &lt;branch_name&gt; #切换分支
+ git checkout -b &lt;branch_name&gt; #切换分支，不存在则创建</code></pre>
+<p>将当前的暂存区改动压栈并隐藏</p>
+<pre><code> git stash</code></pre>
+<p>查看当前的栈区</p>
+<pre><code> git stash list</code></pre>
+<p>从栈顶恢复</p>
+<pre><code> git stash apply # 只恢复不删除栈内容
+ git stash pop # 恢复并删除栈内容</code></pre>
+<p>查看当前分支</p>
+<pre><code> git branch</code></pre>
+<p>合并分支</p>
+<pre><code> git merge &lt;branch_name&gt; #合并指定分支到当前分支</code></pre>
+<p>如果合并出现冲突，修改冲突文件之后，可以重新add、commit进行提交</p>
+<p>删除分支</p>
+<pre><code> git branch -d &lt;branch_name&gt;</code></pre>
+<p>关联远程分支和本地分支</p>
+<pre><code> git branch --set-upstream &lt;branch-name&gt; &lt;origin/branch-name&gt;</code></pre>
+<p>之后就可以从远程分支pull或者push到远程分支了</p>
+<p>关联远程服务器</p>
+<pre><code> git remote add &lt;remote-name&gt; &lt;remote-url&gt;</code></pre>
+<p>创建远程分支</p>
+<pre><code> git push &lt;remote-name&gt; &lt;local-branch-name&gt;:&lt;remote-branch-name&gt;</code></pre>
+<p>删除远程分支</p>
+<pre><code> git push &lt;remote-name&gt; :&lt;remote-branch-name&gt;</code></pre>
+<h1 id="section-3">2019-02-21</h1>
+<h2 id="对l2正则化的理解">对l2正则化的理解</h2>
+<p>普通的损失函数可以写成如下： <span class="math display">\[
+J(w;X,y)
+\]</span></p>
+<p>在权重参数上加上l2正则化项之后，损失函数如下：</p>
+<p><span class="math display">\[
+\begin{aligned}
+    &amp;\tilde{J} = \frac{\alpha}{2}w^Tw + J(w;X,y)\\
+    &amp;对w的求导：\\
+    &amp;\nabla_w\tilde{J} = \alpha w + \nabla_w J(w;X,y)
+\end{aligned}
+\]</span></p>
+<p>每次的参数更新可以写成如下：</p>
+<p><span class="math display">\[
+\begin{aligned}
+    &amp;w \leftarrow w - \epsilon(\alpha w + \nabla_w J(w;X,y))\\
+    &amp;等价于：\\
+    &amp;w \leftarrow (1 - \epsilon\alpha) w + \epsilon\nabla_w J(w;X,y)
+\end{aligned}
+\]</span></p>
+<p>为了分析l2正则化的作用，假定<span class="math inline">\(J(w ^ \ast ;
+X , y)\)</span>是损失函数的极小值。 <span class="math inline">\(w^\ast\)</span>是使损失函数取得极小值的参数，先简单的对损失函数进行二次近似如下，这里没有一次项是因为在函数极小值的地方，一次导数应该为0。</p>
+<p><span class="math display">\[
+\begin{aligned}
+    J(w;X,y) = J(w^\ast;X,y) + (w-w^\ast)^TH(w-w^\ast)
+\end{aligned}
+\]</span></p>
+<p>对加上l2正则化项的损失函数近似形式如下：</p>
+<p><span class="math display">\[
+\begin{aligned}
+    \hat{J}(w;X,y) = J(w^\ast;X,y) + (w-w^\ast)^TH(w-w^\ast) +
+\alpha\frac{1}{2}w^Tw
+\end{aligned}
+\]</span></p>
+<p>对损失函数进行求导如下。</p>
+<p><span class="math display">\[
+\begin{aligned}
+    \nabla_w \hat{J}(w;X,y) = \alpha w + H(w - w^\ast)
+\end{aligned}
+\]</span></p>
+<p>当<span class="math inline">\(\nabla_w\hat{J}(w;X,y) =
+0\)</span>时，有如下推导：</p>
+<p><span class="math display">\[
+\begin{aligned}
+    \alpha w + H(w - w^\ast) = 0\\
+    (H + \alpha I)w = Hw^\ast\\
+    w = (H + \alpha I)^{-1}Hw^\ast
+\end{aligned}
+\]</span></p>
+<p>可见当<span class="math inline">\(\alpha \rightarrow
+0\)</span>时，<span class="math inline">\(w \rightarrow
+w^\ast\)</span>，进一步，因为<span class="math inline">\(H\)</span>是实对称矩阵，因此必定可以正交对角化，<span class="math inline">\(H=Q \Lambda Q^T\)</span>，因此进一步推导如下：</p>
+<p><span class="math display">\[
+\begin{aligned}
+    w &amp;= (Q \Lambda Q^T+ \alpha I)^{-1}Q \Lambda Q^Tw^\ast\\
+    &amp;=[Q (\Lambda+ \alpha I) Q^T]^{-1}Q \Lambda Q^Tw^\ast\\
+    &amp;=Q (\Lambda+ \alpha I)^{-1}\Lambda Q^Tw^\ast
+\end{aligned}
+\]</span></p>
+<p>其中，假设<span class="math inline">\(\Lambda\)</span>如下：</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+    &amp;\lambda_1 &amp;0 &amp;0 &amp;\cdots &amp;0\\
+    &amp;0 &amp;\lambda_2 &amp;0 &amp;\cdots &amp;0\\
+    &amp;0 &amp;0 &amp;\lambda_3 &amp;\cdots &amp;0\\
+    &amp;\vdots &amp;\vdots &amp;\vdots &amp;\ddots &amp;\vdots\\
+    &amp;0 &amp;0 &amp;0 &amp;\cdots &amp;\lambda_n\\
+\end{bmatrix}
+\]</span></p>
+<p>则<span class="math inline">\((\Lambda+ \alpha
+I)^{-1}\Lambda\)</span>如下： <span class="math display">\[
+\begin{bmatrix}
+    &amp;\frac{\lambda_1}{\lambda_1 + \alpha} &amp;0 &amp;0 &amp;\cdots
+&amp;0\\
+    &amp;0 &amp;\frac{\lambda_2}{\lambda_2 + \alpha} &amp;0 &amp;\cdots
+&amp;0\\
+    &amp;0 &amp;0 &amp;\frac{\lambda_3}{\lambda_3 + \alpha} &amp;\cdots
+&amp;0\\
+    &amp;\vdots &amp;\vdots &amp;\vdots &amp;\ddots &amp;\vdots\\
+    &amp;0 &amp;0 &amp;0 &amp;\cdots &amp;\frac{\lambda_n}{\lambda_n +
+\alpha}\\
+\end{bmatrix}
+\]</span> 这就相当于在原损失函数极小值点的Hession矩阵<span class="math inline">\(H\)</span>的特征向量方向上，将<span class="math inline">\(w^\ast\)</span>进行了缩放，而且特征值<span class="math inline">\(\lambda_i\)</span>越小的方向，<span class="math inline">\(\alpha\)</span>对其影响越大，缩小得越大，即加入l2正则化项之后，模型参数倾向于对损失函数影响显著的方向偏移。</p>
+<p>以最小二乘线性回归为例，其损失函数如下：</p>
+<p><span class="math display">\[
+(Xw-y)^T(Xw-y)
+\]</span></p>
+<p>如果加上l2正则化，则损失函数变成如下形式：</p>
+<p><span class="math display">\[
+(Xw-y)^T(Xw-y) + \frac{1}{2}\alpha w^Tw
+\]</span></p>
+<p>那么线性回归的解就从：</p>
+<p><span class="math display">\[
+w = (X^TX)^{-1}X^Ty
+\]</span></p>
+<p>变成了： <span class="math display">\[
+w = (X^TX + \alpha I)^{-1}X^Ty
+\]</span></p>
+<p>其中<span class="math inline">\(X\)</span>可以写成如下,其中<span class="math inline">\(x_{ij}\)</span>表示第i个样本<span class="math inline">\(x_i\)</span>的第j维： <span class="math display">\[
+X=\begin{bmatrix}
+    &amp;x_{11} &amp;x_{12} &amp;\cdots &amp;x_{1m}\\
+    &amp;x_{21} &amp;x_{22} &amp;\cdots &amp;x_{2m}\\
+    &amp;\vdots &amp;\vdots &amp;\ddots &amp;\vdots\\
+    &amp;x_{n1} &amp;x_{n1} &amp;\cdots &amp;x_{nm}\\
+\end{bmatrix}
+\]</span></p>
+<p>则<span class="math inline">\(X^TX\)</span>可以表示如下： <span class="math display">\[
+X^TX=\begin{bmatrix}
+    &amp;\sum_i^nx_{i1}x_{i1} &amp;\sum_i^nx_{i1}x_{i2} &amp;\cdots
+&amp;\sum_i^nx_{i1}x_{im}\\
+    &amp;\sum_i^nx_{i2}x_{i1} &amp;\sum_i^nx_{i2}x_{i2} &amp;\cdots
+&amp;\sum_i^nx_{i2}x_{im}\\
+    &amp;\vdots &amp;\vdots &amp;\ddots &amp;\vdots\\
+    &amp;\sum_i^nx_{im}x_{i1} &amp;\sum_i^nx_{im}x_{i2} &amp;\cdots
+&amp;\sum_i^nx_{im}x_{im}\\
+\end{bmatrix}
+\]</span></p>
+<p><span class="math inline">\(X^TX\)</span>同样可以正交对角化，<span class="math inline">\(X^TX = Q \Lambda Q^T\)</span>，这里的<span class="math inline">\(\Lambda\)</span>对角线上的值是<span class="math inline">\(X\)</span>奇异值的平方，之后的推导和上面相同，可见，加入l2正则化项之后，模型参数倾向于对损失函数影响显著的方向偏移，从而忽略掉数据中的一些干扰，增强模型泛化能力。</p>
+<h2 id="记录几个简单的矩阵求导公式">记录几个简单的矩阵求导公式</h2>
+<p><span class="math display">\[
+\frac{\partial \beta^T X}{\partial X} = \beta\\
+\quad\\
+\frac{\partial X^T X}{\partial X} = X\\
+\quad\\
+\frac{\partial X^T A X}{\partial X} = (A+A^T)X\\
+\]</span></p>
+<h1 id="section-4">2019-02-25</h1>
+<h2 id="使用tensorflow后端的keras中的session和graph">使用tensorflow后端的keras中的session和graph</h2>
+<p>这两天在进行将keras模型集成到项目系统的工作，这个系统需要加载不同的模型和训练不同的模型，而且顺序不固定，多个模型可能同时存在，一些在训练，一些在预测，因此直接加载模型，使用keras创建的session和graph的时候，遇到了很多错误，最后的解决方案是为模型手动创建session，并在加载或者使用模型之前使用Keras.backend.set_session方法设置当前使用的session。</p>
+<p>还有一个问题是模型使用完成之后，已经使用del
+model的形式删除，但是windows任务管理器上显存依旧占用，尝试过Keras.backend.clear_session的方式，显存依旧占用，但是其它模型也可以继续跑，不知道是不是tensorflow自动分配了显存的原因。</p>
+<h2 id="python-multiprocessing的问题">python multiprocessing的问题</h2>
+<p>前两天遇到一个问题，在使用multiprocessing进行多进程任务时，发现所调用的函数所在的文件，多次执行import操作，导致已经被修改的import变量出现不一致的问题，现在还没有找到解决办法，只能把多进程改为了单进程执行。</p>
+<h1 id="section-5">2019-02-26</h1>
+<h2 id="对l1正则化的理解">对l1正则化的理解</h2>
+<p>进行l1正则化之后的损失函数如下：</p>
+<p><span class="math display">\[
+\tilde{J} = \alpha ||w||_1 + J(w;X,y)
+\]</span></p>
+<p>对其进行求导： <span class="math display">\[
+\nabla_w\tilde{J} = \alpha sign(w) + \nabla_wJ(w;X,y)
+\]</span>
+从这里可以看出l1正则化项对导数的影响是一个固定值，和l2有很大区别。</p>
+<p>使用在l2正则化分析中的损失函数近似方法，将原本的损失函数二次近似为<span class="math inline">\(\hat{J}(w)\)</span>，其导数如下： <span class="math display">\[
+\nabla_w\hat{J} = H(w - w^\ast)
+\]</span></p>
+<p>加上正则化项之后，其损失函数的二次近似可以表示为：</p>
+<p><span class="math display">\[
+\hat{J}(w;X,y) = J(w^\ast;X,y) +
+\sum_i[\frac{1}{2}H_{i,i}(w_i-w_i^\ast)^2 + \alpha|w_i|]
+\]</span></p>
+<p>这里将Hessian矩阵简化成了对角阵，这个类似对数据进行PCA之类的操作，将数据之间的相关性去掉了，因此Hessian矩阵变成对角阵，这样分析要简单一些。</p>
+<p>如果对<span class="math inline">\(w_i\)</span>进行求导，如下： <span class="math display">\[
+\nabla_{w_i}\hat{J}(w;X,y) = H_{i,i}(w_i - w_i^\ast) + \alpha sign(w_i)
+\]</span></p>
+<p>可以看出，加了l1正则化之后最优解变成了如下： <span class="math display">\[
+w_i = sign(w_i^\ast)max\{|w_i^\ast| - \frac{\alpha}{H_{i,i}}, 0\}
+\]</span></p>
+<p>描述成图像大概如下：</p>
+<img src="/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-02/l1%E6%AD%A3%E5%88%99%E5%8C%96%E6%95%88%E6%9E%9C%E7%A4%BA%E6%84%8F.png" class title="l1正则化效果示意">
+<p>可以看出，l1使得权重变得更加稀疏，这在特征选择方面非常有用。</p>
+<h1 id="section-6">2019-02-27</h1>
+<h2 id="数据增强之噪声">数据增强之噪声</h2>
+<h3 id="直接在数据上添加噪声">1.直接在数据上添加噪声</h3>
+<p>普遍来说，在数据上添加噪声比简单的收缩权重更加有效。</p>
+<h3 id="在权重上添加噪声">2.在权重上添加噪声</h3>
+<p>类似贝叶斯方法中将权重参数也作为一个随机变量的做法，在权重上添加噪声类似于在损失函数上加上预测结果对权重的导数的l2正则化项:<span class="math inline">\(\eta E_{p(x,y)}[||\nabla_W
+\hat{y}(x)||^2]\)</span>，其中<span class="math inline">\(\hat{y}\)</span>表示模型的输出。这会使得模型偏好于一个对于参数来说更加平缓的区域。</p>
+<h3 id="在标签上添加噪声">3.在标签上添加噪声</h3>
+<p>对于二分类问题，可以使用<span class="math inline">\(\epsilon\)</span>和<span class="math inline">\(1 -
+\epsilon\)</span>来代替0、1标签，对于<span class="math inline">\(k\)</span>类多分类问题，则可以使用<span class="math inline">\(\frac{\epsilon}{k}\)</span> 和 <span class="math inline">\(1 - \frac{k -
+1}{k}\epsilon\)</span>来代替，这对交叉熵损失函数可能没什么区别，因为交叉熵损失函数中为了避免<span class="math inline">\(log0\)</span>，已经使用了这种标签平滑，但是对于最大似然学习并在最后一层使用softmax的算法，标签平滑可能会很有用，因为使用softmax之后，输出不可能为绝对的1和0，因此模型会尝试学习越来越大的权重，让输出更加极端，容易导致数值溢出和模型不稳定的问题，在标签上添加噪声可以解决这个问题，虽然通过权重衰减策略也可以解决这个问题，但是盲目的权重衰减可能影响到分类正确性，而在标签上添加噪声没有这个问题。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%8C%E6%9D%82%E9%A1%B9/" rel="tag"># 学习笔记，杂项</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/" rel="prev" title="学习笔记_2019-01">
+      <i class="fa fa-chevron-left"></i> 学习笔记_2019-01
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/03/06/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-03/" rel="next" title="学习笔记-2019-03">
+      学习笔记-2019-03 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#section"><span class="nav-number">1.</span> <span class="nav-text">2019-02-13</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA"><span class="nav-number">1.1.</span> <span class="nav-text">支持向量机</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-1"><span class="nav-number">2.</span> <span class="nav-text">2019-02-19</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E6%8B%89%E6%A0%BC%E6%9C%97%E6%97%A5%E4%B9%98%E5%AD%90%E6%B3%95%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">2.1.</span> <span class="nav-text">对拉格朗日乘子法的理解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-2"><span class="nav-number">3.</span> <span class="nav-text">2019-02-20</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#git%E7%9A%84%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C%E5%A4%8D%E4%B9%A0"><span class="nav-number">3.1.</span> <span class="nav-text">git的常用操作复习</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-3"><span class="nav-number">4.</span> <span class="nav-text">2019-02-21</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9l2%E6%AD%A3%E5%88%99%E5%8C%96%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">4.1.</span> <span class="nav-text">对l2正则化的理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%B0%E5%BD%95%E5%87%A0%E4%B8%AA%E7%AE%80%E5%8D%95%E7%9A%84%E7%9F%A9%E9%98%B5%E6%B1%82%E5%AF%BC%E5%85%AC%E5%BC%8F"><span class="nav-number">4.2.</span> <span class="nav-text">记录几个简单的矩阵求导公式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-4"><span class="nav-number">5.</span> <span class="nav-text">2019-02-25</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8tensorflow%E5%90%8E%E7%AB%AF%E7%9A%84keras%E4%B8%AD%E7%9A%84session%E5%92%8Cgraph"><span class="nav-number">5.1.</span> <span class="nav-text">使用tensorflow后端的keras中的session和graph</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python-multiprocessing%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">5.2.</span> <span class="nav-text">python multiprocessing的问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-5"><span class="nav-number">6.</span> <span class="nav-text">2019-02-26</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9l1%E6%AD%A3%E5%88%99%E5%8C%96%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">6.1.</span> <span class="nav-text">对l1正则化的理解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-6"><span class="nav-number">7.</span> <span class="nav-text">2019-02-27</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%A2%9E%E5%BC%BA%E4%B9%8B%E5%99%AA%E5%A3%B0"><span class="nav-number">7.1.</span> <span class="nav-text">数据增强之噪声</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E5%9C%A8%E6%95%B0%E6%8D%AE%E4%B8%8A%E6%B7%BB%E5%8A%A0%E5%99%AA%E5%A3%B0"><span class="nav-number">7.1.1.</span> <span class="nav-text">1.直接在数据上添加噪声</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E6%9D%83%E9%87%8D%E4%B8%8A%E6%B7%BB%E5%8A%A0%E5%99%AA%E5%A3%B0"><span class="nav-number">7.1.2.</span> <span class="nav-text">2.在权重上添加噪声</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E6%A0%87%E7%AD%BE%E4%B8%8A%E6%B7%BB%E5%8A%A0%E5%99%AA%E5%A3%B0"><span class="nav-number">7.1.3.</span> <span class="nav-text">3.在标签上添加噪声</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

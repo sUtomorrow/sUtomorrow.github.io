@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="主要工作 基于高斯混合模型和EM优化算法，提出了一种自注意力机制，用一组基向量来对特征图进行重构，达到简化特征图以及去除噪声的目的。 主要思想 将\(C \times H \times W\)大小的特征图看做\(N \times C\)的\(N\)个\(C\)维随机变量\(X\)，其中\(x_i \in \mathbb{R}^{C}\)表示像素\(i\)对应的特征向量。同构构造一组基向量\(\mu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文阅读《Expectation-Maximization Attention Networks for Semantic Segmentation》">
+<meta property="og:url" content="https://sutomorrow.github.io/2020/01/03/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AExpectation-Maximization-Attention-Networks-for-Semantic-Segmentation%E3%80%8B/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="主要工作 基于高斯混合模型和EM优化算法，提出了一种自注意力机制，用一组基向量来对特征图进行重构，达到简化特征图以及去除噪声的目的。 主要思想 将\(C \times H \times W\)大小的特征图看做\(N \times C\)的\(N\)个\(C\)维随机变量\(X\)，其中\(x_i \in \mathbb{R}^{C}\)表示像素\(i\)对应的特征向量。同构构造一组基向量\(\mu">
+<meta property="og:locale">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/01/03/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AExpectation-Maximization-Attention-Networks-for-Semantic-Segmentation%E3%80%8B/EMA_Unit.png">
+<meta property="article:published_time" content="2020-01-03T07:31:52.000Z">
+<meta property="article:modified_time" content="2023-10-12T11:15:02.061Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="论文阅读">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sutomorrow.github.io/2020/01/03/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AExpectation-Maximization-Attention-Networks-for-Semantic-Segmentation%E3%80%8B/EMA_Unit.png">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2020/01/03/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AExpectation-Maximization-Attention-Networks-for-Semantic-Segmentation%E3%80%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>论文阅读《Expectation-Maximization Attention Networks for Semantic Segmentation》 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2020/01/03/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AExpectation-Maximization-Attention-Networks-for-Semantic-Segmentation%E3%80%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          论文阅读《Expectation-Maximization Attention Networks for Semantic Segmentation》
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-01-03 15:31:52" itemprop="dateCreated datePublished" datetime="2020-01-03T15:31:52+08:00">2020-01-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="主要工作">主要工作</h2>
+<p>基于高斯混合模型和EM优化算法，提出了一种自注意力机制，用一组基向量来对特征图进行重构，达到简化特征图以及去除噪声的目的。</p>
+<h2 id="主要思想">主要思想</h2>
+<p>将<span class="math inline">\(C \times H \times
+W\)</span>大小的特征图看做<span class="math inline">\(N \times
+C\)</span>的<span class="math inline">\(N\)</span>个<span class="math inline">\(C\)</span>维随机变量<span class="math inline">\(X\)</span>，其中<span class="math inline">\(x_i
+\in \mathbb{R}^{C}\)</span>表示像素<span class="math inline">\(i\)</span>对应的特征向量。同构构造一组基向量<span class="math inline">\(\mu \in \mathbb{R}^{K \times
+C}\)</span>以及一个隐变量<span class="math inline">\(Z \in \mathbb{R}^{N
+\times K}\)</span>，其中<span class="math inline">\(\mu_i \in
+\mathbb{R}^C\)</span>表示一个其中一个基向量，<span class="math inline">\(z_i \in \mathbb{R}^K\)</span>表示第<span class="math inline">\(i\)</span>个像素点在这组基向量下的坐标，文中最终把输入的特征图<span class="math inline">\(X\)</span>进行了重构，得到<span class="math inline">\(\hat{X} = Z \times \mu\)</span>。</p>
+<h2 id="具体实现">具体实现</h2>
+<p>通过高斯混合模型，对<span class="math inline">\(x_n\)</span>建模得到<span class="math inline">\(p(x_n) = \sum_{k=1}^K
+z_{nk}\mathcal{N}(x_n|\mu_k,\Sigma_k)\)</span>，再通过EM算法（可见我之前的文章<a href="#">Post not found: EM算法学习笔记</a>），求出<span class="math inline">\(\mu\)</span>和<span class="math inline">\(Z\)</span>，这里将EM算法，分解为<span class="math inline">\(A_E\)</span>和<span class="math inline">\(A_M\)</span>，对应EM算法的E步骤和M步骤，再加上重构步骤<span class="math inline">\(A_R\)</span>，构成一种self-attention操作，称为Expectation-Maximization
+Attention（EMA）。</p>
+<p>在实现过程中，EMA
+Unit的结构类似于带有bottleneck的Residual结构，只是将<span class="math inline">\(3 \times 3\)</span>卷积换成了循环的<span class="math inline">\(A_E\)</span>和<span class="math inline">\(A_M\)</span>操作，整体结构如下。</p>
+<figure>
+<img src="EMA_Unit.png" alt="EMA Unit示意图">
+<figcaption aria-hidden="true">EMA Unit示意图</figcaption>
+</figure>
+<p>在这个结构中，第一个<span class="math inline">\(1 \times
+1\)</span>卷积之后，不能有ReLU激活函数，作者解释说这是因为一旦使用ReLU激活，输入的范围将从<span class="math inline">\((-\infty, \infty)\)</span>变为<span class="math inline">\([0,
+\infty)\)</span>，导致EM算法得出的结果中，<span class="math inline">\(\mu\)</span>将是一个半正定矩阵，其表达能力只相当于普通卷积操作的一半。</p>
+<p>在<span class="math inline">\(A_E\)</span>阶段，计算<span class="math inline">\(Z^{(t)}=softmax(\lambda
+X(\mu^{(t-1)})^T)\)</span>，这里<span class="math inline">\(\lambda\)</span>是控制<span class="math inline">\(Z\)</span>分布的一个超参数，作者将<span class="math inline">\(\lambda\)</span>设置为1。</p>
+<p>在<span class="math inline">\(A_M\)</span>阶段，计算<span class="math inline">\(\mu^{(t)}_k=\frac{z^{(t)}_{nk}x_n}{\sum_{m=1}^Nz^{(t)}_{mk}}\)</span></p>
+<p>在训练过程中，对于batch数据，<span class="math inline">\(\mu\)</span>的值不是每个数据都去计算一次，在第一个mini-batch中，使用Kaiming初始化方法对<span class="math inline">\(\mu^{(0)}\)</span>进行初始化（这里将矩阵乘法看做1*1的卷积），之后的mini-batch中，<span class="math inline">\(\mu^{(0)}\)</span>不能简单的使用反向传播来更新，作者解释说是因为在不断的迭代过程中，容易引起梯度消失或者梯度爆炸等问题，这样更新会导致<span class="math inline">\(\mu^{(0)}\)</span>不稳定，因此论文中提出，使用滑动平均对<span class="math inline">\(\mu^{(0)}\)</span>进行学习，每个图像在EM迭代之后所得到的<span class="math inline">\(\mu^{(T)}\)</span>将用于更新<span class="math inline">\(\mu^{(0)}\)</span>：<span class="math inline">\(\mu^{(0)} \leftarrow \alpha\mu^{(0)} +
+(1-\alpha)\mu^{(T)}\)</span>，而在推断过程中，<span class="math inline">\(\mu^{(0)}\)</span>的值是固定的。</p>
+<p>最后，由于<span class="math inline">\(\mu^{(T)}\)</span>和<span class="math inline">\(\mu^{(0)}\)</span>偏差不能太大，因此对于<span class="math inline">\(\mu\)</span>还有一个L2Norm处理，将<span class="math inline">\(\mu_k\)</span>的长度归一化。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag"># 论文阅读</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/01/02/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/EM%E7%AE%97%E6%B3%95%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="prev" title="EM算法学习笔记">
+      <i class="fa fa-chevron-left"></i> EM算法学习笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/17/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E3%80%8A%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="next" title="《机器学习》读书笔记">
+      《机器学习》读书笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%B7%A5%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">主要工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%80%9D%E6%83%B3"><span class="nav-number">2.</span> <span class="nav-text">主要思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">具体实现</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

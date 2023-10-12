@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="概率相关的一些概念简介 随机变量 随机变量表示值不确定的变量，对于一个随机变量，可以从两个方面描述，第一是其取值范围，可以是连续区间或者离散的集合（连续型随机变量和离散型随机变量），第二是其概率函数，即用函数来表示不同取值的概率。 离散型随机变量的概率函数（概率质量函数） 对于离散型随机变量，其概率函数将变量的取值映射为对应的概率，取值为\(x\)的概率表示为\(p(x)\)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常见概率分布">
+<meta property="og:url" content="https://sutomorrow.github.io/2020/08/11/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B8%B8%E8%A7%81%E6%A6%82%E7%8E%87%E5%88%86%E5%B8%83/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="概率相关的一些概念简介 随机变量 随机变量表示值不确定的变量，对于一个随机变量，可以从两个方面描述，第一是其取值范围，可以是连续区间或者离散的集合（连续型随机变量和离散型随机变量），第二是其概率函数，即用函数来表示不同取值的概率。 离散型随机变量的概率函数（概率质量函数） 对于离散型随机变量，其概率函数将变量的取值映射为对应的概率，取值为\(x\)的概率表示为\(p(x)\)">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-08-11T02:28:09.000Z">
+<meta property="article:modified_time" content="2023-10-12T11:15:02.038Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2020/08/11/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B8%B8%E8%A7%81%E6%A6%82%E7%8E%87%E5%88%86%E5%B8%83/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>常见概率分布 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2020/08/11/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B8%B8%E8%A7%81%E6%A6%82%E7%8E%87%E5%88%86%E5%B8%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          常见概率分布
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-08-11 10:28:09" itemprop="dateCreated datePublished" datetime="2020-08-11T10:28:09+08:00">2020-08-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="概率相关的一些概念简介">概率相关的一些概念简介</h1>
+<h2 id="随机变量">随机变量</h2>
+<p>随机变量表示值不确定的变量，对于一个随机变量，可以从两个方面描述，第一是其取值范围，可以是连续区间或者离散的集合（连续型随机变量和离散型随机变量），第二是其概率函数，即用函数来表示不同取值的概率。</p>
+<h2 id="离散型随机变量的概率函数概率质量函数">离散型随机变量的概率函数（概率质量函数）</h2>
+<p>对于离散型随机变量，其概率函数将变量的取值映射为对应的概率，取值为<span class="math inline">\(x\)</span>的概率表示为<span class="math inline">\(p(x)\)</span></p>
+<h2 id="连续型随机变量的概率函数概率密度函数">连续型随机变量的概率函数（概率密度函数）</h2>
+<p>对于连续型随机变量，其概率函数被称为概率密度函数，表示的不是概率，而是概率在某个点位置的密集程度，不等于概率，因此其值可能大于1。在<span class="math inline">\(x\)</span>处的概率密度表示为<span class="math inline">\(p(x)\)</span></p>
+<h2 id="概率分布">概率分布</h2>
+<p>对于离散型变量，其概率分布可以表示为“离散型随机变量的值和概率的分布列表”，即表示为一个表格，也简称为“概率分布列”，需要列出所有情况和所有情况对应的概率。</p>
+<p>对于连续型随机变量，其没有概率分布的概念，因为无法用一个概率分布列写出来，只能用概率密度函数对其进行描述。</p>
+<h2 id="概率分布函数">概率分布函数</h2>
+<p>不同于概率函数，概率分布函数描述的是一个范围内的概率，例如<span class="math inline">\(F(x_k) = P(x \le
+x_k)\)</span>，对于离散型随机变量，其概率分布函数可以进一步写为<span class="math inline">\(F(x_k) = P(x \le x_k) = \sum\limits_{x \le x_k}
+p(x)\)</span>，对于连续型随机变量，其概率分布函数可以进一步写为<span class="math inline">\(F(x_k) = p(x \le x_k) = \int_{-\infty}^{x_k}
+p(x)dx\)</span></p>
+<p>关于概率的一些概念简介到此结束，下面来看一些具体的概率分布。</p>
+<h1 id="连续型随机变量的分布">连续型随机变量的分布</h1>
+<h2 id="均匀分布uniform-distribution">均匀分布（Uniform
+Distribution）</h2>
+<p>取值范围在连续区间<span class="math inline">\([a,
+b]\)</span>上的连续变量，每个值的概率都相等，其参数为<span class="math inline">\(a, b\)</span>，均匀分布用<span class="math inline">\(U\)</span>表示。 <span class="math display">\[
+\begin{aligned}
+    x &amp;\sim U(a, b)\\
+    p(x|a,b) &amp;= \frac{1}{b - a}\\
+    E(x) &amp;= \frac{b + a}{2}\\
+    Var(x) &amp;= \frac{(b - a)^2}{12}
+\end{aligned}
+\]</span></p>
+<h2 id="高斯分布gaussian-dsitribution">高斯分布（Gaussian
+Dsitribution）</h2>
+<p>中心极限定理说明：大量独立同分布的随机变量，其均值适当标准化之后会收敛到高斯分布。</p>
+<p>服从高斯分布的随机变量取值范围为<span class="math inline">\((-\infty,
+\infty)\)</span>。</p>
+<p>对于一元高斯分布，可以用两个参数来描述：<span class="math inline">\(\mu\)</span>、<span class="math inline">\(\sigma^2\)</span>，分别表示高斯分布的均值和方差。
+<span class="math display">\[
+\begin{aligned}
+    x &amp;\sim N(\mu, \sigma^2)\\
+    p(x) &amp;= \frac{1}{\sqrt{2\pi} \sigma}
+e^{-\frac{(x-\mu)^2}{2\sigma^2}}\\
+    E(x) &amp;= \mu\\
+    Var(x) &amp;= \sigma^2\\
+\end{aligned}
+\]</span></p>
+<p>对于多元高斯分布，如果其随机变量是<span class="math inline">\(m\)</span>维向量，那么可以用均值向量<span class="math inline">\(\mu\)</span>和协方差矩阵<span class="math inline">\(\Sigma\)</span>来描述。 <span class="math display">\[
+\begin{aligned}
+    x &amp;\sim N(\mu, \Sigma)\\
+    p(x) &amp;= \frac{1}{(2\pi)^\frac{m}{2} |\Sigma|^\frac{1}{2}}
+e^{-\frac{(x-\mu)^T \Sigma^{-1}(x-\mu)}{2}}\\
+    E(x) &amp;= \mu\\
+    Var(x) &amp;= \Sigma = E((x - \mu) (x - \mu)^T)\\
+\end{aligned}
+\]</span></p>
+<h1 id="离散型随机变量的分布">离散型随机变量的分布</h1>
+<h2 id="伯努利分布bernoulli-distribution">伯努利分布（Bernoulli
+Distribution）</h2>
+<p>取值范围在离散集合<span class="math inline">\(\{0,
+1\}\)</span>上的离散型随机变量，取值1的概率为<span class="math inline">\(\mu\)</span>，取值0的概率为<span class="math inline">\(1 - \mu\)</span>。 <span class="math display">\[
+\begin{aligned}
+    x &amp;\sim Bernoulli(\mu)\\
+    p(x | \mu) &amp;= \mu^x(1-\mu)^{1-x}\\
+    E(x) &amp;= \mu\\
+    Var(x) &amp;= \mu(1 - \mu)
+\end{aligned}
+\]</span></p>
+<h2 id="分类分布categorical-distribution">分类分布（Categorical
+Distribution）</h2>
+<p>也叫范畴分布或者Multinoulli
+Distribution，这个分布是伯努利分布的一个推广，伯努利分布表示一次伯努利实验，得到两种状态，而分类分布表示一次实验，可以得到<span class="math inline">\(C\)</span>种不同的状态，其变量可以表示为一个<span class="math inline">\(C\)</span>维向量<span class="math inline">\(x \in
+\{0,
+1\}^C\)</span>其中每个维度的取值只可能是0或者1，并且满足有且只有一个位置取得1，即<span class="math inline">\(\mathbf{1}^T x = \sum\limits_{c = 1}^C x_c =
+1\)</span>，其参数包括不同状态的概率，表示为<span class="math inline">\(\mu_c\)</span>。</p>
+<p>在分类分布中，我们一般不关心其均值和方差。 <span class="math display">\[
+\begin{aligned}
+    x \in \{0, 1\}^C,\ \mathbf{1}^T x &amp;= 1,\ x \sim
+multinoulli(\mu)\\
+    p(x | \mu) &amp;= x^T \mu \\
+    E(x_c) &amp;= \mu_c\\
+    Var(x_c) &amp;= \mu_c(1 - \mu_c)
+\end{aligned}
+\]</span></p>
+<h2 id="二项分布binomial-distribution">二项分布（Binomial
+Distribution）</h2>
+<p>用于表示N次对<span class="math inline">\(Bernoulli(\mu)\)</span>进行独立同分布采样之后，有m次得到1的概率分布，取值范围为<span class="math inline">\(\{0, 1, 2, ... , m\}\)</span>，如果<span class="math inline">\(N =
+1\)</span>，那么二项分布就是伯努利分布，二项分布用<span class="math inline">\(Binomial(N, \mu)\)</span>表示。 <span class="math display">\[
+\begin{aligned}
+    x &amp;\sim Binomial(N, \mu)\\
+    p(x = m) &amp;= C_N^m \mu^m(1-\mu)^{N-m}\\
+    E(x) &amp;= N\mu\\
+    Var(x) &amp;= N\mu(1 - \mu)
+\end{aligned}
+\]</span></p>
+<h2 id="多项分布nultinomial-distribution">多项分布（Nultinomial
+Distribution）</h2>
+<p>类似于分类分布在伯努利分布上的扩展，如果在二项分布上将状态扩展至C个，那么N次采样之后，每个状态分别出现<span class="math inline">\(m_c\)</span>次的概率分布即为多项分布，<span class="math inline">\(\mathbf{1}^T m = N\)</span>，其参数包括<span class="math inline">\(N\)</span>和<span class="math inline">\(\mu\)</span>，表示采样次数和每次采样时，不同状态出现的概率，<span class="math inline">\(\mathbf{1}^T \mu = 1\)</span> <span class="math display">\[
+\begin{aligned}
+    m &amp;\sim Nultinomial(N, \mu)\\
+    p(m) &amp;= \frac{N!}{\prod\limits_{c=1}^C
+(m_c!)}\prod\limits_{c=1}^C\mu_c^{m_c}\\
+    E(m_c) &amp;= N\mu_c\\
+    Var(m_c) &amp;= N\mu_c(1 - \mu_c)
+\end{aligned}
+\]</span></p>
+<h2 id="泊松分布poisson-distribution">泊松分布（Poisson
+Distribution）</h2>
+<p>一个随机事件发生的概率不随时间变化，而且单位时间内发生的平均次数记为<span class="math inline">\(\lambda\)</span>，那么在单位时间内该事件发生的次数（取值可以为所有非负整数）服从参数为<span class="math inline">\(\lambda\)</span>的泊松分布。</p>
+<p>当二项分布中的<span class="math inline">\(N\)</span>较大（例如大于20），而<span class="math inline">\(\mu\)</span>较小，例如小于0.05时，可以用Poisson分布来近似二项分布。</p>
+<p><span class="math display">\[
+\begin{aligned}
+    x &amp;\sim Poisson(\lambda)\\
+    p(x) &amp;= \frac{\lambda^x e^{-\lambda}}{x!}\\
+    E(x) &amp;= \lambda\\
+    Var(x) &amp;= \lambda
+\end{aligned}
+\]</span></p>
+<h2 id="几何分布">几何分布</h2>
+<p>每一次实验，事件发生概率为<span class="math inline">\(\mu\)</span>，那么重复实验直到事件第一次发生，需要重复的实验次数服从几何分布。</p>
+<p><span class="math display">\[
+\begin{aligned}
+    p(x) &amp;= \mu (1 - \mu)^{x-1}\\
+    E(x) &amp;= \frac{1}{\mu}\\
+    Var(x) &amp;= \frac{1-\mu}{\mu^2}
+\end{aligned}
+\]</span></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/09/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/attention%E6%9C%BA%E5%88%B6%E6%80%BB%E7%BB%93/" rel="prev" title="attention机制总结">
+      <i class="fa fa-chevron-left"></i> attention机制总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/11/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="next" title="推荐系统学习笔记">
+      推荐系统学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A6%82%E7%8E%87%E7%9B%B8%E5%85%B3%E7%9A%84%E4%B8%80%E4%BA%9B%E6%A6%82%E5%BF%B5%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">概率相关的一些概念简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA%E5%8F%98%E9%87%8F"><span class="nav-number">1.1.</span> <span class="nav-text">随机变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A6%BB%E6%95%A3%E5%9E%8B%E9%9A%8F%E6%9C%BA%E5%8F%98%E9%87%8F%E7%9A%84%E6%A6%82%E7%8E%87%E5%87%BD%E6%95%B0%E6%A6%82%E7%8E%87%E8%B4%A8%E9%87%8F%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.</span> <span class="nav-text">离散型随机变量的概率函数（概率质量函数）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9E%E7%BB%AD%E5%9E%8B%E9%9A%8F%E6%9C%BA%E5%8F%98%E9%87%8F%E7%9A%84%E6%A6%82%E7%8E%87%E5%87%BD%E6%95%B0%E6%A6%82%E7%8E%87%E5%AF%86%E5%BA%A6%E5%87%BD%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">连续型随机变量的概率函数（概率密度函数）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E7%8E%87%E5%88%86%E5%B8%83"><span class="nav-number">1.4.</span> <span class="nav-text">概率分布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E7%8E%87%E5%88%86%E5%B8%83%E5%87%BD%E6%95%B0"><span class="nav-number">1.5.</span> <span class="nav-text">概率分布函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9E%E7%BB%AD%E5%9E%8B%E9%9A%8F%E6%9C%BA%E5%8F%98%E9%87%8F%E7%9A%84%E5%88%86%E5%B8%83"><span class="nav-number">2.</span> <span class="nav-text">连续型随机变量的分布</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9D%87%E5%8C%80%E5%88%86%E5%B8%83uniform-distribution"><span class="nav-number">2.1.</span> <span class="nav-text">均匀分布（Uniform
+Distribution）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83gaussian-dsitribution"><span class="nav-number">2.2.</span> <span class="nav-text">高斯分布（Gaussian
+Dsitribution）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A6%BB%E6%95%A3%E5%9E%8B%E9%9A%8F%E6%9C%BA%E5%8F%98%E9%87%8F%E7%9A%84%E5%88%86%E5%B8%83"><span class="nav-number">3.</span> <span class="nav-text">离散型随机变量的分布</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%AF%E5%8A%AA%E5%88%A9%E5%88%86%E5%B8%83bernoulli-distribution"><span class="nav-number">3.1.</span> <span class="nav-text">伯努利分布（Bernoulli
+Distribution）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E7%B1%BB%E5%88%86%E5%B8%83categorical-distribution"><span class="nav-number">3.2.</span> <span class="nav-text">分类分布（Categorical
+Distribution）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E9%A1%B9%E5%88%86%E5%B8%83binomial-distribution"><span class="nav-number">3.3.</span> <span class="nav-text">二项分布（Binomial
+Distribution）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E9%A1%B9%E5%88%86%E5%B8%83nultinomial-distribution"><span class="nav-number">3.4.</span> <span class="nav-text">多项分布（Nultinomial
+Distribution）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B3%8A%E6%9D%BE%E5%88%86%E5%B8%83poisson-distribution"><span class="nav-number">3.5.</span> <span class="nav-text">泊松分布（Poisson
+Distribution）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%A0%E4%BD%95%E5%88%86%E5%B8%83"><span class="nav-number">3.6.</span> <span class="nav-text">几何分布</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

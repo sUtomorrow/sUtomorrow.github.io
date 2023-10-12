@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="2019-01-20 学习了如何在hexo的markdown中使用数学公式 首先修改next的配置文件如下：  mathjax:     enable: true     per_page: true 由于开启了pre_page，因此首先需要在markdown页面中使用：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习笔记_2019-01">
+<meta property="og:url" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="2019-01-20 学习了如何在hexo的markdown中使用数学公式 首先修改next的配置文件如下：  mathjax:     enable: true     per_page: true 由于开启了pre_page，因此首先需要在markdown页面中使用：">
+<meta property="og:locale">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF%E6%84%9F%E5%8F%97%E9%87%8E%E7%A4%BA%E6%84%8F%E5%9B%BE.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/DenseNet%E6%A8%A1%E5%9E%8B%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/ROI_Pooling%E8%BE%93%E5%85%A5.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/%E5%8C%BA%E5%9F%9F%E5%BB%BA%E8%AE%AE%E7%BD%91%E7%BB%9C%E7%BB%99%E5%87%BA%E7%9A%84%E4%BD%8D%E7%BD%AE.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/%E6%8C%89%E7%85%A7%E8%AE%BE%E5%AE%9A%E7%9A%84%E8%BE%93%E5%87%BA%E5%A4%A7%E5%B0%8F%E8%BF%9B%E8%A1%8C%E5%88%92%E5%88%86.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/ROI_Pooling%E8%BE%93%E5%87%BA.png">
+<meta property="article:published_time" content="2019-02-13T07:06:42.000Z">
+<meta property="article:modified_time" content="2023-10-12T11:15:02.031Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="学习笔记，杂项">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF%E6%84%9F%E5%8F%97%E9%87%8E%E7%A4%BA%E6%84%8F%E5%9B%BE.png">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>学习笔记_2019-01 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          学习笔记_2019-01
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-02-13 15:06:42" itemprop="dateCreated datePublished" datetime="2019-02-13T15:06:42+08:00">2019-02-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="section">2019-01-20</h1>
+<h2 id="学习了如何在hexo的markdown中使用数学公式">学习了如何在hexo的markdown中使用数学公式</h2>
+<p>首先修改next的配置文件如下：</p>
+<pre><code> mathjax:
+    enable: true
+    per_page: true</code></pre>
+<p>由于开启了pre_page，因此首先需要在markdown页面中使用：</p>
+<pre><code> mathjax: true</code></pre>
+<p>写法和latex中的公式差不多，如： <figure class="highlight latex"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">$</span><span class="keyword">\sum</span><span class="built_in">_</span>&#123;i=0&#125;<span class="built_in">^</span>&#123;n&#125;x<span class="built_in">_</span>i<span class="built_in">$</span></span><br></pre></td></tr></table></figure> 显示效果：<span class="math inline">\(\sum_{i=0}^{n}x_i\)</span></p>
+<p>但是在使用中碰到了数学公式渲染不正确的问题，网上说是hexo默认的渲染包有问题，因此需要修改。
+首先在博客根目录使用以下命令，卸载原来的渲染包，安装新的。</p>
+<pre><code> npm uninstall hexo-renderer-marked --save
+ npm install hexo-renderer-kramed --save</code></pre>
+<p>这里需要注意的是一定要在博客根目录下打开控制台，才会安装到博客的node_modules目录中，否则不起作用。</p>
+<p>之后还需要修改kramed的rule文件</p>
+<pre><code> 修改node_modules/kramed/lib/rules/inline.js
+ 第11行: escape: /^\\([\\`*&#123;&#125;\[\]()#$+\-.!_&gt;])/,
+ 替换为: escape: /^\\([`*\[\]()#$+\-.!_&gt;])/,
+ 第20行: em: /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
+ 替换为: em: /^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,</code></pre>
+<p>修改之后，一切正常。语法与latex公式基本相同，详细参考<a target="_blank" rel="external nofollow noopener noreferrer" href="https://www.luogu.org/blog/IowaBattleship/latex-gong-shi-tai-quan">latex数学公式</a></p>
+<h2 id="deep-learning读书笔记">《Deep learning》读书笔记</h2>
+<h3 id="极大似然与对数极大似然与kl散度">极大似然与对数极大似然与KL散度</h3>
+<p>极大似然估计表示如下：</p>
+<p><span class="math display">\[\begin{aligned}
+\theta_{ML}  &amp; = \mathop{\arg\max}_\theta p_{model}(\mathbb{X};
+\theta)\\
+&amp; = \mathop{\arg\max}_\theta \prod_{i=1}^m p_{model}(x^{(i)};\theta)
+\end{aligned}
+\]</span></p>
+<p>由于这样的连乘容易造成下溢，因此可以替换为对数极大似然估计：</p>
+<p><span class="math display">\[
+\begin{aligned}
+\theta_{ML} &amp; = \mathop{\arg\max}_\theta\sum_{i=1}^m\log
+p_{model}(x^{(i)};\theta)
+\end{aligned}
+\]</span></p>
+<p>将训练数据看做一种经验分布<span class="math inline">\(\hat
+p_{data}\)</span>，且因整体缩放不会影响<span class="math inline">\(\mathop{\arg\max}\)</span>操作，因此后面的项可以用期望表示，对数似然估计可以用下面的式子表达：</p>
+<p><span class="math display">\[
+\begin{aligned}
+\theta_{ML} &amp; = \mathop{\arg\max}_\theta \mathbb{E}_{\mathbf{x}\sim
+\hat p_{data}}\log p_{model}(x^{(i)};\theta)
+\end{aligned}
+\]</span></p>
+<p>这其实就相当于最小化KL散度，KL散度的定义如下：</p>
+<p><span class="math display">\[
+\begin{aligned}
+    D_{KL}(\hat p_{data} \| p_{model}) &amp; = \mathbb{E}_{\mathbf{x}
+\sim \hat p_{data}}[\log \hat p_{data}(x) - \log p_{model}(x)]
+\end{aligned}
+\]</span></p>
+<p>其中有最后一项的期望:<span class="math inline">\(-\mathbb{E}_{\mathbf{x} \sim \hat p_{data}} \log
+p_{model}(x)\)</span>即是负的对数似然。</p>
+<h1 id="section-1">2019-01-21</h1>
+<h2 id="在vscode预览markdown时渲染数学公式">在vscode预览markdown时渲染数学公式</h2>
+<p>只需要安装'Markdown+Math'这个插件就OK了。</p>
+<h2 id="尝试解析keras保存的参数hd5文件">尝试解析keras保存的参数hd5文件</h2>
+<p>经过尝试，发现keras保存的参数文件结构如下：最上层有两个键:'optimizer_weights'和'model_weights'，其中'optimizer_weights'是优化器参数，这里不关心，第二个键有关于模型
+权重的信息。</p>
+<p>'model_weights'包含attrs属性，其下又会有三个键:'layer_names','backend','keras_version'。
+重要的是其中的'layer_names',这个下面需要包含所有层名，字节数组的形式。</p>
+<p>'model_weights'下所有层名作为键值，每个键值都有attrs属性，attrs属性下有键值'weight_names'，包括所有的权重参数名，字节数组形式。</p>
+<h1 id="section-2">2019-01-22</h1>
+<h2 id="空洞卷积也叫膨胀卷积dilated-convolution">空洞卷积(也叫膨胀卷积,Dilated
+Convolution)</h2>
+<p>空洞卷积的数学定义如下： 如果<span class="math inline">\(F:\mathbb{Z}^2\rightarrow\mathbb{R}\)</span>是一个离散函数，定义一个变量域<span class="math inline">\(\Omega_r = [-r, r]^2
+\cap\mathbb{Z}^2\)</span>再定义一个大小为<span class="math inline">\((2r+1)^2\)</span>的离散卷积<span class="math inline">\(k:\Omega_r\rightarrow
+\mathbb{R}\)</span>,那么卷积操作可以表示为：</p>
+<p><span class="math display">\[
+\begin{aligned}
+(F \ast k)(p) = \sum_{s+t=p}F(s)k(t)
+\end{aligned}
+\]</span></p>
+<p>空洞卷积可以表示为：</p>
+<p><span class="math display">\[
+\begin{aligned}
+(F \ast_l k)(p) = \sum_{s+lt=p}F(s)k(t)
+\end{aligned}
+\]</span></p>
+<p>可见，当<span class="math inline">\(l\)</span>为1时，空洞卷积就是普通的卷积。</p>
+<p>空洞卷积可以增加感受野，空洞卷积感受野示意图如下，其中(a)图为普通卷积产生的感受野示意,记为<span class="math inline">\(F1\)</span>，<span class="math inline">\(3 \times
+3\)</span>的普通卷积感受野和卷积核大小相同，(b)图为在(a)中的<span class="math inline">\(F1\)</span>基础上进行<span class="math inline">\(l\)</span>等于2的空洞卷积操作，结果记为<span class="math inline">\(F2\)</span>，其感受野变为<span class="math inline">\(7 \times 7\)</span>，(c)图为在(b)中<span class="math inline">\(F2\)</span>的基础上进行<span class="math inline">\(l\)</span>等于4的空洞卷积，其感受野计算为<span class="math inline">\((4 \ast 2 + 1) \times (4 \ast 2 + 1) = (9 \times
+9)\)</span>，注意这里的感受野计算是基于逐层卷积的结果，很多博客中没有说明，我看了原文才知道。
+<img src="/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF%E6%84%9F%E5%8F%97%E9%87%8E%E7%A4%BA%E6%84%8F%E5%9B%BE.png" class title="空洞卷积感受野示意图"></p>
+<h1 id="section-3">2019-01-23</h1>
+<h2 id="densenet论文阅读">DenseNet论文阅读</h2>
+<p>论文地址：<a target="_blank" rel="external nofollow noopener noreferrer" href="https://arxiv.org/pdf/1608.06993.pdf">Densely
+Connected Convolutional Networks</a></p>
+<p>DenseNet模型结构如下。</p>
+<img src="/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/DenseNet%E6%A8%A1%E5%9E%8B%E7%BB%93%E6%9E%84.png" class title="DenseNet模型结构">
+<p>其中<span class="math inline">\(1 \times
+1\)</span>卷积层称为bottleneck层，用于减少通道个数，DenseBlock由BN-ReLU-Conv(<span class="math inline">\(1 \times 1\)</span>)-BN-ReLU-Conv(<span class="math inline">\(3 \times
+3\)</span>)这样的结构重复而组成，如果一个DenseBlock中每一个<span class="math inline">\(3 \times 3\)</span>的卷积输出通道个数是<span class="math inline">\(k\)</span>，那么作者建议设置的bottleneck层输出通道个数为<span class="math inline">\(4k\)</span>，使用了bottleneck层的DenseNet称为DenseNet-B。</p>
+<p>之后的TransitionLayer会进一步压缩模型的通道个数，其输出通道个数为<span class="math inline">\(\theta
+m\)</span>，其中m为DenseBlock的输出通道数。而<span class="math inline">\(0 &lt; \theta \le 1\)</span>，如果<span class="math inline">\(0 &lt; \theta &lt;
+1\)</span>那么称为DenseNet-C。</p>
+<p>作者的实验中，最前面的一个卷积层输出通道数为<span class="math inline">\(2k\)</span>，设置<span class="math inline">\(\theta=0.5\)</span>并且使用了bottleneck层，因此称其模型为DenseNet-BC。训练过程中，使用SGD，初始学习率为0.1在30代和60代的时候分别除以10，训练batch_size：256，一共训练90代。</p>
+<p>论文中解释说Densenet的提出是希望解决深层网络带来的梯度消失和梯度爆炸问题，并提对深度学习模型提出了一种新的解释：传统的前向传播模型就像是一种具有状态的算法，每一层读取其前一层的状态(输入)并对其进行处理，修改并保存了认为需要保存的状态，之后传到下一层，而Resnet通过相加处理，显式的保存了前一层的状态，Densenet通过通道连接，不仅保存了前一层的状态，而且还可以加以区分，虽然连接更密集，但是Densenet的模型可以参数相比于Resnet少，因为Densenet在DenseBlock中每一层的卷积核个数可以很少，通过<span class="math inline">\(k\)</span>来指定。</p>
+<h2 id="roi-pooling">ROI Pooling</h2>
+<p>ROI
+Pooling可以根据提供的区域位置信息，将特征图上的位置pooling到一个固定大小的输出。</p>
+<p>以一个输出为<span class="math inline">\(2 \times 2\)</span>的ROI
+Pooling为例。</p>
+<p>输入为一张特征图。</p>
+<img src="/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/ROI_Pooling%E8%BE%93%E5%85%A5.png" class title="ROI Pooling输入">
+<p>由区域建议网络给出区域位置。</p>
+<img src="/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/%E5%8C%BA%E5%9F%9F%E5%BB%BA%E8%AE%AE%E7%BD%91%E7%BB%9C%E7%BB%99%E5%87%BA%E7%9A%84%E4%BD%8D%E7%BD%AE.png" class title="区域建议网络给出的位置">
+<p>将建议区域划分为<span class="math inline">\(2 \times
+2\)</span>的区域。</p>
+<img src="/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/%E6%8C%89%E7%85%A7%E8%AE%BE%E5%AE%9A%E7%9A%84%E8%BE%93%E5%87%BA%E5%A4%A7%E5%B0%8F%E8%BF%9B%E8%A1%8C%E5%88%92%E5%88%86.png" class title="按照设定的输出大小进行划分">
+<p>在各个区域内进行Pooling操作(这里是Max Pooling)，得到最终输出。</p>
+<img src="/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/ROI_Pooling%E8%BE%93%E5%87%BA.png" class title="ROI Pooling输出">
+<h2 id="卷积层输出的尺寸计算">卷积层输出的尺寸计算</h2>
+<p><span class="math inline">\(n_{out} = [\dfrac{n_{in} + 2p - k}{s}] +
+1\)</span></p>
+<p>其中<span class="math inline">\(n_{out}\)</span>表示输出的特征图的大小，<span class="math inline">\(n_{in}\)</span>表示输入的特征图的大小，<span class="math inline">\(p\)</span>表示padding大小，<span class="math inline">\(k\)</span>表示卷积核大小，<span class="math inline">\(s\)</span>表示stride大小。</p>
+<h2 id="inception-net">Inception Net</h2>
+<p>Inception使用了NIN(Network in
+Network)的思想，网络中的一层不再是单一的卷积，而是几种大小的卷积分支或者几个不同深度的分支进行同时计算，最后在通道维度连接到一起。</p>
+<p>Inception在V1版本中(也就是GoogLeNet)使用了<span class="math inline">\(5 \times 5\)</span>和<span class="math inline">\(7
+\times 7\)</span>大小的卷积核，以适应不同尺度的目标识别。</p>
+<p>Inception V2版本将V1中的<span class="math inline">\(5 \times
+5\)</span>和<span class="math inline">\(7 \times
+7\)</span>卷积拆开成了小卷积的堆叠，减少了计算量的同时，增加了层数。在卷积层之后使用了BN层，添加了辅助分类层，论文中说，辅助分类层在最开始的训练过程中看不出效果，在模型收敛的时候才显现出效果。</p>
+<p>Inception V3将V2中的辅助分类层也加上了BN。</p>
+<p>Inception V4修改了之前inception模型中最前面的卷积部分(进入Inception
+Block之前)，将其中的下采样变成了两个分支，一个是步长为2的卷积，一个是池化，最终再Concatenate。</p>
+<p>inception
+v2/v3论文中还提到了设计模型的一些经验原则，我的理解如下：</p>
+<pre><code>  1、慎用非常窄的瓶颈层，前馈神经网络中的瓶颈层会减少传播的信息量，如果瓶颈层非常窄，会导致有用信息的丢失，特征图尺寸应该从输入到输出逐渐减小，直到用来完成当前的任务(识别、分类等)。
+  2、增加卷积层的卷积核个数可以丰富特征的组合，让特征图通道之间耦合程度更低，使网络加速收敛。
+  3、网络开始的几层特征关联性很高，对其进行降维导致的信息损失较小，降维甚至可以加速学习。
+  4、平衡网络的宽度和深度。优化网络性能可以认为是平衡每个阶段(层)的卷积核数目和网络深度。同时增加宽度和深度能够提升网络性能。</code></pre>
+<h1 id="section-4">2019-01-25 ~ 2019-01-26</h1>
+<h2 id="pandas库的排序问题">Pandas库的排序问题</h2>
+<p>注意到了一个非常坑的地方，关于Pandas库的，例如以下代码。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line">dict1 = &#123;<span class="string">&#x27;c&#x27;</span>: [<span class="number">1</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>]&#125;</span><br><span class="line">dict2 = &#123;<span class="string">&#x27;c&#x27;</span>: [<span class="number">5</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]&#125;</span><br><span class="line">df1 = pd.DataFrame(dict1)</span><br><span class="line">df2 = pd.DataFrame(dict2)</span><br><span class="line">df1[<span class="string">&#x27;c&#x27;</span>] += df2[<span class="string">&#x27;c&#x27;</span>]</span><br><span class="line">print(<span class="built_in">list</span>(df1[<span class="string">&#x27;c&#x27;</span>]))</span><br></pre></td></tr></table></figure>
+<p>代码中创建了两个DataFrame，然后进行列求和。
+这个输出如下，一切正常。</p>
+<pre><code>      c
+  0   6
+  1   8
+  2   6
+  3   4
+  4   6</code></pre>
+<p>但是，如果首先对两个DataFrame排序，如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line">dict1 = &#123;<span class="string">&#x27;c&#x27;</span>: [<span class="number">1</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">2</span>, <span class="number">3</span>]&#125;</span><br><span class="line">dict2 = &#123;<span class="string">&#x27;c&#x27;</span>: [<span class="number">5</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]&#125;</span><br><span class="line">df1 = pd.DataFrame(dict1)</span><br><span class="line">df2 = pd.DataFrame(dict2)</span><br><span class="line"></span><br><span class="line">df1 = df1.sort_values(by=<span class="string">&#x27;c&#x27;</span>)</span><br><span class="line">df2 = df2.sort_values(by=<span class="string">&#x27;c&#x27;</span>)</span><br><span class="line">print(df1)</span><br><span class="line">print(df2)</span><br><span class="line">df1[<span class="string">&#x27;c&#x27;</span>] += df2[<span class="string">&#x27;c&#x27;</span>]</span><br><span class="line">print(<span class="built_in">list</span>(df1[<span class="string">&#x27;c&#x27;</span>]))</span><br></pre></td></tr></table></figure>
+<p>这个时候输出就很奇怪了，如下。</p>
+<pre><code>     c
+  0  1
+  3  2
+  4  3
+  1  4
+  2  5
+     c
+  2  1
+  3  2
+  4  3
+  1  4
+  0  5
+  [6, 4, 6, 8, 6]</code></pre>
+<p>首先是打印的两个DataFrame，常规操作没有任何问题，之后进行了两列的求和，但是求和结果的顺序看不懂了，按照代码里的意思，我希望得到的结果是</p>
+<pre><code>  [2, 4, 6, 8, 10]</code></pre>
+<p>但是输出的结果是，乍一看，好像还挺顺口！！！</p>
+<pre><code>  [6, 4, 6, 8, 6]</code></pre>
+<p>这个结果，既不是排序之后相加，也不是原顺序相加(注意这个输出和不排序版本的输出也有差别)。</p>
+<p>最后找到了正确解释：先按照对应的index相加，之后再按照df1的index顺序进行输出。</p>
+<h2 id="全连接层的反向传播算法">全连接层的反向传播算法</h2>
+<p>之前看过深度神经网络(Deep Neural
+Network)反向传播的推导，但是没怎么用，现在感觉快忘光了，再来详细的推导一遍。
+首先假设损失函数: <span class="math display">\[
+loss = J(a^L, y)
+\]</span> 其中<span class="math inline">\(a^L\)</span>为第<span class="math inline">\(L\)</span>层的输出值，且有 <span class="math display">\[
+\begin{aligned}
+a^L &amp; = \sigma(z^L)\\
+z^L &amp; = W^L a^{L-1} + b^L\\
+z^L &amp; = W^L \sigma(z^{L-1}) + b^L
+\end{aligned}
+\]</span> 那么损失函数对第<span class="math inline">\(L\)</span>层的权重和偏置的偏导为： <span class="math display">\[
+\begin{aligned}
+\frac{\partial J}{\partial W^L} &amp; = \frac{\partial J}{\partial
+z^L}\frac{\partial z^L}{\partial W^L}\\
+\frac{\partial J}{\partial b^L} &amp; = \frac{\partial J}{\partial
+z^L}\frac{\partial z^L}{\partial b^L}
+\end{aligned}
+\]</span> 首先要计算的是<span class="math inline">\(\frac{\partial
+J}{\partial
+z^L}\)</span>，这一项与损失函数和最后一层的激活函数有关，这里不具体讨论，直接计算即可，并将其结果记为<span class="math inline">\(\delta^L\)</span>，之后的<span class="math inline">\(\frac{\partial z^L}{\partial
+W^L}\)</span>项和<span class="math inline">\(\frac{\partial
+z^L}{\partial
+b^L}\)</span>的计算非常简单，最后计算出的两个偏导结果分别为<span class="math inline">\(\delta^L(a^{L-1})^T\)</span>和<span class="math inline">\(\delta^L\)</span>。</p>
+<p>到这里，第<span class="math inline">\(L\)</span>层的偏导就计算完了，那么<span class="math inline">\(L-1\)</span>层同理可以如下计算。</p>
+<p><span class="math display">\[
+\begin{aligned}
+\frac{\partial J}{\partial W^{L-1}} &amp; = \frac{\partial J}{\partial
+z^L}\frac{\partial z^L}{\partial z^{L-1}}\frac{\partial
+z^{L-1}}{\partial W^{L-1}}\\
+&amp; = \delta^L \frac{\partial z^L}{\partial z^{L-1}}(a^{L-2})^T\\
+\frac{\partial J}{\partial b^{L-1}} &amp; = \frac{\partial J}{\partial
+z^L}\frac{\partial z^L}{\partial z^{L-1}}\frac{\partial
+z^{L-1}}{\partial b^{L-1}}\\
+&amp; = \delta^L \frac{\partial z^L}{\partial z^{L-1}}
+\end{aligned}
+\]</span></p>
+<p>推广开来，若一共有<span class="math inline">\(L\)</span>层，为方便表达，定义任意层的<span class="math inline">\(\delta^l\)</span> <span class="math display">\[
+\delta^l = \begin{cases}
+     \frac{\partial J}{\partial z^l}&amp;l=L\\
+     \\
+     \delta^{l+1} \frac{\partial z^l}{\partial z^{l-1}}&amp;l &lt; L
+\end{cases}
+\]</span></p>
+<p>则<span class="math inline">\(L-n\)</span>层的计算如下： <span class="math display">\[
+\begin{aligned}
+     \frac{\partial J}{\partial W^{L-n}} &amp; = \delta^{L-n}
+(a^{L-n-1})^T\\
+     \frac{\partial J}{\partial b^{L-n}} &amp; = \delta^{L-n}\\
+\end{aligned}
+\]</span></p>
+<h2 id="卷积层的反向传播">卷积层的反向传播</h2>
+<p>首先要明确数学上的离散卷积和卷积网络中的卷积操作(网上有人也称作互相关)有区别。</p>
+<p>对于数学中的二维卷积<span class="math inline">\(Z =
+K*B\)</span>，若<span class="math inline">\(K\)</span>的宽度和高度分别为<span class="math inline">\(W_K, H_K\)</span>，若<span class="math inline">\(B\)</span>的宽度和高度分别为<span class="math inline">\(W_B, H_B\)</span>，那么其表达式可以写为: <span class="math display">\[
+\begin{aligned}
+     Z &amp;= K \ast B\\
+     Z_{s,t} &amp;=
+\sum_{h=0}^{H_K-1}\sum_{w=0}^{W_K-1}K_{h,w}B_{s-h,t-w}
+\end{aligned}
+\]</span></p>
+<p>而同样条件下，卷积网络卷积操作表示如下： <span class="math display">\[
+\begin{aligned}
+     Z &amp;= K \ast_{Conv} B\\
+     Z_{s,t} &amp;=
+\sum_{h=0}^{H_K-1}\sum_{w=0}^{W_K-1}K_{h,w}B_{s+h,t+w}
+\end{aligned}
+\]</span> 数学中的卷积<span class="math inline">\(\ast\)</span>可以看做是把<span class="math inline">\(\ast_{Conv}\)</span>中的卷积核<span class="math inline">\(K\)</span>旋转180度后再进行<span class="math inline">\(\ast_{Conv}\)</span>操作。</p>
+<p>一般的卷积网络中，卷积层的操作可以表示如下 <span class="math display">\[
+\begin{aligned}
+     z^l_{s,t} &amp;= b^l +
+\sum_{h=0}^{H_K-1}\sum_{w=0}^{W_K-1}K^l_{h,w}a^{l-1}_{s+h,t+w}\\
+     a^l &amp;= \sigma(z^l)
+\end{aligned}
+\]</span> 其中<span class="math inline">\(a^l\)</span>表示第<span class="math inline">\(l\)</span>层输出的特征图，是一个三维张量，<span class="math inline">\(W_K\)</span>和<span class="math inline">\(H_K\)</span>意义同上，<span class="math inline">\(K^l\)</span>表示第<span class="math inline">\(l\)</span>层的卷积核，二维卷积的卷积核是一个四维张量，前面两维表示位置，后两维是一个用于映射前一层特征向量到下一层特征向量的矩阵。</p>
+<p>如果不考虑卷积核的最后两维和特征图的最后一维，第<span class="math inline">\(l\)</span>层的卷积核的偏导表示如下，其中<span class="math inline">\(S\)</span>和<span class="math inline">\(T\)</span>分别为第<span class="math inline">\(z^l\)</span>层的高和宽。 <span class="math display">\[
+\begin{aligned}
+     \frac{\partial J}{\partial K^l} &amp;= \frac{\partial J}{\partial
+z^l}\frac{\partial z^l}{\partial K^l}\\
+\end{aligned}
+\]</span> 写成逐像素计算的形式，如下: <span class="math display">\[
+\begin{aligned}
+     \frac{\partial J}{\partial K^l_{h,w}} &amp;=
+\sum_{s=0}^{S}\sum_{t=0}^{T}\frac{\partial J}{\partial
+z^l_{s,t}}\frac{\partial z^l_{s,t}}{\partial K^l_{h,w}}
+\end{aligned}
+\]</span> 其中的第二项如下： <span class="math display">\[
+\begin{aligned}
+     \frac{\partial z^l_{s,t}}{\partial K^l_{h,w}} &amp;= \frac{b^l +
+\sum_{h^{&#39;}=0}^{H_K-1}\sum_{w^{&#39;}=0}^{W_K-1}K^l_{h^{&#39;},w^{&#39;}}a^{l-1}_{s+h^{&#39;},t+w^{&#39;}}}{\partial
+K^l_{h,w}}\\
+     &amp;=a^{l-1}_{s+h,t+w}
+\end{aligned}
+\]</span> 则有： <span class="math display">\[
+\begin{aligned}
+     \frac{\partial J}{\partial K^l_{h,w}} &amp;=
+\sum_{s=0}^{S}\sum_{t=0}^{T}\frac{\partial J}{\partial
+z^l_{s,t}}a^{l-1}_{s+h,t+w}
+\end{aligned}
+\]</span></p>
+<p>要进一步计算，为了简化，这里和DNN中的反向传播相同，先给出<span class="math inline">\(\delta^l\)</span>定义和逐层计算规则如下：</p>
+<p><span class="math display">\[
+\begin{aligned}
+     \delta^l &amp;= \frac{\partial J}{\partial z^l}\\
+     \delta^l_{s,t} &amp;= \frac{\partial J}{\partial z^l_{s,t}}
+\end{aligned}
+\]</span></p>
+<p>因此可以将上面的偏导等式写成如下表示：</p>
+<p><span class="math display">\[
+\begin{aligned}
+     \frac{\partial J}{\partial K^l_{h,w}} &amp;=
+\sum_{s=0}^{S}\sum_{t=0}^{T}\delta^l_{s,t}a^{l-1}_{s+h,t+w}\\
+     &amp;=\delta^l\ast_{Conv}a^{l-1}
+\end{aligned}
+\]</span> 这里的卷积操作是上面提到的卷积层的卷积(互相关)。</p>
+<p>最后的问题就是，如何计算<span class="math inline">\(\delta^l\)</span>，推导如下：</p>
+<p><span class="math display">\[
+\begin{aligned}
+     \delta^l &amp;= \frac{\partial J}{\partial z^l}\\
+     \delta^{l-1} &amp;= \frac{\partial J}{\partial z^l}\frac{\partial
+z^l}{\partial z^{l-1}}\\
+     &amp;=\delta^l\frac{\partial z^l}{\partial z^{l-1}}\\
+     \delta^{l-1}_{s,t} &amp;= \frac{\partial J}{\partial z^l_{s,t}}\\
+     &amp;=\sum_{s^{&#39;} = 0}^{S^{&#39;}}\sum_{t^{&#39;} =
+0}^{T^{&#39;}}\frac{\partial J}{\partial z^l_{s{&#39;},
+t^{&#39;}}}\frac{\partial z^l_{s{&#39;}, t^{&#39;}}}{\partial
+z^{l-1}_{s,t}}\\
+     &amp;=\sum_{s^{&#39;} = 0}^{S^{&#39;}}\sum_{t^{&#39;} =
+0}^{T^{&#39;}}\delta^l_{s^{&#39;},t^{&#39;}}\frac{\partial
+z^l_{s{&#39;}, t^{&#39;}}}{\partial z^{l-1}_{s,t}}\\
+     z^l_{s^{&#39;},t^{&#39;}} &amp;= b^l +
+\sum_{h=0}^{H_K-1}\sum_{w=0}^{W_K-1}K^l_{h,w}a^{l-1}_{s^{&#39;}+h,t^{&#39;}+w}\\
+     &amp;=b^l +
+\sum_{h=0}^{H_K-1}\sum_{w=0}^{W_K-1}K^l_{h,w}\sigma(z^{l-1}_{s^{&#39;}+h,t^{&#39;}+w})\\
+     \frac{\partial z^l_{s{&#39;}, t^{&#39;}}}{\partial z^{l-1}_{s,t}}
+&amp;= K^l_{s-s^{&#39;},t-t^{&#39;}}\sigma^{&#39;}(z^l_{s, t})\\
+     \delta^{l-1}_{s,t} &amp;= \sum_{s^{&#39;} =
+0}^{S^{&#39;}}\sum_{t^{&#39;} =
+0}^{T^{&#39;}}\delta^l_{s^{&#39;},t^{&#39;}}(K^l_{s-s^{&#39;},t-t^{&#39;}}\sigma^{&#39;}(z^l_{s,
+t}))\\
+     &amp;=\sigma^{&#39;}(z^l_{s, t})(\delta^l\ast K^l)
+\end{aligned}
+\]</span></p>
+<p>如果考虑卷积核的最后两维的话，卷积操作中的乘法应该是向量乘法，这里不详细讨论。</p>
+<h2 id="池化层的反向传播">池化层的反向传播</h2>
+<p>池化层的反向传播算法非常简单，因为池化层没有可学习的参数，所以只需要传播<span class="math inline">\(\delta^l\)</span>，以便于前面的层计算梯度。</p>
+<h1 id="section-5">2019-01-27</h1>
+<h2 id="无偏性">无偏性</h2>
+<p>估计值的均值等于被估计的随机变量:<span class="math inline">\(E(\hat{\alpha}) = \alpha\)</span></p>
+<h2 id="渐进无偏性">渐进无偏性</h2>
+<p>渐进无偏性相比于无偏性的要求要弱一些，是指在样本数趋于无穷大的时候，估计值的期望等于被估计值:<span class="math inline">\(\lim_{n\rightarrow\infty}E(\hat{\alpha}) =
+\alpha\)</span></p>
+<h2 id="依概率收敛">依概率收敛</h2>
+<p><span class="math inline">\(\lim_{n\rightarrow\infty}\mathbb{P}(|X-X_n|
+\ge\epsilon) = 0\)</span></p>
+<h2 id="条件极大似然与均方误差">条件极大似然与均方误差</h2>
+<p>首先回顾下极大似然估计：极大似然估计用于估计数据的分布参数，其对数似然形式的定义为：<span class="math inline">\(\sum_i\log P(x^{(i)};\theta)\)</span>。</p>
+<p>而在线性回归问题中，给定一个输入<span class="math inline">\(x\)</span>，要预测一个<span class="math inline">\(y\)</span>。</p>
+<p>即需要求出一个函数<span class="math inline">\(\hat{y}(x;w)\)</span>，其参数为<span class="math inline">\(w\)</span>，给定输入<span class="math inline">\(x\)</span>，输出预测值。</p>
+<p>假设训练集中样本为<span class="math inline">\(x^{(i)}\)</span>，符合独立同分布(i.i.d.)条件，观测标签为<span class="math inline">\(y^{(i)}\)</span>。</p>
+<p>最小二乘法的思想是直接对<span class="math inline">\(\hat{y}(x;w)\)</span>建模并学习参数<span class="math inline">\(w\)</span>。
+如果使用最小二乘法，学习的过程可以表示如下： <span class="math display">\[
+\begin{aligned}
+     \mathop{\arg\min}_w\sum_{i}{||y^{(i)} - \hat{y}(x^{(i)};w)||}_2
+\end{aligned}
+\]</span></p>
+<p>从似然估计的角度，可以对<span class="math inline">\(P(y|x)\)</span>建模，借助高斯分布，可以做如下定义：</p>
+<p><span class="math display">\[
+\begin{aligned}
+     P(y|x) = \mathcal{N}(y;\hat{y}(x;w),\sigma^2)
+\end{aligned}
+\]</span></p>
+<p>这里使用<span class="math inline">\(\hat{y}(x;w)\)</span>作为均值，方差则考虑了观测标签中的噪声。</p>
+<p>因此在线性回归问题中，使用条件极大似然的方法，给出条件对数似然的形式定义如下：</p>
+<p><span class="math display">\[
+\begin{aligned}
+     \sum_i\log P(y^{(i)}|x^{(i)};w)
+\end{aligned}
+\]</span> 可以进一步写成： <span class="math display">\[
+\begin{aligned}
+     \sum_i\log \mathcal{N}(y;\hat{y}(x;w),\sigma^2)
+\end{aligned}
+\]</span></p>
+<p>学习的过程可以表示成如下：</p>
+<p><span class="math display">\[
+\begin{aligned}
+     \mathop{\arg\max}_{w}\sum_i\log
+\mathcal{N}(y^{(i)};\hat{y}(x^{(i)};w),\sigma^2)\\
+\end{aligned}
+\]</span></p>
+<p>展开表示： <span class="math display">\[
+\begin{aligned}
+     &amp;\mathop{\arg\max}_{w} \sum_i\log (\frac{1}{\sqrt{2\pi}\sigma}
+e^{ - \frac{(y^{(i)} - \hat{y}(x^{(i)};w))^2}{2\sigma^2}})\\
+     &amp;=\mathop{\arg\max}_{w}\sum_i(-\frac{1}{2}\log2\pi - \log
+\sigma - \frac{(y^{(i)} - \hat{y}(x^{(i)};w))^2}{2\sigma^2})
+\end{aligned}
+\]</span></p>
+<p>可见这里和最小二乘估计相同，依旧需要小化<span class="math inline">\(\sum_i{(y^{(i)}-\hat{y}(x^{(i)};w))}^2\)</span></p>
+<p>因此条件似然估计和最小二乘估计其实最终得到的结果是相同的。</p>
+<h2 id="hexo的一个问题">hexo的一个问题</h2>
+<p>在latex公式中，如果出现如下的写法，会导致报错(虽然在vscode中预览渲染没有问题)
+<figure class="highlight latex"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;(...)&#125;<span class="built_in">^</span>2</span><br></pre></td></tr></table></figure>
+报错如下，说是表达式后面需要逗号，明显是hexo解析有问题，暂时没有解决方案，只能换一种写法，将大括号去掉(不影响公式形式)。</p>
+<pre><code>  INFO  Start processing
+  FATAL Something&#39;s wrong. Maybe you can find the solution here: http://hexo.io/docs/troubleshooting.html
+  Template render error: (unknown path) [Line 201, Column 78]parseAggregate: expected comma after expression</code></pre>
+<h1 id="section-6">2019-01-28</h1>
+<h2 id="贝叶斯统计方法和频率统计方法的理解">贝叶斯统计方法和频率统计方法的理解</h2>
+<p>贝叶斯统计的视角将参数也看做一个随机变量，而频率统计的视角是将参数看做一个固定量。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%8C%E6%9D%82%E9%A1%B9/" rel="tag"># 学习笔记，杂项</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/05/08/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E4%B9%8B%E3%80%8APerceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution%E3%80%8B/" rel="prev" title="论文翻译之《Perceptual Losses for Real-Time Style Transferand Super-Resolution》">
+      <i class="fa fa-chevron-left"></i> 论文翻译之《Perceptual Losses for Real-Time Style Transferand Super-Resolution》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-02/" rel="next" title="学习笔记_2019-02">
+      学习笔记_2019-02 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#section"><span class="nav-number">1.</span> <span class="nav-text">2019-01-20</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E4%BA%86%E5%A6%82%E4%BD%95%E5%9C%A8hexo%E7%9A%84markdown%E4%B8%AD%E4%BD%BF%E7%94%A8%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">学习了如何在hexo的markdown中使用数学公式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#deep-learning%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0"><span class="nav-number">1.2.</span> <span class="nav-text">《Deep learning》读书笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%81%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%B8%8E%E5%AF%B9%E6%95%B0%E6%9E%81%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%B8%8Ekl%E6%95%A3%E5%BA%A6"><span class="nav-number">1.2.1.</span> <span class="nav-text">极大似然与对数极大似然与KL散度</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-1"><span class="nav-number">2.</span> <span class="nav-text">2019-01-21</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8vscode%E9%A2%84%E8%A7%88markdown%E6%97%B6%E6%B8%B2%E6%9F%93%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F"><span class="nav-number">2.1.</span> <span class="nav-text">在vscode预览markdown时渲染数学公式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%9D%E8%AF%95%E8%A7%A3%E6%9E%90keras%E4%BF%9D%E5%AD%98%E7%9A%84%E5%8F%82%E6%95%B0hd5%E6%96%87%E4%BB%B6"><span class="nav-number">2.2.</span> <span class="nav-text">尝试解析keras保存的参数hd5文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-2"><span class="nav-number">3.</span> <span class="nav-text">2019-01-22</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A9%BA%E6%B4%9E%E5%8D%B7%E7%A7%AF%E4%B9%9F%E5%8F%AB%E8%86%A8%E8%83%80%E5%8D%B7%E7%A7%AFdilated-convolution"><span class="nav-number">3.1.</span> <span class="nav-text">空洞卷积(也叫膨胀卷积,Dilated
+Convolution)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-3"><span class="nav-number">4.</span> <span class="nav-text">2019-01-23</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#densenet%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB"><span class="nav-number">4.1.</span> <span class="nav-text">DenseNet论文阅读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#roi-pooling"><span class="nav-number">4.2.</span> <span class="nav-text">ROI Pooling</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E5%B1%82%E8%BE%93%E5%87%BA%E7%9A%84%E5%B0%BA%E5%AF%B8%E8%AE%A1%E7%AE%97"><span class="nav-number">4.3.</span> <span class="nav-text">卷积层输出的尺寸计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#inception-net"><span class="nav-number">4.4.</span> <span class="nav-text">Inception Net</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-4"><span class="nav-number">5.</span> <span class="nav-text">2019-01-25 ~ 2019-01-26</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pandas%E5%BA%93%E7%9A%84%E6%8E%92%E5%BA%8F%E9%97%AE%E9%A2%98"><span class="nav-number">5.1.</span> <span class="nav-text">Pandas库的排序问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%A8%E8%BF%9E%E6%8E%A5%E5%B1%82%E7%9A%84%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD%E7%AE%97%E6%B3%95"><span class="nav-number">5.2.</span> <span class="nav-text">全连接层的反向传播算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B7%E7%A7%AF%E5%B1%82%E7%9A%84%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD"><span class="nav-number">5.3.</span> <span class="nav-text">卷积层的反向传播</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%A0%E5%8C%96%E5%B1%82%E7%9A%84%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD"><span class="nav-number">5.4.</span> <span class="nav-text">池化层的反向传播</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-5"><span class="nav-number">6.</span> <span class="nav-text">2019-01-27</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A0%E5%81%8F%E6%80%A7"><span class="nav-number">6.1.</span> <span class="nav-text">无偏性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%90%E8%BF%9B%E6%97%A0%E5%81%8F%E6%80%A7"><span class="nav-number">6.2.</span> <span class="nav-text">渐进无偏性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%9D%E6%A6%82%E7%8E%87%E6%94%B6%E6%95%9B"><span class="nav-number">6.3.</span> <span class="nav-text">依概率收敛</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E6%9E%81%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%B8%8E%E5%9D%87%E6%96%B9%E8%AF%AF%E5%B7%AE"><span class="nav-number">6.4.</span> <span class="nav-text">条件极大似然与均方误差</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo%E7%9A%84%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98"><span class="nav-number">6.5.</span> <span class="nav-text">hexo的一个问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-6"><span class="nav-number">7.</span> <span class="nav-text">2019-01-28</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BB%9F%E8%AE%A1%E6%96%B9%E6%B3%95%E5%92%8C%E9%A2%91%E7%8E%87%E7%BB%9F%E8%AE%A1%E6%96%B9%E6%B3%95%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">7.1.</span> <span class="nav-text">贝叶斯统计方法和频率统计方法的理解</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

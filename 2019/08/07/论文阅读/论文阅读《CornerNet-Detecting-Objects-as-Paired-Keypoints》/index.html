@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="提出的问题 单阶段目标检测大多基于anchor实现，但是用anchor存在两个问题：  为了保证所有ground truth都有匹配的anchor，不得不使用非常多的anchor，例如retinanet anchor个数100K, DSSD anchor个数40K，但是真正与ground truth iou较大的anchor非常少，导致了很严重的正负样本不平衡问题。 设置anchor时需要非常多的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="“论文阅读《CornerNet-Detecting-Objects-as-Paired-Keypoints》”">
+<meta property="og:url" content="https://sutomorrow.github.io/2019/08/07/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACornerNet-Detecting-Objects-as-Paired-Keypoints%E3%80%8B/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="提出的问题 单阶段目标检测大多基于anchor实现，但是用anchor存在两个问题：  为了保证所有ground truth都有匹配的anchor，不得不使用非常多的anchor，例如retinanet anchor个数100K, DSSD anchor个数40K，但是真正与ground truth iou较大的anchor非常少，导致了很严重的正负样本不平衡问题。 设置anchor时需要非常多的">
+<meta property="og:locale">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/08/07/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACornerNet-Detecting-Objects-as-Paired-Keypoints%E3%80%8B/CornerPooling.png">
+<meta property="article:published_time" content="2019-08-07T12:17:13.000Z">
+<meta property="article:modified_time" content="2023-10-12T11:15:02.058Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="论文阅读">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sutomorrow.github.io/2019/08/07/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACornerNet-Detecting-Objects-as-Paired-Keypoints%E3%80%8B/CornerPooling.png">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2019/08/07/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACornerNet-Detecting-Objects-as-Paired-Keypoints%E3%80%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>“论文阅读《CornerNet-Detecting-Objects-as-Paired-Keypoints》” | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/08/07/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACornerNet-Detecting-Objects-as-Paired-Keypoints%E3%80%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          “论文阅读《CornerNet-Detecting-Objects-as-Paired-Keypoints》”
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-08-07 20:17:13" itemprop="dateCreated datePublished" datetime="2019-08-07T20:17:13+08:00">2019-08-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="提出的问题">提出的问题</h2>
+<p>单阶段目标检测大多基于anchor实现，但是用anchor存在两个问题：</p>
+<ul>
+<li>为了保证所有ground
+truth都有匹配的anchor，不得不使用非常多的anchor，例如retinanet
+anchor个数100K, DSSD anchor个数40K，但是真正与ground truth
+iou较大的anchor非常少，导致了很严重的正负样本不平衡问题。</li>
+<li>设置anchor时需要非常多的超参数，anchor的大小、长宽比、个数，使得找到合适的anchor设置非常困难</li>
+</ul>
+<h2 id="解决思想">解决思想</h2>
+<p>丢弃anchor，模型在回归目标位置时，不是去预测基于anchor的偏移量，而是使用两个feature
+map同时预测两个角点（左上、右下）即可，在feature
+map上的点，只有为目标角点的时候才进行激活预测其目标类别，只是这里又有三个问题：</p>
+<ul>
+<li>两个feature
+map预测出来的角点，如何进行匹配，从而合并成一个目标？</li>
+<li>目标在两个角点之间，因此feature
+map上的角点位置缺少关于目标的信息，如何准确的进行分类？</li>
+<li>feature map在经过下采样之后，feature
+map上的点的位置要映射回原图，这个时候存在位置精度的损失，可能造成预测位置的偏差。</li>
+</ul>
+<h2 id="具体做法">具体做法</h2>
+<p>针对第一个角点匹配的问题，这里引用了另外一篇论文的方法（《ssociative
+embedding: End-to-end learning forjoint detection and
+grouping》），在模型中，两个角点坐标的feature
+map都会额外预测一个一维的嵌入向量（embedding
+vector），希望当两个角点匹配时，两个角点位置预测的嵌入向量的距离尽可能接近，否则尽可能远离（<strong>这里嵌入向量的想法没看得太懂，可能还要看看原论文才能理解，除此之外计算量貌似有点大</strong>），因此定义了两个loss如下所示，其中<span class="math inline">\(e_{t_k}\)</span>代表第k个目标左上角点的嵌入向量，<span class="math inline">\(e_{b_k}\)</span>代表第k个目标右下角点的嵌入向量，<span class="math inline">\(e_k = \frac{(e_{t_k} +
+e_{b_k})}{2}\)</span>，N代表目标的个数，<span class="math inline">\(\Delta\)</span>在论文的所有实验中均为1。 <span class="math display">\[
+\begin{aligned}
+    L_{pull} &amp;= \frac{1}{N}\sum_{k=1}^N[(e_{t_k} - e_k) ^ 2 +
+(e_{b_k} - e_k) ^ 2]\\
+    L_{push} &amp;= \frac{1}{N(N - 1)}\sum_{k=1}^N\sum_{\begin{aligned}
+        j = 1 \\
+        j \neq k
+    \end{aligned}}max(0, \Delta - |e_k - e_j|)
+\end{aligned}
+\]</span></p>
+<p>针对第二个角点处没有目标信息的问题，论文中提出了Corner
+Pooling，如下图所示，在左上角角点预测过程中，进行pooling时，每个点水平向右和垂直向下搜索，找到最大的值，之后加起来作为这个点pooling之后的值，这样给出了当前点是否是角点的判断信息，并且引入了一个非常强的先验：一个点是否是左上角点，需要看其右边的信息和下面的信息来判断。而如果是在预测右下角点，那么Corner
+Pooling变为每个点水平向左和垂直向上搜索。</p>
+<figure>
+<img src="CornerPooling.png" alt="CornerPooling示意图">
+<figcaption aria-hidden="true">CornerPooling示意图</figcaption>
+</figure>
+<p>这里为了加快Corner Pooling的计算，如果是左上角点的Corner
+Pooling，可以从右下点开始计算，计算方式如下，<span class="math inline">\(t_{ij}\)</span>和<span class="math inline">\(l_{ij}\)</span>分别代表水平向右搜索和垂直向下搜索的结果，最终pooling结果<span class="math inline">\(p_{ij} = t_{ij} + l_{ij}\)</span>。 <span class="math display">\[
+\begin{aligned}
+    t_{ij} &amp;= \begin{cases}
+        max(f_{t_{ij}}, t_{(i+1)j}) &amp; if \quad i &lt; H\\
+        f_{t_{Hj}} &amp; otherwise
+    \end{cases}\\
+    l_{ij} &amp;= \begin{cases}
+        max(f_{t_{ij}}, t_{i(j+1)}) &amp; if \quad j &lt; W\\
+        f_{t_{iW}} &amp; otherwise
+    \end{cases}
+\end{aligned}
+\]</span></p>
+<p>针对第三个问题，在模型中还预测两组偏移量，分别对左上角点和右下角点进行偏移，对于一组偏移量，其目标<span class="math inline">\(o_k\)</span>计算如下，并使用SmoothL1Loss进行训练。
+<span class="math display">\[
+o_k = (\frac{x}{n} - \lfloor\frac{x}{n}\rfloor, \frac{y}{n} -
+\lfloor\frac{y}{n}\rfloor)
+\]</span></p>
+<p>最后要说的就是ground truth匹配问题，一个geound
+truth只匹配一个左上角点和一个右下角点，其余点都为负样本，但在训练时，在正样本周围画一个半径为<span class="math inline">\(r\)</span>的圈，这里有个约束：半径<span class="math inline">\(r\)</span>范围内的点，要保证可以和ground
+truth生成iou大于0.7的检测框，从而决定<span class="math inline">\(r\)</span>的大小。</p>
+<p>这个圈中除中心点之外，其余点在计算loss时，会降低其loss权重，作者定义了一个focal
+loss的变种，作为每个点的分类损失函数，如下所示，其中<span class="math inline">\(C、H、W\)</span>分别表示类别数、图片高度、图片宽度，N表示图片上目标个数，<span class="math inline">\(p_{cij}\)</span>表示位置<span class="math inline">\(ij\)</span>处的<span class="math inline">\(c\)</span>类预测概率，在论文所有实验中，<span class="math inline">\(\alpha = 2\)</span>，<span class="math inline">\(\beta = 4\)</span>，<span class="math inline">\(y_{cij}\)</span>不是纯粹的标签，还编码了刚才说的loss函数权重信息，对于正样本点，<span class="math inline">\(y_{cij} = 1\)</span>，对于正样本周围半径为<span class="math inline">\(r\)</span>的圈内的点，<span class="math inline">\(y_{cij} = 1 -
+e^{-\frac{x^2+y^2}{\sigma}}\)</span>(这里的<span class="math inline">\(xy\)</span>是相对于中心点的坐标)，其中<span class="math inline">\(\sigma =
+\frac{r}{3}\)</span>，而对于其余负样本点，<span class="math inline">\(y_{cij} = 0\)</span>。 <span class="math display">\[
+\begin{aligned}
+    L_{det} =
+\frac{-1}{N}\sum_{c=1}^C\sum_{i=1}^H\sum_{j=1}^W\begin{cases}
+        (1 - p_{cij})^\alpha log(p_{cij}) &amp; if \quad y = 1\\
+        (1 - y_{cij})^\beta p_{cij}^\alpha log(1 - p_{cij}) &amp;
+otherwise
+    \end{cases}
+\end{aligned}
+\]</span></p>
+<h2 id="存在的问题">存在的问题</h2>
+<p>个人觉得这个模型的计算可能非常慢，首先是嵌入向量的匹配过程，我没有想到比较好的实现方式，暴力匹配的话应该非常慢，还有一个问题是Corner
+Pooling的计算，这里如果需要按顺序计算，那么GPU并行加速提升不大。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag"># 论文阅读</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/08/01/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8AReducing-the-Dimensionality-of-Data-with-Neural-Networks%E3%80%8B/" rel="prev" title="论文阅读《Reducing-the-Dimensionality-of-Data-with-Neural-Networks》">
+      <i class="fa fa-chevron-left"></i> 论文阅读《Reducing-the-Dimensionality-of-Data-with-Neural-Networks》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/09/03/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ADeformable-Convolutional-Networks%E3%80%8B/" rel="next" title="论文阅读《Deformable-Convolutional-Networks》">
+      论文阅读《Deformable-Convolutional-Networks》 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E5%87%BA%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">提出的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%80%9D%E6%83%B3"><span class="nav-number">2.</span> <span class="nav-text">解决思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%81%9A%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">具体做法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">4.</span> <span class="nav-text">存在的问题</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

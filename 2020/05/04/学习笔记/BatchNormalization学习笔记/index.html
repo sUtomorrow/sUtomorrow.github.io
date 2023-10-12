@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="BatchNormalization的作用机制 推理过程 对于深度神经网络中的一层，可以表示为\(o &#x3D; g(x),\ x&#x3D;wl + b\)，其中\(w,b\)是该层的参数，\(l\)是该层的输入，\(g\)表示激活函数，\(o\)表示该层输出。 在提出BN的原始论文《Batch Normalization: Accelerating Deep Network Training byReducin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BatchNormalization学习笔记">
+<meta property="og:url" content="https://sutomorrow.github.io/2020/05/04/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/BatchNormalization%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="BatchNormalization的作用机制 推理过程 对于深度神经网络中的一层，可以表示为\(o &#x3D; g(x),\ x&#x3D;wl + b\)，其中\(w,b\)是该层的参数，\(l\)是该层的输入，\(g\)表示激活函数，\(o\)表示该层输出。 在提出BN的原始论文《Batch Normalization: Accelerating Deep Network Training byReducin">
+<meta property="og:locale">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/05/04/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/BatchNormalization%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/normalization.png">
+<meta property="article:published_time" content="2020-05-04T05:51:26.000Z">
+<meta property="article:modified_time" content="2023-10-12T11:15:02.014Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="论文笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sutomorrow.github.io/2020/05/04/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/BatchNormalization%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/normalization.png">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2020/05/04/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/BatchNormalization%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>BatchNormalization学习笔记 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2020/05/04/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/BatchNormalization%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          BatchNormalization学习笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-05-04 13:51:26" itemprop="dateCreated datePublished" datetime="2020-05-04T13:51:26+08:00">2020-05-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="batchnormalization的作用机制">BatchNormalization的作用机制</h1>
+<h2 id="推理过程">推理过程</h2>
+<p>对于深度神经网络中的一层，可以表示为<span class="math inline">\(o =
+g(x),\ x=wl + b\)</span>，其中<span class="math inline">\(w,b\)</span>是该层的参数，<span class="math inline">\(l\)</span>是该层的输入，<span class="math inline">\(g\)</span>表示激活函数，<span class="math inline">\(o\)</span>表示该层输出。</p>
+<p>在提出BN的原始论文《Batch Normalization: Accelerating Deep Network
+Training byReducing Internal Covariate
+Shift》中，BN层是加在每一层的激活函数之前的，即对上面的<span class="math inline">\(x\)</span>进行操作。</p>
+<p>BN层的操作有两步： - 首先对数据进行归一化（normalize）：设<span class="math inline">\(\mu\)</span>，<span class="math inline">\(\sigma^2\)</span>分别是<span class="math inline">\(x\)</span>的均值和方差，归一化之后的<span class="math inline">\(x\)</span>变为<span class="math inline">\(\hat{x}
+= \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}}\)</span>，其中<span class="math inline">\(\epsilon\)</span>是个防止分母为零的平滑项， -
+然后对归一化的数据进行scale和shift（transform）：<span class="math inline">\(\gamma \hat{x} +
+\beta\)</span>，最终该层加入BN之后，表达式变为<span class="math inline">\(o = g(\gamma \hat{x} + \beta)\)</span></p>
+<p>这里先不管<span class="math inline">\(\mu,\ \sigma^2,\ \epsilon,\
+\beta\)</span>怎么得到，上面的操作看起来非常简单，不过这里有一点细节：一般情况下，这里的<span class="math inline">\(x,\ x_i,\ \mu,\ \sigma^2,\ \epsilon,\ \gamma,\
+\beta\)</span>全都是向量，因为一个样本由多个特征构成，BatchNormalization其实是对每个特征进行normalize和transform，因此上面涉及到的计算，其实全都是逐元素运算，如果是对于图像数据，在CNN中的BatchNormalization其实是将特征图上的每个点当做一个样本的，例如一个<span class="math inline">\(N\times H\times W\times
+C\)</span>大小的特征图（<span class="math inline">\(N\)</span>是batch
+size），那么其中<span class="math inline">\(1\times 1 \times 1 \times
+C\)</span>的一个点就被当成一个样本，其包含<span class="math inline">\(C\)</span>个特征，所有样本共用<span class="math inline">\(C\)</span>个均值和方差。</p>
+<h2 id="训练过程">训练过程</h2>
+<p>对于BatchNormalizatioin层，训练过程其实就是确定<span class="math inline">\(\mu,\ \sigma^2,\ \gamma,\
+\beta\)</span>的过程。</p>
+<p>首先，对于<span class="math inline">\(\mu,\
+\sigma^2\)</span>，在训练过程中，对于每一个batch的数据，我们可以得到<span class="math inline">\(\mu_B = \frac{1}{m}\sum\limits_{i=1}^m
+x_i\)</span>，<span class="math inline">\(\sigma^2_B =
+\frac{1}{m}\sum\limits_{i=1}^m(x_i
+-\mu)^2\)</span>作为当前batch数据的均值和方差，其中<span class="math inline">\(m\)</span>是一个batch中的样本数，下标<span class="math inline">\(i\)</span>表示某个样本，训练是迭代进行的，为了得到对所有数据的均值和方差，需要使用一些方法根据<span class="math inline">\(\mu_B,\
+\sigma^2_B\)</span>来估计整体数据的均值和方差。</p>
+<p>在主流的深度学习框架（tensorflow、pytorch）中，一般使用滑动平均来进行估计：
+将变量<span class="math inline">\(\mu,\ \sigma^2\)</span>初始化为<span class="math inline">\(\mu_0,\
+\sigma^2_0\)</span>，因为每次迭代处理一个batch的数据，均可以得到<span class="math inline">\(\mu_B,\ \sigma^2_B\)</span>，第<span class="math inline">\(k\)</span>次迭代时，更新<span class="math inline">\(\mu_k = \alpha\mu_{k-1} + (1-\alpha)\mu_B,\
+\sigma^2_k = \alpha\sigma^2_{k-1} +
+(1-\alpha)\sigma^2_B\)</span>，其中<span class="math inline">\(0 &lt;
+\alpha &lt;
+1\)</span>是滑动平均的滑动速率，训练完成之后，假设一共迭代了<span class="math inline">\(K\)</span>次，则令<span class="math inline">\(\mu
+= \mu_K,\ \sigma^2 = \sigma^2_K\)</span>，即可用于推理过程。</p>
+<p>对于<span class="math inline">\(\gamma,\
+\beta\)</span>两个参数，在训练过程中，将其和<span class="math inline">\(w,\
+b\)</span>一样，使用优化器根据梯度进行更新即可。</p>
+<h2 id="batchnormalization的推理加速">BatchNormalization的推理加速</h2>
+<p>将BatchNormalization的两个步骤结合起来，可以得到：</p>
+<p><span class="math display">\[
+\begin{aligned}
+    o &amp;= g(\hat{z})\\
+    &amp;= g(\gamma \hat{x} + \beta)\\
+    &amp;= g(\gamma \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} +
+\beta)\\
+    &amp;= g(\gamma \frac{wl + b - \mu}{\sqrt{\sigma^2 + \epsilon}} +
+\beta)\\
+    &amp;= g(\frac{\gamma wl}{\sqrt{\sigma^2 + \epsilon}} + \frac{\gamma
+b -\gamma \mu}{\sqrt{\sigma^2 + \epsilon}}+ \beta)\\
+\end{aligned}
+\]</span></p>
+<p>可以发现，在模型训练完成之后，如果仅需要使用模型进行推理，则可以将<span class="math inline">\(\frac{\gamma w}{\sqrt{\sigma^2 +
+\epsilon}}\)</span>保存为该层的<span class="math inline">\(w\)</span>参数，将<span class="math inline">\(\frac{\gamma b -\gamma \mu}{\sqrt{\sigma^2 +
+\epsilon}}+ \beta\)</span>保存为该层的<span class="math inline">\(b\)</span>参数。这样在推理过程中完全不增加计算量。</p>
+<p>有一种说法是如果使用了BatchNormalization，则该层的偏置参数<span class="math inline">\(b\)</span>可以省略掉，这也是根据上式得来的，因为BatchNormalization中包含了一个可学习的<span class="math inline">\(\beta\)</span>项，完全可以替代<span class="math inline">\(b\)</span>参数的效果，而且不影响模型的表达能力。</p>
+<h1 id="batchnormalization的理解">BatchNormalization的理解</h1>
+<p>原论文中认为：BatchNormalization可以让深度神经网络使用更大的学习速率训练以达到加速收敛的目的。</p>
+<p>论文中作者解释说是因为深度神经网络在训练过程中，由于前一层参数变化，导致每一层的输入分布不断发生变化，这种情况在论文中被称为“internal
+convariate shift”，BatchNormalization的作用是缓解这种“internal
+convariate
+shift”：通过强行将激活之前的特征进行减平均除方差的操作，使得特征均值为0，方差为1，让激活之后的输出，即下一层的输入，维持在一个相对稳定的分布中。</p>
+<p>但是在该论文中，作者又说如果简单的将某一层的激活函数的输入进行normalize，会改变该层的表示能力（原文：Note
+that simply normalizing each input of a layer may change what the layer
+can represent. For instance, nor-malizing the inputs of a sigmoid would
+constrain them tothe linear regime of the
+nonlinearity.），因此需要在normalize之后，再对其进行transform。</p>
+<p>这里的transform之后，如果不是接近于0均值，1方差的，那之前的normalize就白做了，原论文中也明确说了transform有能力将之前的normalize的效果完全还原，所以原论文得出的结论是这样一来模型可以选择是否进行normalize，相当于增强了模型的表达能力。</p>
+<p>我对这里的理解是：<strong>BatchNormalization先将特征变换到0均值，1方差，再transform到<span class="math inline">\(\beta\)</span>均值，<span class="math inline">\(\gamma\)</span>标准差，这样一定程度上可以让模型来显式地选择特征的均值和方差，可以让数据的分布向更加适合随机初始化的权重的位置靠拢（否则就需要单方面调整随机初始化的权重来适应数据的分布，这样显然需要更长时间的训练），因此BatchNormalization有缩短收敛时间的效果，也可以说是减小了对参数初始化的依赖，另外，BN层的先normalize再transform的操作，如果通过<span class="math inline">\(\beta\)</span>和<span class="math inline">\(\gamma\)</span>将特征的均值和方差限定在一定范围，一定程度上是对模型表达能力的一种限制，有一定的类似正则化的作用，一定情况下或许可以稍微提高模型的泛化能力。</strong></p>
+<p>从梯度方面来看，BN是通过某种对梯度的调整，从而对整个学习过程产生影响，我分析了论文中得出的求导结果，并将<span class="math inline">\(\frac{\partial l}{\partial
+x_i}\)</span>继续化简，如下： <span class="math display">\[
+\begin{aligned}
+    \frac{\partial l}{\partial \hat{x}} &amp;= \frac{\partial
+l}{\partial \hat{z}} \gamma\\
+    \frac{\partial l}{\partial \sigma^2_B} &amp;= \sum\limits_{i=1}^m
+\frac{\partial l}{\partial \hat{x}_i}(x_i -
+\mu_B)\cdot-\frac{1}{2}(\sigma^2_B +\epsilon)^{-\frac{3}{2}}\\
+    &amp;= \sum\limits_{i=1}^m \frac{\partial l}{\partial \hat{z}_i}
+\gamma (x_i - \mu_B)\cdot-\frac{1}{2}(\sigma^2_B
++\epsilon)^{-\frac{3}{2}}\\
+    \frac{\partial l}{\partial \mu_B} &amp;= \sum_{i=1}^m\frac{\partial
+l}{\partial \hat{x}_i} \cdot -\frac{1}{\sqrt{\sigma^2_B + \epsilon}}\\
+    &amp;=\sum\limits_{i=1}^m \frac{\partial l}{\partial
+\hat{z}_i}\gamma \cdot -\frac{1}{\sqrt{\sigma^2_B + \epsilon}}\\
+    \frac{\partial l}{\partial x_i} &amp;= \frac{\partial l}{\partial
+\hat{x}_i} \frac{1}{\sqrt{\sigma^2_B + \epsilon}} + \frac{\partial
+l}{\partial \sigma^2_B} \frac{2(x_i - \mu_B)}{m} + \frac{\partial
+l}{\partial \mu_B} \frac{1}{m}\\
+    &amp;= \frac{\partial l}{\partial \hat{z}_i} \gamma
+\frac{1}{\sqrt{\sigma^2_B + \epsilon}} + \sum\limits_{j=1}^m
+(\frac{\partial l}{\partial \hat{z}_j} \gamma (x_j -
+\mu_B)\cdot-\frac{1}{2}(\sigma^2_B +\epsilon)^{-\frac{3}{2}})
+\frac{2(x_i - \mu_B)}{m} + \sum\limits_{k=1}^m (\frac{\partial
+l}{\partial \hat{z}_k}\gamma \cdot -\frac{1}{\sqrt{\sigma^2_B +
+\epsilon}}) \frac{1}{m}\\
+    &amp;= \frac{\partial l}{\partial \hat{z}_i} \gamma
+\frac{1}{\sqrt{\sigma^2_B + \epsilon}} + \sum\limits_{j=1}^m
+\{\frac{\partial l}{\partial \hat{z}_j} \gamma [(x_j -
+\mu_B)\cdot-\frac{1}{2}(\sigma^2_B +\epsilon)^{-\frac{3}{2}}\frac{2(x_i
+- \mu_B)}{m} - \frac{1}{\sqrt{\sigma^2_B + \epsilon}} \frac{1}{m}]\}\\
+    &amp;= \frac{\partial l}{\partial \hat{z}_i} \gamma
+\frac{1}{\sqrt{\sigma^2_B + \epsilon}} - \sum\limits_{j=1}^m
+\{\frac{\partial l}{\partial \hat{z}_j} \frac{\gamma}{m} [(x_j -
+\mu_B)\cdot(\sigma^2_B +\epsilon)^{-\frac{3}{2}}(x_i - \mu_B) +
+\frac{1}{\sqrt{\sigma^2_B + \epsilon}}]\}\\
+    &amp;= \frac{\partial l}{\partial \hat{z}_i} \gamma
+\frac{1}{\sqrt{\sigma^2_B + \epsilon}} - \sum\limits_{j=1}^m
+\{\frac{\partial l}{\partial \hat{z}_j} \frac{\gamma}{m} [\frac{(x_j -
+\mu_B)(x_i - \mu_B)}{(\sigma^2_B +\epsilon)^{\frac{3}{2}}} +
+\frac{1}{\sqrt{\sigma^2_B + \epsilon}}]\}\\
+    &amp;= \frac{\partial l}{\partial \hat{z}_i} \gamma
+\frac{1}{\sqrt{\sigma^2_B + \epsilon}} - \sum\limits_{j=1}^m
+\{\frac{\partial l}{\partial \hat{z}_j} \frac{\gamma}{m} [\frac{(x_j -
+\mu_B)(x_i - \mu_B) + \sigma^2_B +\epsilon}{(\sigma^2_B
++\epsilon)^{\frac{3}{2}}}]\}\\
+\end{aligned}
+\]</span></p>
+<p><strong>如果没有BatchNormalization，则<span class="math inline">\(\hat{z} = \hat{x} = x = wl +
+b\)</span>，可以看出，添加了BatchNormalization之后，计算<span class="math inline">\(\frac{\partial l}{\partial
+x_i}\)</span>的过程变得复杂了很多，仅考虑<span class="math inline">\(\frac{\partial l}{\partial \hat{z}_i} \gamma
+\frac{1}{\sqrt{\sigma^2_B +
+\epsilon}}\)</span>这一项的话，可以看出，如果一个batch中，如果特征的标准差越大，则传递回去的梯度越小，如果模型学习到的标准差<span class="math inline">\(\gamma\)</span>很大，则梯度也相应变大，这里相当于有个自动调整学习速率的功能因此增加了BN层的模型，能够适应更高的学习速率。但是后面一项就不好分析了，我暂时没有什么思路。如果有自己的想法欢迎留言讨论。</strong></p>
+<p>BatchNormalization的缺点也很明显：如果batch
+size比较小，那么想要通过<span class="math inline">\(\sigma^2_B\)</span>和<span class="math inline">\(\mu_B\)</span>来估计所有特征的方差和均值非常困难。</p>
+<h1 id="batchnormalization的变种">BatchNormalization的变种</h1>
+<p>除了BatchNormalization，还有一些Normalization方式，其对比如下图所示。</p>
+<figure>
+<img src="normalization.png" alt="各种normalization对比">
+<figcaption aria-hidden="true">各种normalization对比</figcaption>
+</figure>
+<h2 id="layernormalization">LayerNormalization</h2>
+<p>LN对每个样本计算一个标量均值和方差，计算过程不受batch
+size的影响，常用在RNN中，但是如果同一个样本的特征区别较大，则不适合使用统一的均值和方差。</p>
+<h2 id="instancenormalization">InstanceNormalization</h2>
+<p>对每个样本计算C个均值和方差，不受batch
+size和通道数的影响，常用于风格化迁移，如果通道之间有相关性，则不适合使用IN。</p>
+<h2 id="groupnormalization">GroupNormalization</h2>
+<p>作为BatchNormalization的变种之一，GroupNormalization主要解决的问题是BatchNormalization对batch大小的依赖性。</p>
+<p>在CNN中，对于<span class="math inline">\(N\times H\times W\times
+C\)</span>大小的特征图，BatchNormalization将其中每一个大小为<span class="math inline">\(1\times 1\times 1\times
+C\)</span>看做一个样本，而GroupNormalization首先将<span class="math inline">\(N\times H\times W\times
+C\)</span>大小的特征图拆分成<span class="math inline">\(N\times H\times
+W\times \frac{C}{G}\times G\)</span>，然后在<span class="math inline">\(H\times W\times
+\frac{C}{G}\)</span>范围内求方差和均值，得到<span class="math inline">\(N \times
+G\)</span>个均值和方差，可以理解为样本个数为<span class="math inline">\(H\times W\times
+\frac{C}{G}\)</span>，每个样本的维度为<span class="math inline">\(N
+\times G\)</span>，这样做的好处是样本个数不依赖batch
+size，原论文中作者还解释说使用GroupNormalization将特征分组处理，更加符合特征之间的依赖性，对模型性能有提升。</p>
+<p>训练时GroupNormalization的方差和均值都是<span class="math inline">\(N\times 1\times 1\times 1\times
+G\)</span>大小，在测试时，Batch
+size基本上不会和训练时一样，不能和BN一样保存均值和方差参数，因此GN在模型保存时，只保存<span class="math inline">\(\gamma\)</span>和<span class="math inline">\(\beta\)</span>的值，均值和方差在预测过程中是每个样本计算一次的。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+              <a href="/tags/%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" rel="tag"># 论文笔记</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/02/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E3%80%8ADeepLearning%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" rel="prev" title="《DeepLearning》读书笔记">
+      <i class="fa fa-chevron-left"></i> 《DeepLearning》读书笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/06/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%9B%9E%E5%BD%92%E6%96%B9%E6%B3%95%E6%80%BB%E7%BB%93/" rel="next" title="回归方法总结">
+      回归方法总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#batchnormalization%E7%9A%84%E4%BD%9C%E7%94%A8%E6%9C%BA%E5%88%B6"><span class="nav-number">1.</span> <span class="nav-text">BatchNormalization的作用机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A8%E7%90%86%E8%BF%87%E7%A8%8B"><span class="nav-number">1.1.</span> <span class="nav-text">推理过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E8%BF%87%E7%A8%8B"><span class="nav-number">1.2.</span> <span class="nav-text">训练过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#batchnormalization%E7%9A%84%E6%8E%A8%E7%90%86%E5%8A%A0%E9%80%9F"><span class="nav-number">1.3.</span> <span class="nav-text">BatchNormalization的推理加速</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#batchnormalization%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">BatchNormalization的理解</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#batchnormalization%E7%9A%84%E5%8F%98%E7%A7%8D"><span class="nav-number">3.</span> <span class="nav-text">BatchNormalization的变种</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#layernormalization"><span class="nav-number">3.1.</span> <span class="nav-text">LayerNormalization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#instancenormalization"><span class="nav-number">3.2.</span> <span class="nav-text">InstanceNormalization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#groupnormalization"><span class="nav-number">3.3.</span> <span class="nav-text">GroupNormalization</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

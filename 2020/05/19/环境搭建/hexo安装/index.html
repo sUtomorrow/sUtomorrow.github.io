@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="hexo安装过程 参考资料 https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;187435941 ## nodejs 版本：12.19.0，安装过程略 安装hexo命令 运行命令:  npm install -g hexo-cli">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hexo安装记录">
+<meta property="og:url" content="https://sutomorrow.github.io/2020/05/19/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/hexo%E5%AE%89%E8%A3%85/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="hexo安装过程 参考资料 https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;187435941 ## nodejs 版本：12.19.0，安装过程略 安装hexo命令 运行命令:  npm install -g hexo-cli">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-05-19T07:21:29.000Z">
+<meta property="article:modified_time" content="2023-10-12T12:26:13.698Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="杂项">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2020/05/19/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/hexo%E5%AE%89%E8%A3%85/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>hexo安装记录 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2020/05/19/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/hexo%E5%AE%89%E8%A3%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hexo安装记录
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-05-19 15:21:29" itemprop="dateCreated datePublished" datetime="2020-05-19T15:21:29+08:00">2020-05-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 20:26:13" itemprop="dateModified" datetime="2023-10-12T20:26:13+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="hexo安装过程">hexo安装过程</h1>
+<p>参考资料 https://zhuanlan.zhihu.com/p/187435941 ## nodejs
+版本：12.19.0，安装过程略</p>
+<h2 id="安装hexo命令">安装hexo命令</h2>
+<p>运行命令:</p>
+<pre><code> npm install -g hexo-cli</code></pre>
+<h2 id="查看hexo版本">查看hexo版本</h2>
+<p>运行命令:</p>
+<pre><code> hexo --version</code></pre>
+<p>得到以下输出</p>
+<pre><code> hexo: 5.3.0
+ hexo-cli: 4.2.0
+ os: Windows_NT 10.0.19041 win32 x64
+ node: 12.19.0
+ v8: 7.8.279.23-node.44
+ uv: 1.39.0
+ zlib: 1.2.11
+ brotli: 1.0.9
+ ares: 1.16.0
+ modules: 72
+ nghttp2: 1.41.0
+ napi: 7
+ llhttp: 2.1.2
+ http_parser: 2.9.3
+ openssl: 1.1.1g
+ cldr: 37.0
+ icu: 67.1
+ tz: 2019c
+ unicode: 13.0</code></pre>
+<h2 id="初始化博客文件夹">初始化博客文件夹</h2>
+<p>运行命令:</p>
+<pre><code> hexo init blogDev</code></pre>
+<h2 id="安装package.json中的依赖">安装package.json中的依赖</h2>
+<p>运行命令：</p>
+<pre><code> cd blogDev
+ npm install</code></pre>
+<h2 id="修改_config.yml文件">修改_config.yml文件</h2>
+<p>使用hexo-autonofollow插件来给外链添加nofollow属性</p>
+<p>在站点根目录下执行下列命令：</p>
+<pre><code> npm install hexo-autonofollow --save</code></pre>
+<h2 id="修改git-init文件">修改git init文件</h2>
+<p>去掉以下三项：</p>
+<pre><code> db.json,
+ Thumbs.db
+ node-modules/</code></pre>
+<h2 id="支持latex">支持latex</h2>
+<p>卸载hexo自带的makrdown渲染工具：</p>
+<pre><code> npm uninstall hexo-renderer-markded --save</code></pre>
+<p>直接安装hexo-renderer-pandoc如下，但该方式会出现"pandoc exited with
+code null"的报错，需要在 https://github.com/jgm/pandoc/releases
+重新下载pandoc安装</p>
+<pre><code> npm install hexo-renderer-pandoc --save</code></pre>
+<p>下载next主题：</p>
+<pre><code> git clone https://github.com/theme-next/hexo-theme-next themes/next</code></pre>
+<p>在_config.yml中将主题修改为next</p>
+<p>修改next主题下的_config.yml文件中mathjax部分。</p>
+<pre><code> mathjax:
+    enable: true</code></pre>
+<p>访问网页时又遇到输出代码的问题，于是又安装swig：</p>
+<pre><code> npm i hexo-renderer-swig</code></pre>
+<h2 id="设置首页不显示全文">设置首页不显示全文</h2>
+<p>安装插件命令如下： npm install hexo-excerpt --save</p>
+<h2 id="设置导航栏">设置导航栏</h2>
+<p>除了修改next主题下的config文件menu字段之外，还需要执行以下命令，已经执行的无需重复执行：</p>
+<pre><code> hexo new page &quot;about&quot;
+ hexo new page &quot;tags&quot;
+ hexo new page &quot;categories&quot;</code></pre>
+<h2 id="hexo-next-主题配置右侧栏的分类和标签打开的是空白">Hexo next
+主题配置右侧栏的分类和标签打开的是空白</h2>
+<p>categories 文件夹里面的 index.md 文件打开，修改（即添加一行）为：</p>
+<pre><code> ---
+ title: categories
+ date: 2018-01-23 17:14:51
+ type: &quot;categories&quot;   #新添加的
+ ---</code></pre>
+<p>同理，tags</p>
+<pre><code> ---
+ title: tags
+ date: 2018-01-23 17:14:51
+ type: &quot;tags&quot;     #新添加的
+ ---</code></pre>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9D%82%E9%A1%B9/" rel="tag"># 杂项</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/19/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" rel="prev" title="目标检测">
+      <i class="fa fa-chevron-left"></i> 目标检测
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/28/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Boosting%E6%80%BB%E7%BB%93/" rel="next" title="Boosting总结">
+      Boosting总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#hexo%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">hexo安装过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85hexo%E5%91%BD%E4%BB%A4"><span class="nav-number">1.1.</span> <span class="nav-text">安装hexo命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8Bhexo%E7%89%88%E6%9C%AC"><span class="nav-number">1.2.</span> <span class="nav-text">查看hexo版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8D%9A%E5%AE%A2%E6%96%87%E4%BB%B6%E5%A4%B9"><span class="nav-number">1.3.</span> <span class="nav-text">初始化博客文件夹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85package.json%E4%B8%AD%E7%9A%84%E4%BE%9D%E8%B5%96"><span class="nav-number">1.4.</span> <span class="nav-text">安装package.json中的依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9_config.yml%E6%96%87%E4%BB%B6"><span class="nav-number">1.5.</span> <span class="nav-text">修改_config.yml文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9git-init%E6%96%87%E4%BB%B6"><span class="nav-number">1.6.</span> <span class="nav-text">修改git init文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%AF%E6%8C%81latex"><span class="nav-number">1.7.</span> <span class="nav-text">支持latex</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E9%A6%96%E9%A1%B5%E4%B8%8D%E6%98%BE%E7%A4%BA%E5%85%A8%E6%96%87"><span class="nav-number">1.8.</span> <span class="nav-text">设置首页不显示全文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%AF%BC%E8%88%AA%E6%A0%8F"><span class="nav-number">1.9.</span> <span class="nav-text">设置导航栏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-next-%E4%B8%BB%E9%A2%98%E9%85%8D%E7%BD%AE%E5%8F%B3%E4%BE%A7%E6%A0%8F%E7%9A%84%E5%88%86%E7%B1%BB%E5%92%8C%E6%A0%87%E7%AD%BE%E6%89%93%E5%BC%80%E7%9A%84%E6%98%AF%E7%A9%BA%E7%99%BD"><span class="nav-number">1.10.</span> <span class="nav-text">Hexo next
+主题配置右侧栏的分类和标签打开的是空白</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Boosting Boosting是集成学习的一类算法的总称，这类算法的流程可以概括为：首先从初始训练集中训练出一个基学习器，然后根据基学习器的表现对训练样本分布进行调整，使得之前做错的样本在后面受到更多的关注，然后基于调整后的样本分布来训练下一个基学习器，如此逐步增加基学习器，直到基学习器的数目达到了指定值T。 AdaBoost AdaBoost是Boosting方法中的一个代表，主要应用在二分">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Boosting总结">
+<meta property="og:url" content="https://sutomorrow.github.io/2020/05/28/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Boosting%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="Boosting Boosting是集成学习的一类算法的总称，这类算法的流程可以概括为：首先从初始训练集中训练出一个基学习器，然后根据基学习器的表现对训练样本分布进行调整，使得之前做错的样本在后面受到更多的关注，然后基于调整后的样本分布来训练下一个基学习器，如此逐步增加基学习器，直到基学习器的数目达到了指定值T。 AdaBoost AdaBoost是Boosting方法中的一个代表，主要应用在二分">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-05-28T08:56:22.000Z">
+<meta property="article:modified_time" content="2023-10-12T11:15:02.016Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2020/05/28/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Boosting%E6%80%BB%E7%BB%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Boosting总结 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2020/05/28/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Boosting%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Boosting总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-05-28 16:56:22" itemprop="dateCreated datePublished" datetime="2020-05-28T16:56:22+08:00">2020-05-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="boosting">Boosting</h1>
+<p>Boosting是集成学习的一类算法的总称，这类算法的流程可以概括为：首先从初始训练集中训练出一个基学习器，然后根据基学习器的表现对训练样本分布进行调整，使得之前做错的样本在后面受到更多的关注，然后基于调整后的样本分布来训练下一个基学习器，如此逐步增加基学习器，直到基学习器的数目达到了指定值T。</p>
+<h2 id="adaboost">AdaBoost</h2>
+<p>AdaBoost是Boosting方法中的一个代表，主要应用在二分类任务上，AdaBoost可以理解为将基学习进行线性组合得到最终的学习器，其中<span class="math inline">\(\alpha_t\)</span>是一个正数，表示第<span class="math inline">\(t\)</span>个基学习器的权重，如下所示。</p>
+<p><span class="math display">\[
+H(x) = \sum\limits_{t=1}^T \alpha_t h_t(x)
+\]</span></p>
+<p>AdaBoost使用指数损失函数作为优化目标，如下所示，其中<span class="math inline">\(f(x)\)</span>表示真实函数，<span class="math inline">\(f(x) \in \{1,
+-1\}\)</span>，优化这个指数损失函数其实相当于优化0/1损失函数（证明略），因为指数损失函数的平滑性质更利于优化过程，因此这里用指数损失函数，其中<span class="math inline">\(E\)</span>表示期望，<span class="math inline">\(D\)</span>表示原始数据的分布（每个数据出现的概率是<span class="math inline">\(\frac{1}{N}\)</span>，<span class="math inline">\(N\)</span>为数据个数）。</p>
+<p><span class="math display">\[
+l(H|D) = E_{x \sim D}[e^{-f(x)H(x)}]
+\]</span></p>
+<p>因此AdaBoost的目标可以表示为： <span class="math display">\[
+\mathop{\arg\min}\limits_{\alpha, h} E_{x \sim
+D}[e^{-f(x)(\sum\limits_{t=1}^T \alpha_t h_t(x))}]
+\]</span></p>
+<p>但是这个问题的直接求解非常困难，因此这里使用一种<strong>前向分步算法</strong>来解决这个问题，其思路是：每增加一个基学习器，就让损失函数减小一些，这样来逐步逼近最优解。</p>
+<p>假设现在已经得到<span class="math inline">\(m\)</span>个基学习器组成的集成学习器：<span class="math inline">\(H_m(x)\)</span>，现在下一个学习器（<span class="math inline">\(\alpha_{m+1}, h_{m+1}\)</span>）的目标可以表示为：
+<span class="math display">\[
+\begin{aligned}
+    &amp;\mathop{\arg\min}\limits_{\alpha_{m+1}, h_{m+1}} E_{x \sim
+D}[e^{-f(x)(H_m(x) + \alpha_{m+1} h_{m+1}(x))}]\\
+    &amp;=\mathop{\arg\min}\limits_{\alpha_{m+1}, h_{m+1}} E_{x \sim
+D}[e^{-f(x)(H_m(x)} \times e^{-f(x) \alpha_{m+1} h_{m+1}(x))}]
+\end{aligned}
+\]</span></p>
+<p><span class="math inline">\(H_m(x)\)</span>和<span class="math inline">\(\alpha_{m+1},
+h_{m+1}\)</span>无关，因此可以将<span class="math inline">\(e^{-f(x)(H_m(x)}\)</span>看做数据的一种权重，即使用<span class="math inline">\(e^{-f(x)(H_m(x)}\)</span>这一项来改变数据的分布，假设这样改变数据权重之后，得到的数据分布为<span class="math inline">\(D_m\)</span>，那么可以进一步将目标化简为：</p>
+<p><span class="math display">\[
+\mathop{\arg\min}\limits_{\alpha_{m+1}, h_{m+1}} E_{x \sim D_m}\
+e^{-f(x) \alpha_{m+1} h_{m+1}(x)}
+\]</span></p>
+<p>因为<span class="math inline">\(f(x)\)</span>和<span class="math inline">\(h_m{x}\)</span>的取值要么是1，要么是<span class="math inline">\(-1\)</span>，又因为<span class="math inline">\(\alpha_m\)</span>为正数，因此这里如果要最小化目标，可以先不考虑<span class="math inline">\(\alpha_m\)</span>，而是先最小化：</p>
+<p><span class="math display">\[
+\mathop{\arg\min}\limits_{h_{m+1}} E_{x \sim D_m}\ e^{-f(x)h_{m+1}(x)}
+\]</span></p>
+<p>因此第<span class="math inline">\(m+1\)</span>个基学习器的目标就是在数据分布<span class="math inline">\(D_m\)</span>上优化指数损失函数：</p>
+<p><span class="math display">\[
+\begin{aligned}
+h^\star_{m+1} &amp;= \mathop{\arg\min}\limits_{h_{m+1}} E_{x \sim D_m}\
+e^{-f(x)h_{m+1}(x)}\\
+&amp;=\mathop{\arg\min}\limits_{h_{m+1}} \sum\limits_{i=1}^N
+w_{mi}I\{f(x_i) \ne h_{m+1}(x_i)\}
+\end{aligned}
+\]</span></p>
+<p>用<span class="math inline">\(w_{mi} =
+\frac{e^{-f(x_i)(H_m(x_i)}}{\sum\limits_{i=1}^N
+e^{-f(x_i)(H_m(x_i)}}\)</span>来表示数据<span class="math inline">\(x_i\)</span>的权重，这里多出来了一个用于权重归一化的分母，但是不影响<span class="math inline">\(\alpha_{m+1}，h_{m+1}\)</span>的训练，只是后面推导会方便些。</p>
+<p>第<span class="math inline">\(m+1\)</span>个基学习器<span class="math inline">\(h^\star_{m+1}\)</span>得到之后，再来确定其权重<span class="math inline">\(\alpha_{m+1}\)</span>，其目标是：</p>
+<p><span class="math display">\[
+\begin{aligned}
+    &amp;\mathop{\arg\min}\limits_{\alpha_{m+1}} E_{x \sim D_m}\
+e^{-f(x) \alpha_{m+1} h^\star_{m+1}(x)}\\
+    &amp;=\mathop{\arg\min}\limits_{\alpha_{m+1}} \sum\limits_{i=1}^N
+w_{mi} e^{-f(x) \alpha_{m+1} h^\star_{m+1}(x)}
+\end{aligned}
+\]</span></p>
+<p>求损失函数<span class="math inline">\(l(\alpha_{m+1}) =
+\sum\limits_{i=1}^N w_{mi} e^{-f(x) \alpha_{m+1}
+h^\star_{m+1}(x)}\)</span>对于<span class="math inline">\(\alpha_{m+1}\)</span>的导数，可以得到：</p>
+<p><span class="math display">\[
+\begin{aligned}
+    \frac{\partial l(\alpha_{m+1})}{\partial \alpha_{m+1}} &amp;=
+\sum\limits_{f(x_i) \ne h_{m+1}(x_i)} w_{mi}e^{\alpha_{m+1}} -
+\sum\limits_{f(x_i) = h_{m+1}(x_i)} w_{mi}e^{-\alpha_{m+1}}
+\end{aligned}
+\]</span></p>
+<p>令导数<span class="math inline">\(\frac{\partial
+l(\alpha_{m+1})}{\partial \alpha_{m+1}} = 0\)</span>可得： <span class="math display">\[
+\begin{aligned}
+    \sum\limits_{f(x_i) \ne h_{m+1}(x_i)} w_{mi}e^{\alpha_{m+1}} &amp;=
+\sum\limits_{f(x_i) = h_{m+1}(x_i)} w_{mi}e^{-\alpha_{m+1}}\\
+    e^{2\alpha_{m+1}} &amp;= \frac{\sum\limits_{f(x_i) = h_{m+1}(x_i)}
+w_{mi}}{\sum\limits_{f(x_i) \ne h_{m+1}(x_i)} w_{mi}}
+\end{aligned}
+\]</span></p>
+<p>容易发现，因为<span class="math inline">\(w_{mi}\)</span>是经过了归一化的，因此<span class="math inline">\(\sum\limits_{i=1}^N w_{mi} =
+1\)</span>，那么可以得到<span class="math inline">\(\sum\limits_{f(x_i)
+= h_{m+1}(x_i)} w_{mi} = 1 - \sum\limits_{f(x_i) \ne h_{m+1}(x_i)}
+w_{mi}\)</span>，这里令<span class="math inline">\(\sum\limits_{f(x_i)
+\ne h_{m+1}(x_i)} w_{mi} = e_{m+1}\)</span>表示<span class="math inline">\(h_{m+1}\)</span>的损失，那么<span class="math inline">\(\sum\limits_{f(x_i) = h_{m+1}(x_i)}
+w_{mi}\)</span>可以表示为<span class="math inline">\(1 -
+e_{m+1}\)</span>，代入上面的导数为0的推导，可以得到：</p>
+<p><span class="math display">\[
+\begin{aligned}
+    e^{2\alpha_{m+1}} &amp;= \frac{1 - e_{m+1}}{e_{m+1}}\\
+    \Rightarrow \alpha_{m+1} &amp;= \frac{1}{2}\ln{\frac{1 -
+e_{m+1}}{e_{m+1}}}
+\end{aligned}
+\]</span></p>
+<p>因此AdaBoost的流程就很明确了：</p>
+<ol type="1">
+<li>在数据分布<span class="math inline">\(D_{m-1}\)</span>上训练基学习器<span class="math inline">\(h_m(x)\)</span></li>
+<li>计算<span class="math inline">\(e_m = \sum\limits_{f(x_i) \ne
+h_m(x_i)} w_{mi}\)</span></li>
+<li>确定当前基学习器的权重<span class="math inline">\(\alpha_m =
+\frac{1}{2}\ln{\frac{1 - e_m}{e_m}}\)</span></li>
+<li>得到新的学习器<span class="math inline">\(H_m(x) =
+\sum\limits_{i=1}^m \alpha_i h_i(x)\)</span></li>
+<li>如果学习器个数达到指定个数，则退出，否则使用新的学习器调整权重参数<span class="math inline">\(w_{mi} =
+\frac{e^{-f(x_i)(H_m(x_i)}}{\sum\limits_{i=1}^N
+e^{-f(x_i)(H_m(x_i)}}\)</span>得到分布<span class="math inline">\(D_m\)</span>，跳转到第一步，进行第<span class="math inline">\(m+1\)</span>个基学习器的训练。</li>
+</ol>
+<h2 id="提升树boosting-decision-tree-bdt">提升树（Boosting Decision
+Tree, BDT）</h2>
+<p>残差树是针对回归问题的一种boosting方法。其基学习器是基于CART算法的回归树（关于决策树的相关内容可以见我的另外一篇文章<a href="#">Post not found: 决策树总结 决策树总结</a>），模型依旧为加法模型、损失函数为平方函数、学习算法为前向分步算法。</p>
+<p>第<span class="math inline">\(m\)</span>个树模型基学习器可以表示为<span class="math inline">\(T(x; \theta_m)\)</span>，得到前<span class="math inline">\(m\)</span>个基学习器之后，残差树的预测函数可以看做：<span class="math inline">\(H_m(x) = \sum\limits_{i = 1}^mT(x;
+\theta_i)\)</span>，那么下一个树模型<span class="math inline">\(T(x;
+\theta_{m+1})\)</span>的目标损失函数可以写作： <span class="math display">\[
+\begin{aligned}
+L(y, T(x; \theta_{m+1})) &amp;= (y - H_m(x) - T(x; \theta_{m+1}))^2\\
+&amp;= (r - T(x; \theta_{m+1}))^2
+\end{aligned}
+\]</span> 这里的<span class="math inline">\(r\)</span>表示上一次的残差，这也是残差树名字的由来，例如现在需要拟合的值为20，第一次残差树拟合的值为18，那么第二次拟合的目标值为上一次的残差：20-18=2。</p>
+<h2 id="梯度提升决策树gradient-boosting-decision-tree-gbdt">梯度提升决策树（Gradient
+Boosting Decision Tree, GBDT）</h2>
+<p>在提升树的训练过程中，每次增加的决策树是以残差作为目标，并使用CART方法构造决策树，而在GBDT中，添加新的决策树是以损失函数在当前模型预测值下的负梯度作为目标，同样使用CART方法构造决策树。如果损失函数使用的是均方误差，那么新的决策树的优化目标其实和提升树类似。</p>
+<p>其实严格来将，GBDT并不是去拟合梯度，而是在进行决策树构建时，尽量将梯度相近的样本划分到同一个叶节点。</p>
+<p>例如对于损失函数<span class="math inline">\(\sum\limits_{i=1}^N
+l(y_i, \hat{y}_i)\)</span>，其中<span class="math inline">\(N\)</span>为样本个数，<span class="math inline">\(y_i\)</span>表示第<span class="math inline">\(i\)</span>个样本的目标值，<span class="math inline">\(\hat{y}_i\)</span>表示对第<span class="math inline">\(i\)</span>个样本的预测值，现在GBDT已经构造出了第<span class="math inline">\(t\)</span>颗决策树，目前的预测函数表示为<span class="math inline">\(F_t(x) = \sum\limits_{i=1}^t
+f_i(x)\)</span>，这里每个<span class="math inline">\(f_i(x)\)</span>表示一个决策树，现在的损失函数表示为<span class="math inline">\(\sum\limits_{i=1}^N l(y_i,
+F_t(x_i))\)</span>，现在要构造第<span class="math inline">\(t+1\)</span>颗树，那么其目标很简单，就是进一步使得损失函数<span class="math inline">\(\sum\limits_{i=1}^N l(y_i, F_t(x_i) +
+f_{t+1}(x_i))\)</span>最小，这里将损失函数进行一次泰勒展开，可以将损失函数近似为：</p>
+<p><span class="math display">\[
+\begin{aligned}
+    \sum\limits_{i=1}^N [l(y_i, F_t(x_i)) + \frac{\partial l(y_i,
+F_t(x_i))}{\partial F_t(x_i)}f_{t+1}(x_i)]
+\end{aligned}
+\]</span></p>
+<p>其中<span class="math inline">\(l(y_i, F_t(x_i))\)</span>的值和<span class="math inline">\(f_{t+1}\)</span>无关，因此<span class="math inline">\(f_{t+1}\)</span>只关心下面的表达式是否能够进一步将损失函数减小：</p>
+<p><span class="math display">\[
+\sum\limits_{i=1}^N \frac{\partial l(y_i, F_t(x_i))}{\partial
+F_t(x_i)}f_{t+1}(x_i)
+\]</span></p>
+<p>但是上面这个函数没有最小值，而且损失函数的一次展开是有误差的，<span class="math inline">\(f_{t+1}\)</span>的预测值越大，误差越大，不能按照最小化问题来处理，自然的一个想法是使得<span class="math inline">\(f_{t+1}(x_i) = -\frac{\partial l(y_i,
+F_t(x_i))}{\partial
+F_t(x_i)}\)</span>，因此GBDT这里将其简化为拟合负梯度。</p>
+<h3 id="xgboost">XGBoost</h3>
+<p>XGBoost是GBDT的一种改进版本。</p>
+<p>在已知第<span class="math inline">\(t\)</span>颗决策树时，下一个决策树的损失函数为：<span class="math inline">\(\sum\limits_{i=1}^N l(y_i, F_t(x_i) +
+f_{t+1}(x_i)) + \Omega(f_{t+1})\)</span>。</p>
+<p>这里损失函数中新增了正则化项<span class="math inline">\(\Omega(f_{t+1})\)</span>，可以表示为：<span class="math inline">\(\Omega(f_{t+1}) = \gamma T +
+\frac{1}{2}\lambda\sum\limits_{j=1}^Tw^2_j\)</span>，其中<span class="math inline">\(T\)</span>表示第<span class="math inline">\(t+1\)</span>颗树中的叶节点个数，而<span class="math inline">\(w_j\)</span>表示第<span class="math inline">\(j\)</span>个叶节点的输出值。</p>
+<p>在XGBoost中，对损失函数进行二次泰勒展开近似：</p>
+<p><span class="math display">\[
+\begin{aligned}
+    &amp;\sum\limits_{i=1}^N l(y_i, F_t(x_i) + f_{t+1}(x_i)) +
+\Omega(f_{t+1})\\
+    &amp;= \sum\limits_{i=1}^N l(y_i, F_t(x_i) + f_{t+1}(x_i)) + \gamma
+T + \frac{1}{2}\lambda\sum\limits_{j=1}^Tw^2_j\\
+    &amp;\simeq \sum\limits_{i=1}^N [l(y_i, F_t(x_i)) + \frac{\partial
+l(y_i, F_t(x_i))}{\partial F_t(x_i)}f_{t+1}(x_i) +
+\frac{1}{2}\frac{\partial^2 l(y_i, F_t(x_i))}{\partial^2
+F_t(x_i)}f^2_{t+1}(x_i)] + \gamma T +
+\frac{1}{2}\lambda\sum\limits_{j=1}^Tw^2_j\\
+    &amp;=constant + \sum\limits_{i=1}^N [\frac{\partial l(y_i,
+F_t(x_i))}{\partial F_t(x_i)}f_{t+1}(x_i) + \frac{1}{2}\frac{\partial^2
+l(y_i, F_t(x_i))}{\partial^2 F_t(x_i)}f^2_{t+1}(x_i)] + \gamma T +
+\frac{1}{2}\lambda\sum\limits_{j=1}^Tw^2_j\\
+    &amp;=constant + \sum\limits_{j=1}^T [\sum\limits_{i\in
+I_j}\frac{\partial l(y_i, F_t(x_i))}{\partial F_t(x_i)}w_j +
+\sum\limits_{i\in I_j}\frac{1}{2}\frac{\partial^2 l(y_i,
+F_t(x_i))}{\partial^2 F_t(x_i)}w_j^2] + \gamma T +
+\frac{1}{2}\lambda\sum\limits_{j=1}^Tw^2_j\\
+    &amp;=constant + \sum\limits_{j=1}^T[\sum\limits_{i\in I_j} g_i w_j
++ \frac{1}{2}(\sum\limits_{i\in I_j}h_i + \lambda)w^2_j] + \gamma T\\
+    &amp;=constant + \sum\limits_{j=1}^T[G_j w_j + \frac{1}{2}(H_j +
+\lambda)w^2_j] + \gamma T
+\end{aligned}
+\]</span> 这里的化简过程中，<span class="math inline">\(I_j\)</span>表示属于第<span class="math inline">\(j\)</span>个叶节点的样本id的集合，<span class="math inline">\(g_i\)</span>表示第<span class="math inline">\(i\)</span>个样本在<span class="math inline">\(H_t(x_i)\)</span>这个预测结果下的一阶导数：<span class="math inline">\(\frac{\partial l(y_i, F_t(x_i))}{\partial
+F_t(x_i)}\)</span>，<span class="math inline">\(h_i\)</span>表示第<span class="math inline">\(i\)</span>个样本在<span class="math inline">\(F_t(x_i)\)</span>这个预测结果下的二阶导数：<span class="math inline">\(\frac{\partial^2 l(y_i, F_t(x_i))}{\partial^2
+F_t(x_i)}\)</span>，<span class="math inline">\(G_j\)</span>表示属于第<span class="math inline">\(j\)</span>个叶节点的样本的导数之和，<span class="math inline">\(H_j\)</span>表示属于第<span class="math inline">\(j\)</span>个叶节点的样本的二阶导数之和。</p>
+<p>得到上面的化简结果之后，首先对<span class="math inline">\(w_j\)</span>做个处理，令上式对<span class="math inline">\(w_j\)</span>的导数为0，可以得到<span class="math inline">\(w^\star_j = -\frac{G_j}{H_j +
+\lambda}\)</span>就是第<span class="math inline">\(j\)</span>个叶节点的预测值的最优解，因此上式可以进一步写成：</p>
+<p><span class="math display">\[
+constant - \sum\limits_{j=1}^T \frac{1}{2}\frac{G^2_j}{H_j + \lambda} +
+\gamma T
+\]</span></p>
+<p>XGBoost在构造新的决策树时，和CART类似，将当前节点分裂成两个子节点，但是选择特征以及特征的最优划分，不是使用Gini_index，为了最小化上面的目标，XGBoost在划分新的叶节点时，判断是否将叶节点<span class="math inline">\(j\)</span>划分为新的左节点和右节点时，主要考察下式：
+<span class="math display">\[
+\begin{aligned}
+&amp;constant - \frac{1}{2}\frac{G^2_j}{H_j + \lambda} + \gamma T -
+(constant - \frac{1}{2}\frac{G^2_L}{H_L + \lambda} -
+\frac{1}{2}\frac{G^2_R}{H_R + \lambda} + \gamma(T+1))\\
+&amp;= \frac{1}{2}( \frac{G^2_L}{H_L + \lambda} + \frac{G^2_R}{H_R +
+\lambda} - \frac{G^2_j}{H_j + \lambda}) - \gamma    
+\end{aligned}
+\]</span></p>
+<p>这里<span class="math inline">\(G_L，
+H_L\)</span>分别表示划分出的左叶节点的导数和二阶导数和，<span class="math inline">\(G_R，
+H_R\)</span>分别表示划分出的右叶节点的导数和二阶导数和。上式的结果表示将叶节点<span class="math inline">\(j\)</span>划分为新的左节点和右节点时的增益情况。如果上式为正，则表示新划分节点有助于降低损失函数值，所以这里创建新节点时，遍历所有特征以及特征的划分位置，找到使得上式为正且最大的划分来创建新节点，如果没有能够使得上式为正的划分，那么停止继续添加叶节点。</p>
+<p>按照上面的方法，逐个构造新的决策树以降低损失函数值，就是XGBoost的主要工作原理。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/19/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/hexo%E5%AE%89%E8%A3%85/" rel="prev" title="hexo安装记录">
+      <i class="fa fa-chevron-left"></i> hexo安装记录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/29/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%86%B3%E7%AD%96%E6%A0%91%E6%80%BB%E7%BB%93/" rel="next" title="决策树总结">
+      决策树总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#boosting"><span class="nav-number">1.</span> <span class="nav-text">Boosting</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#adaboost"><span class="nav-number">1.1.</span> <span class="nav-text">AdaBoost</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E5%8D%87%E6%A0%91boosting-decision-tree-bdt"><span class="nav-number">1.2.</span> <span class="nav-text">提升树（Boosting Decision
+Tree, BDT）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A2%AF%E5%BA%A6%E6%8F%90%E5%8D%87%E5%86%B3%E7%AD%96%E6%A0%91gradient-boosting-decision-tree-gbdt"><span class="nav-number">1.3.</span> <span class="nav-text">梯度提升决策树（Gradient
+Boosting Decision Tree, GBDT）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#xgboost"><span class="nav-number">1.3.1.</span> <span class="nav-text">XGBoost</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

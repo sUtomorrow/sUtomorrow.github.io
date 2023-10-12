@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="2019-06-20 课程学习在弱监督学习中的应用 在网上看到了关于CVPR2017 WebVision图片分类竞赛冠军的技术分享，大致整理其主要思路。 这个比赛的数据非常多，但是标签可能存在问题，要求是在存在问题标签的数据中进行模型训练。 这里主要使用了一种课程学习的思想，先让模型学习简单的样本，然后再让其学习较困难的样本，循序渐进，得到最终的训练模型。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习笔记-2019-06">
+<meta property="og:url" content="https://sutomorrow.github.io/2019/06/20/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-06/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="2019-06-20 课程学习在弱监督学习中的应用 在网上看到了关于CVPR2017 WebVision图片分类竞赛冠军的技术分享，大致整理其主要思路。 这个比赛的数据非常多，但是标签可能存在问题，要求是在存在问题标签的数据中进行模型训练。 这里主要使用了一种课程学习的思想，先让模型学习简单的样本，然后再让其学习较困难的样本，循序渐进，得到最终的训练模型。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-06-20T11:13:39.000Z">
+<meta property="article:modified_time" content="2023-10-12T11:15:02.038Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="学习笔记，杂项">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2019/06/20/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-06/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>学习笔记-2019-06 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/06/20/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-06/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          学习笔记-2019-06
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-06-20 19:13:39" itemprop="dateCreated datePublished" datetime="2019-06-20T19:13:39+08:00">2019-06-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="section">2019-06-20</h1>
+<h2 id="课程学习在弱监督学习中的应用">课程学习在弱监督学习中的应用</h2>
+<p>在网上看到了关于CVPR2017
+WebVision图片分类竞赛冠军的技术分享，大致整理其主要思路。</p>
+<p>这个比赛的数据非常多，但是标签可能存在问题，要求是在存在问题标签的数据中进行模型训练。</p>
+<p>这里主要使用了一种课程学习的思想，先让模型学习简单的样本，然后再让其学习较困难的样本，循序渐进，得到最终的训练模型。</p>
+<p>难点在于没有先验知识的情况下定义数据集或者图片的难易程度。</p>
+<p>其基本思想是在同一个类别的图像的特征空间中，越密集的地方的图像特征越相似，表示图片类别越可能正确，根据这个思想将图片分类成不同的难易程度，分步，使用不同权重对待不同数据，进行模型训练。</p>
+<p>这里先介绍一种样本分析方法density-distance：对于样本<span class="math inline">\(P_i\)</span>，其特征<span class="math inline">\(f(P_i)\)</span>，计算所有样本之间的特征距离矩阵：<span class="math inline">\(D_{ij} = {||f(P_i) - f(P_j)||} ^
+2\)</span>，定义样本密度：<span class="math inline">\(\rho_i = \sum_i
+X(D_{ij} - d_c) \quad X(d) = \begin{cases} 1 &amp; d &lt; 0 \\ 0 &amp;
+other \end{cases}\)</span>，其中<span class="math inline">\(d_c\)</span>是一个超参数，
+计算每个样本的密度距离值：<span class="math inline">\(\delta_i =
+\begin{cases}min_{j:\rho_j &gt; \rho_i}(D_{ij}) &amp; if \quad \exists j
+s.t. \rho_j &gt; \rho_i \\ max(D_{ij}) &amp; otherwise
+\end{cases}\)</span>，将<span class="math inline">\(\rho_i\)</span>和<span class="math inline">\(\delta_i\)</span>相乘，值越大的说明可能在聚类中心，数据标签越可能正确。</p>
+<p>对数据进行分类的具体实现步骤如下：</p>
+<ul>
+<li>设计课程
+<ul>
+<li>使用所有数据(<span class="math inline">\(P_i\)</span>)训练一个特征提取模型：<span class="math inline">\(f\)</span></li>
+<li>对所有样本的进行特征提取：<span class="math inline">\(f(P_i)\)</span></li>
+<li>对每个类别的图片分别进行density-distance分析</li>
+<li>按照<span class="math inline">\(\rho_i \times
+\delta_i\)</span>结果划分出三个子类，分别代表难易度不同的图片，作为先后训练的数据</li>
+</ul></li>
+<li>课程训练
+<ul>
+<li>首先使用第一类最简单的数据进行训练</li>
+<li>为第二类数据设置权重0.5，继续训练</li>
+<li>为第三类数据设置权重0.5，继续训练</li>
+</ul></li>
+</ul>
+<h1 id="section-1">2019-06-29</h1>
+<h2 id="bcece两个分类损失与激活函数的关系">BCE、CE两个分类损失与激活函数的关系</h2>
+<p>网上都说BCE用于二分类，CE用于多分类，我认为这里有些问题可以讨论，下面的例子基于tensorflow和keras。</p>
+<p>BCE和CE是常用的分类损失函数，计算公式如下。 <span class="math display">\[
+\begin{aligned}
+    BCE(x)_i &amp;= -(y_i log(f(x)_i) + (1 - y_i) log(1 - f(x)_i)) \\
+    BCE_{loss}(x) &amp;= \frac{\sum_{i=0}^{C}BCE(x)_i}{C}\\
+    CE_{loss}(x) &amp;= CE(x) = \sum_{i=0}^{C}-y_i log(f(x)_i)
+\end{aligned}
+\]</span>
+从上面可以看出，CE是个标量，直接作为loss函数使用，而BCE计算出的是一个向量，在keras的实现中，BCE损失最终需要对每个类别求平均才能作为loss函数使用。</p>
+<p>而对于一个batch的数据，在keras实现中，BCE和CE都是直接对每个样本求平均。
+<span class="math display">\[
+\begin{aligned}
+    BCE_{final} &amp;= \frac{\sum_{b=1}^{N} BCE_{loss}(x^{(b)}}{N}\\
+    CE_{final} &amp;= \frac{\sum_{b=1}^{N} CE_{loss}(x^{(b)}}{N}
+\end{aligned}
+\]</span></p>
+<p>对于一般的分类任务，最终都是一个全连接层变为输出向量<span class="math inline">\(O\)</span>，之后再经过sigmoid或者softmax变为预测概率向量。</p>
+<p><span class="math display">\[
+\begin{aligned}
+    O_{sigmoid} = [\frac{1}{1 + e^{-O_1}} \quad \frac{1}{1 + e^{-O_2}}
+\quad ... \quad \frac{1}{1 + e^{-O_c}}]\\
+    O_{softmax} = [\frac{O_1}{\sum_{j = 1}^c O_j} \quad
+\frac{O_2}{\sum_{j = 1}^c O_j} \quad ... \quad \frac{O_c}{\sum_{j = 1}^c
+O_j}]
+\end{aligned}
+\]</span></p>
+<p>这里要注意的是，如果输出的损失函数是用的sigmoid，那么输出向量中，每个元素是相互独立的，如果这个时候使用CE作为损失函数，CE只计算了<span class="math inline">\(y_i\)</span>为1的地方的损失，对于<span class="math inline">\(y_i\)</span>为0的地方不考虑，所以可能导致模型训练出现问题。</p>
+<p>tensorflow作为后端的keras定义的两种损失函数见下方代码，一般使用时要注意from_logits这个参数，如果为False，则binary_crossentropy默认模型的输出是<span class="math inline">\(O_{sigmoid}\)</span>而categorical_crossentropy默认模型的输出的是<span class="math inline">\(O_{softmax}\)</span>BCE会尝试将<span class="math inline">\(O_{sigmoid}\)</span>还原成<span class="math inline">\(O\)</span>，然后调用tf.nn.sigmoid_cross_entropy_with_logits这个方法，而对于CE,因为softmax无法还原，因此keras直接自己写了个损失函数，否则会直接调用softmax_cross_entropy_with_logits这个方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">binary_crossentropy</span>(<span class="params">target, output, from_logits=<span class="literal">False</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;Binary crossentropy between an output tensor and a target tensor.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    # Arguments</span></span><br><span class="line"><span class="string">        target: A tensor with the same shape as `output`.</span></span><br><span class="line"><span class="string">        output: A tensor.</span></span><br><span class="line"><span class="string">        from_logits: Whether `output` is expected to be a logits tensor.</span></span><br><span class="line"><span class="string">            By default, we consider that `output`</span></span><br><span class="line"><span class="string">            encodes a probability distribution.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    # Returns</span></span><br><span class="line"><span class="string">        A tensor.</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># Note: tf.nn.sigmoid_cross_entropy_with_logits</span></span><br><span class="line">    <span class="comment"># expects logits, Keras expects probabilities.</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> from_logits:</span><br><span class="line">        <span class="comment"># transform back to logits</span></span><br><span class="line">        _epsilon = _to_tensor(epsilon(), output.dtype.base_dtype)</span><br><span class="line">        output = tf.clip_by_value(output, _epsilon, <span class="number">1</span> - _epsilon)</span><br><span class="line">        output = tf.log(output / (<span class="number">1</span> - output))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> tf.nn.sigmoid_cross_entropy_with_logits(labels=target,</span><br><span class="line">                                                   logits=output)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">categorical_crossentropy</span>(<span class="params">target, output, from_logits=<span class="literal">False</span>, axis=-<span class="number">1</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;Categorical crossentropy between an output tensor and a target tensor.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    # Arguments</span></span><br><span class="line"><span class="string">        target: A tensor of the same shape as `output`.</span></span><br><span class="line"><span class="string">        output: A tensor resulting from a softmax</span></span><br><span class="line"><span class="string">            (unless `from_logits` is True, in which</span></span><br><span class="line"><span class="string">            case `output` is expected to be the logits).</span></span><br><span class="line"><span class="string">        from_logits: Boolean, whether `output` is the</span></span><br><span class="line"><span class="string">            result of a softmax, or is a tensor of logits.</span></span><br><span class="line"><span class="string">        axis: Int specifying the channels axis. `axis=-1`</span></span><br><span class="line"><span class="string">            corresponds to data format `channels_last`,</span></span><br><span class="line"><span class="string">            and `axis=1` corresponds to data format</span></span><br><span class="line"><span class="string">            `channels_first`.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    # Returns</span></span><br><span class="line"><span class="string">        Output tensor.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    # Raises</span></span><br><span class="line"><span class="string">        ValueError: if `axis` is neither -1 nor one of</span></span><br><span class="line"><span class="string">            the axes of `output`.</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    output_dimensions = <span class="built_in">list</span>(<span class="built_in">range</span>(<span class="built_in">len</span>(output.get_shape())))</span><br><span class="line">    <span class="keyword">if</span> axis != -<span class="number">1</span> <span class="keyword">and</span> axis <span class="keyword">not</span> <span class="keyword">in</span> output_dimensions:</span><br><span class="line">        <span class="keyword">raise</span> ValueError(</span><br><span class="line">            <span class="string">&#x27;&#123;&#125;&#123;&#125;&#123;&#125;&#x27;</span>.<span class="built_in">format</span>(</span><br><span class="line">                <span class="string">&#x27;Unexpected channels axis &#123;&#125;. &#x27;</span>.<span class="built_in">format</span>(axis),</span><br><span class="line">                <span class="string">&#x27;Expected to be -1 or one of the axes of `output`, &#x27;</span>,</span><br><span class="line">                <span class="string">&#x27;which has &#123;&#125; dimensions.&#x27;</span>.<span class="built_in">format</span>(<span class="built_in">len</span>(output.get_shape()))))</span><br><span class="line">    <span class="comment"># Note: tf.nn.softmax_cross_entropy_with_logits</span></span><br><span class="line">    <span class="comment"># expects logits, Keras expects probabilities.</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> from_logits:</span><br><span class="line">        <span class="comment"># scale preds so that the class probas of each sample sum to 1</span></span><br><span class="line">        output /= tf.reduce_sum(output, axis, <span class="literal">True</span>)</span><br><span class="line">        <span class="comment"># manual computation of crossentropy</span></span><br><span class="line">        _epsilon = _to_tensor(epsilon(), output.dtype.base_dtype)</span><br><span class="line">        output = tf.clip_by_value(output, _epsilon, <span class="number">1.</span> - _epsilon)</span><br><span class="line">        <span class="keyword">return</span> - tf.reduce_sum(target * tf.log(output), axis)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> tf.nn.softmax_cross_entropy_with_logits(labels=target,</span><br><span class="line">                                                       logits=output)</span><br></pre></td></tr></table></figure>
+<p>最后，总结一下就是：<strong>BCE loss不是不能用于多分类, 但CE
+loss不适合单输出的分类, BCE loss最好用sigmoid激活函数，而CE
+loss最好用softmax函数。</strong></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%8C%E6%9D%82%E9%A1%B9/" rel="tag"># 学习笔记，杂项</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/" rel="prev" title="论文阅读《CondenseNet: An Efficient DenseNet using Learned Group Convolutions》">
+      <i class="fa fa-chevron-left"></i> 论文阅读《CondenseNet: An Efficient DenseNet using Learned Group Convolutions》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/04/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-07/" rel="next" title="学习笔记-2019-07">
+      学习笔记-2019-07 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#section"><span class="nav-number">1.</span> <span class="nav-text">2019-06-20</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BE%E7%A8%8B%E5%AD%A6%E4%B9%A0%E5%9C%A8%E5%BC%B1%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">课程学习在弱监督学习中的应用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section-1"><span class="nav-number">2.</span> <span class="nav-text">2019-06-29</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#bcece%E4%B8%A4%E4%B8%AA%E5%88%86%E7%B1%BB%E6%8D%9F%E5%A4%B1%E4%B8%8E%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">2.1.</span> <span class="nav-text">BCE、CE两个分类损失与激活函数的关系</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

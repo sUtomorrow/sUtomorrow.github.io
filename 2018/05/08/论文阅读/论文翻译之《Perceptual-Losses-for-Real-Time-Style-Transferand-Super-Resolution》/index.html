@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在实时风格转换和超分辨率上使用感知损失函数 作者：Justin Johnson, Alexandre Alahi, and Li Fei-Fei 摘要 本文研究图像转换问题，即将一个输入图像转化到一个输出图像，最近在这个问题上使用的典型方法是训练一个使用在输出和目标图像上逐像素计算损失函数（per-pixel loss）的卷积神经网络。有研究表明高质量的图像可以通过基于预训练网络提取的高级特征定义">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文翻译之《Perceptual Losses for Real-Time Style Transferand Super-Resolution》">
+<meta property="og:url" content="https://sutomorrow.github.io/2018/05/08/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E4%B9%8B%E3%80%8APerceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution%E3%80%8B/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="在实时风格转换和超分辨率上使用感知损失函数 作者：Justin Johnson, Alexandre Alahi, and Li Fei-Fei 摘要 本文研究图像转换问题，即将一个输入图像转化到一个输出图像，最近在这个问题上使用的典型方法是训练一个使用在输出和目标图像上逐像素计算损失函数（per-pixel loss）的卷积神经网络。有研究表明高质量的图像可以通过基于预训练网络提取的高级特征定义">
+<meta property="og:locale">
+<meta property="og:image" content="https://sutomorrow.github.io/2018/05/08/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E4%B9%8B%E3%80%8APerceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution%E3%80%8B/fig1.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2018/05/08/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E4%B9%8B%E3%80%8APerceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution%E3%80%8B/fig2.png">
+<meta property="article:published_time" content="2018-05-08T12:24:09.000Z">
+<meta property="article:modified_time" content="2023-10-12T12:19:45.469Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="论文翻译">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sutomorrow.github.io/2018/05/08/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E4%B9%8B%E3%80%8APerceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution%E3%80%8B/fig1.png">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2018/05/08/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E4%B9%8B%E3%80%8APerceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution%E3%80%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>论文翻译之《Perceptual Losses for Real-Time Style Transferand Super-Resolution》 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2018/05/08/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91%E4%B9%8B%E3%80%8APerceptual-Losses-for-Real-Time-Style-Transferand-Super-Resolution%E3%80%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          论文翻译之《Perceptual Losses for Real-Time Style Transferand Super-Resolution》
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2018-05-08 20:24:09" itemprop="dateCreated datePublished" datetime="2018-05-08T20:24:09+08:00">2018-05-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 20:19:45" itemprop="dateModified" datetime="2023-10-12T20:19:45+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="在实时风格转换和超分辨率上使用感知损失函数">在实时风格转换和超分辨率上使用感知损失函数</h1>
+<h3 id="作者justin-johnson-alexandre-alahi-and-li-fei-fei">作者：Justin
+Johnson, Alexandre Alahi, and Li Fei-Fei</h3>
+<h3 id="摘要">摘要</h3>
+<p>本文研究图像转换问题，即将一个输入图像转化到一个输出图像，最近在这个问题上使用的典型方法是训练一个使用在输出和目标图像上逐像素计算损失函数（per-pixel
+loss）的卷积神经网络。有研究表明高质量的图像可以通过基于预训练网络提取的高级特征定义和优化感知损失函数（perceptual
+loss）来生成。我们结合这些方法的有点，并且提出使用干事损失函数来训练前向网络来做图像风格转换任务，我们展示一个由Gatys等人提出的训练于解决优化问题的前向网络来做图像风格转换器的结果，相比于这个方法，我们的方法可以得到质量大致相同的图像，但是我们的速度比这个方法大约快三个数量级。我们还在单图像超分辨率问题上进行的实验，将逐像素计算的损失函数替换为感知损失函数，我们得到了视觉上令人满意的效果。</p>
+<h3 id="关键词">关键词：</h3>
+<p>风格转换器，超分辨率，深度学习</p>
+<h2 id="简介">简介</h2>
+<p>许多经典问题可以被构筑为图像风格转换任务，即一个系统接收一些输入图像，并且将其转换到输出图像，图像处理的例子包括去躁、超分辨率、着色，这些问题中，输入图像是一个低质量图像（噪声多、分辨率低或者灰度图），而输出是一个高质量彩色图像。机器视觉问题中的例子包括语义分隔和深度估计（depth
+estimation）,这里的输入时彩色图像，输出图像编码了场景中的语义或者集合信息。
+一个解决图像转换任务的方法是用有监督方法训练一个前向卷积神经网络，使用逐像素计算的损失函数来测量输出和目标图像之间的距离，例如被Dong等人用于超分辨率问题[1]，被Cheng等人用于着色问题[2,3]，被Long等人用于分割问题[4]，被Eigen等人用于深度和表面正则预测（depth
+and surface normal
+prediction）[5,6]，这些方法在测试阶段非常高效，仅仅需要一个前向的通过一个训练好的网络。</p>
+<p>然而，使用这些方法逐像素计算的损失函数不能捕获输出图像和目标图像感知上的差异。例如，考虑两个在对方基础上平移一个像素的独立图像，虽然他们在感知上相似，但是在他们之间按照逐像素计算的损失函数来度量差距的话，会显示两个图像非常不同。</p>
+<figure>
+<img src="fig1.png" alt="fig.1 风格转换（上）和4倍超分辨率（下）结果示例，在风格转换上，我们实现了和Gatys等人相似的结果[11],但是比他们的速度快三个数量级。在超分辨率问题上，我们的方法使用感知损失函数可以比其他使用逐像素损失函数的方法更好的重构细节">
+<figcaption aria-hidden="true">fig.1
+风格转换（上）和4倍超分辨率（下）结果示例，在风格转换上，我们实现了和Gatys等人相似的结果[11],但是比他们的速度快三个数量级。在超分辨率问题上，我们的方法使用感知损失函数可以比其他使用逐像素损失函数的方法更好的重构细节</figcaption>
+</figure>
+<p>最近的研究显示使用感知损失函数生成的高质量图像不是基于图像像素之间的差异，而是基于预训练的卷积神经网络提取的图像的高级特征之间的差异。图像通过最小化一个损失函数来生成。这种策略已经被Mahendran等人用于特征反演[7]，被Simonyan和Yosinski等人用于特征可视化[8][9],被Gatys等人用于上下文分析和风格转换[10][11][12]，这些方法生成了高质量的图像，但是在用于解决一个优化问题的时候很慢。</p>
+<p>在本文中我们结合了两种方法的优点，我们训练一个用于图像转换任务的前向转换网络，但是不仅只是在低级的像素信息上使用逐像素的损失函数，我们在预训练的损失网络提取出的高级特征上使用感知损失函数。在训练过程中，感知损失函数在测试实时转换网络运行时在度量图像相似度的效果上比逐像素损失函数有更好的鲁棒性。</p>
+<p>我们在两个任务上进行了实验：风格转换和单图像超分辨率，两者本质上是病态的。在风格转换任务上，这里没有唯一正确的输出，而在超分辨率图像上，一个低分辨率输入可以生成很多高分辨率输出图像。l两个任务都需要在输入图像上进行语意推理。在风格转换任务中，虽然在纹理和颜色上有很大变化，但输出必须在语义上和输入相似。在超分辨率任务上，需要从视觉模糊的低分辨率图片上推断出细节。原则上，训练好的用于这两个任务的一个大容量的神经网络可以隐式的学习到推断相关的语义；然而实际上我们不需要从头学习，使用感知损失函数允许语义转换的知识从损失网络传递到转换网络。</p>
+<p>在图像风格转换优化问题[11]上；我们的结果在使用目标函数值衡量的质量上和[11]相似，但是快了三个数量级。对于超分辨率问题，我们发现使用感知损失函数替代逐像素计算的损失给出了在放大4倍和8倍的超分辨率问题上的令人满意的结果。</p>
+<h2 id="相关工作">相关工作</h2>
+<pre><code> 前馈的图像转换</code></pre>
+<p>在最近几年中，很多不同的图像转换任务使用逐像素计算的损失函数来训练。</p>
+<p>语义分隔方法[4,6,14-17]使用一个逐像素的分类损失，通过全卷积的方式在输入图像上运行网络来产生密集的场景标签，最近的深度和表层正态估计（normal
+estimation）方法[6,19]都是相似的，依靠使用一个前向的用逐像素的回归[5,6]或者分类损失函数[19]训练的前向卷积网络。一些方法在使用逐像素损失函数之外还使用图像梯度的惩罚[6]，将复发层和网络的其余部分一起训练来构建CRF推断[17]。或者使用一个CRF损失层[8]来加强输出中的局部一致性。</p>
+<p>我们的风格转换网络的架构来源于[4]和[16]，使用网络内下采样来减少
+特征映射的空间范围，然后进行网络内上采样来产生最终的输出图像。</p>
+<pre><code> 感知优化</code></pre>
+<p>最近大量的论文已经着手使用感知目标来优化图像的生成，依赖于从一个卷积网络中提取出的高级特征。图像可以根据最大化分类预测值[8,9]或者为了理解函数编码而是用个别特征[9]的方向来生成。相似的优化技术可以被用于生成高度混淆的图片[20,21]。</p>
+<p>Mahendran和Vedaldi[7]使用最小化一个特征重构损失反转卷积网络的特征来理解不同网络层保留的图像信息;相似的方法更早被用于反转局部二值描述[22.23]以及HOG特征[24]</p>
+<p>Dosovitskiy和Brox的研究[25]和我们非常相关，他们训练了一个前向神经网络来反转卷积特征，迅速的估计一个由[7]提出的优化问题的解。然而，他们的前向网络使用的是逐像素计算的重构损失，而我们直接优化了[7]中的特征重构损失。</p>
+<pre><code> 风格转换</code></pre>
+<p>Gatys等人[11]实现了艺术风格的转换，将一个图片的内容通过最小化[7]中的特征重构损失函数以及一个同样基于预训练的卷积网络提取的特征的风格重构损失来实现和另一个图片的风格结合；在这之前，有人用类似的方法来做纹理合成[10]。他们在这个问题上得到了非常好的结果，但是由于优化问题的每一步都需要在预训练的网络上前向和反向传播共两次，他们的方法需要非常大的计算量。为了减少这个计算负担，我们训练了一个前向网络来迅速估计他们的优化问题的解。论文[26,27]和我们同时提出了前向方法来快速转换图像风格。</p>
+<pre><code> 图像超分辨率</code></pre>
+<p>图像差分辨率问题是产生了许多技术的一个经典问题。Yang等人[28]在广泛采用卷积神经网络之前，对之前的技术做了广泛的评估。他们将超分辨率技术分组为基于预测的技术（biliner，bicubic，Lanczos，[29]）,基于边界的方法[30,31]，统计方法[32-34]，贴片型方法[30,35-41]，以及稀疏字典方法[42,43]。最近论文[1]在但图像超分辨率问题上使用了一个使用逐像素欧几里得损失的三层卷积神经网络实现了非常好的效果。其他近期的方法包括[44-46]。</p>
+<h2 id="方法">方法</h2>
+<p>如fig.2所示，我们的系统包括两个部分：一个图像转换网络以及一个损失网络</p>
+<figure>
+<img src="fig2.png" alt="fig.2 系统概况，我们训练了一个图像转换网络来把输入图像转换到输出图像。我们使用一个预训练的图像分类网络来定义测量图像之间内容和风格上感知差异的感知损失函数。这个感知网络在训练过程中是固定不变的">
+<figcaption aria-hidden="true">fig.2
+系统概况，我们训练了一个图像转换网络来把输入图像转换到输出图像。我们使用一个预训练的图像分类网络来定义测量图像之间内容和风格上感知差异的感知损失函数。这个感知网络在训练过程中是固定不变的</figcaption>
+</figure>
+<p>...待完成</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%BA%E6%96%87%E7%BF%BB%E8%AF%91/" rel="tag"># 论文翻译</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/03/10/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/%E5%9C%A8win10%E4%B8%8A%E6%90%AD%E5%BB%BApython3%E5%92%8Ctensorflow-gpu%E7%8E%AF%E5%A2%83/" rel="prev" title="在win10上搭建python3和tensorflow-gpu环境">
+      <i class="fa fa-chevron-left"></i> 在win10上搭建python3和tensorflow-gpu环境
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/02/13/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-01/" rel="next" title="学习笔记_2019-01">
+      学习笔记_2019-01 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9C%A8%E5%AE%9E%E6%97%B6%E9%A3%8E%E6%A0%BC%E8%BD%AC%E6%8D%A2%E5%92%8C%E8%B6%85%E5%88%86%E8%BE%A8%E7%8E%87%E4%B8%8A%E4%BD%BF%E7%94%A8%E6%84%9F%E7%9F%A5%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">1.</span> <span class="nav-text">在实时风格转换和超分辨率上使用感知损失函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E8%80%85justin-johnson-alexandre-alahi-and-li-fei-fei"><span class="nav-number">1.0.1.</span> <span class="nav-text">作者：Justin
+Johnson, Alexandre Alahi, and Li Fei-Fei</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.0.2.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E8%AF%8D"><span class="nav-number">1.0.3.</span> <span class="nav-text">关键词：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B7%A5%E4%BD%9C"><span class="nav-number">1.2.</span> <span class="nav-text">相关工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95"><span class="nav-number">1.3.</span> <span class="nav-text">方法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

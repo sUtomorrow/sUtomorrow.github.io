@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="主要工作 本文主要贡献是提出了一种比ShuffleNets还要高效很多的CondenseNets。 主要思想 该论文认为普通的卷积模型:layer-by-layer的连接模式，模型需要在每一层都去重复最前面层的特征，因此DenseNet的短连接所引导的特征重用对这个问题有一定的缓解，但论文中猜想对于DenseNet这样的密集短连接，会引入一些冗余的浅层特征，因此论文提出了一种方法来减少这种冗余，并">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文阅读《CondenseNet: An Efficient DenseNet using Learned Group Convolutions》">
+<meta property="og:url" content="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="主要工作 本文主要贡献是提出了一种比ShuffleNets还要高效很多的CondenseNets。 主要思想 该论文认为普通的卷积模型:layer-by-layer的连接模式，模型需要在每一层都去重复最前面层的特征，因此DenseNet的短连接所引导的特征重用对这个问题有一定的缓解，但论文中猜想对于DenseNet这样的密集短连接，会引入一些冗余的浅层特征，因此论文提出了一种方法来减少这种冗余，并">
+<meta property="og:locale">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/GroupConv_Learn_Test.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/训练loss和学习速率.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/特征凝聚因子实验.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/分组个数实验.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/特征凝聚因子效率对比.png">
+<meta property="article:published_time" content="2019-06-04T06:27:49.000Z">
+<meta property="article:modified_time" content="2023-10-12T11:15:02.056Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="论文阅读">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/GroupConv_Learn_Test.png">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>论文阅读《CondenseNet: An Efficient DenseNet using Learned Group Convolutions》 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2019/06/04/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ACondenseNet-An-Efficient-DenseNet-using-Learned-Group-Convolutions%E3%80%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          论文阅读《CondenseNet: An Efficient DenseNet using Learned Group Convolutions》
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2019-06-04 14:27:49" itemprop="dateCreated datePublished" datetime="2019-06-04T14:27:49+08:00">2019-06-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="主要工作">主要工作</h2>
+<p>本文主要贡献是提出了一种比ShuffleNets还要高效很多的CondenseNets。</p>
+<h2 id="主要思想">主要思想</h2>
+<p>该论文认为普通的卷积模型:layer-by-layer的连接模式，模型需要在每一层都去重复最前面层的特征，因此DenseNet的短连接所引导的特征重用对这个问题有一定的缓解，但论文中猜想对于DenseNet这样的密集短连接，会引入一些冗余的浅层特征，因此论文提出了一种方法来减少这种冗余，并形成了一种高效的模型结构。</p>
+<h2 id="主要方法">主要方法</h2>
+<p>将一层中的输出特征分成多组（分组也是学习得到），并在训练过程中按照分组逐渐移除组中与一些不重要的输入特征之间的连接。</p>
+<h2 id="效率对比">效率对比</h2>
+<p>在ImageNet数据上进行图像分类实验，
+CondenseNets相比于同样正确率的DenseNets模型，计算量减少到了DenseNets的<span class="math inline">\(\frac{1}{10}\)</span>，相比于相近top-1错误率的MobileNet，CondenseNets计算量为MobileNet的<span class="math inline">\(\frac{1}{2}\)</span>。</p>
+<h2 id="具体实现">具体实现</h2>
+<p><img src="GroupConv_Learn_Test.png" alt="Learn Group Convolution的学习和预测示意">
+如图，在Condensing阶段训练过程中，使用sparsity inducing
+regularization重复训练模型，
+并丢弃权重较低的特征（在丢弃时，保证同一个Group的卷积核有相同的稀疏连接，方便在测试阶段使用一个标准的group
+convolution实现计算），在optimization阶段，固定分组，并训练卷积核。<strong>图中解释可能有误，图上说是的每个Condensing
+stage 移除<span class="math inline">\((C-1)/C\)</span>比例的连接，但后面又说每个Condensing
+stage之后移除<span class="math inline">\(1/C\)</span>比例的连接，我觉得应该是后面一种说法正确</strong></p>
+<h3 id="特征凝聚原则condensation-criterion">特征凝聚原则(Condensation
+Criterion)</h3>
+<p>普通的卷积核是四维的<span class="math inline">\(O \times R \times W
+\times H\)</span>，其中<span class="math inline">\(O\)</span>代表输出的特征个数，<span class="math inline">\(R\)</span>代表输入的特征个数，<span class="math inline">\(W\)</span>代表卷积核宽度，<span class="math inline">\(H\)</span>代表卷积核高度，如果简化为<span class="math inline">\(1 \times 1\)</span>卷积，则卷积核可以看成一个<span class="math inline">\(O \times R\)</span>的矩阵<span class="math inline">\(F\)</span>, 对于某个分组<span class="math inline">\(G\)</span>, 其卷积权重表示为<span class="math inline">\(F^G\)</span>，<span class="math inline">\(F^g_{ij}\)</span>则表示分组<span class="math inline">\(g\)</span>中第<span class="math inline">\(j\)</span>个输入到第<span class="math inline">\(i\)</span>个输出的权重。</p>
+<p>在筛选的过程中，第<span class="math inline">\(j\)</span>输入特征的重要程度由<span class="math inline">\(\sum_{i=1}^{O/G}|F^g_{ij}|\)</span>来衡量，丢弃的过程可以简单描述为：对于矩阵<span class="math inline">\(F^g\)</span>，如果其某一列的<span class="math inline">\(L_1\)</span>正则项较小，则把这一列的全都置0。</p>
+<p>为了激励同一组的卷积倾向于同样的一组输入特征，作者没有使用逐元素的<span class="math inline">\(L_1\)</span>正则化，而是使用其提出的一种group-lasso正则化，其正则化项计算如下：
+<span class="math display">\[
+\sum_{g=1}^G \sum_{j=1}^R \sqrt{\sum_{i=1}^{O/G}{F^g_{ij}}^2}
+\]</span> 这样的的正则化项由于其值由每个<span class="math inline">\(F^g\)</span>中的每一列的最大值来主导，因此会倾向于把<span class="math inline">\(F^g\)</span>中某一列整体变小，满足要求。</p>
+<h3 id="特征凝聚因子condensation-factor">特征凝聚因子(Condensation
+Factor)</h3>
+<p>一组输出所连接到的输入个数比例不一定是<span class="math inline">\(\frac{1}{G}\)</span>，这里定义特征凝聚因子<span class="math inline">\(C\)</span>，允许每一组输出连接到<span class="math inline">\(\lfloor\frac{R}{C}\rfloor\)</span>个输入特征。</p>
+<h3 id="特征凝聚过程condensation-procedure">特征凝聚过程(Condensation
+Procedure)</h3>
+<p>在上面的Learn Group Convolution的学习和预测示意图中，在经过<span class="math inline">\(C - 1\)</span>个Condensing stage之后，只有<span class="math inline">\(1 - (C - 1) \times
+\frac{1}{C}=\frac{1}{C}\)</span>比例的输入特征保留下来。</p>
+<p>epoch设置：Condensing stage <span class="math inline">\(C-1\)</span>的训练epoch设置为<span class="math inline">\(\frac{M}{2(C-1)}\)</span>,其中M表示总共的训练epoch数。</p>
+<p>学习速率：使用余弦状学习速率，初始值为0.1,300个epoch下降到0，如下图所示。</p>
+<figure>
+<img src="训练loss和学习速率.png" alt="训练loss和学习速率">
+<figcaption aria-hidden="true">训练loss和学习速率</figcaption>
+</figure>
+<p>上图在150代的时候，训练loss跳跃上升，论文解释说是因为在最后一个Condensing
+stage，去掉了当前一半的连接导致。</p>
+<h3 id="特征选择和重排index-layer">特征选择和重排(Index Layer)</h3>
+<p>在经过训练丢弃一些卷积核权重之后，层间的连接非常杂乱，为了高效的在硬件上实现组卷积操作，增加了Index
+Layer用于特征选择和重排。(暂时没有看到有关Index
+Layer的具体实现方法的描述)</p>
+<h3 id="模型结构设计architecture-design">模型结构设计(Architecture
+Design)</h3>
+<ol type="1">
+<li>普通的DenseNet结构在每个dense block之后特征个数增加<span class="math inline">\(k\)</span>(常数)个，作者在一篇论文中看到在DenseNet中更深的层更多的依赖深层特征而非浅层特征，因此作者决定将k改为指数增长，加大深层特征所占的比例，所以设置<span class="math inline">\(k=2^{m-1}k_0\)</span>，其中<span class="math inline">\(m\)</span>表示层的编号，<span class="math inline">\(k_0\)</span>是一个常数。</li>
+<li>为了提高特征重用率，作者将原始输入（或者原始输入对应大小的平均池化下采样）连接到了所有的层。</li>
+</ol>
+<h2 id="在cifar-10数据上进行的对比实验">在CIFAR-10数据上进行的对比实验</h2>
+<h3 id="特征凝聚因子对比实验">特征凝聚因子对比实验</h3>
+<figure>
+<img src="特征凝聚因子实验.png" alt="特征凝聚因子实验">
+<figcaption aria-hidden="true">特征凝聚因子实验</figcaption>
+</figure>
+<p>在DenseNet50的基础上，对比了不同模型权重丢弃程度(特征凝聚因子)下的测试集错误率，如下图，蓝色表示原始模型，黄色表示其他的模型剪枝方法，红色表示作者提出的凝聚模型，三个凝聚模型的分组个数<span class="math inline">\(G\)</span>都设置为4，这里将特征凝聚因子<span class="math inline">\(C\)</span>作为横坐标，表示使用不同的特征凝聚因子的效果，<strong>其它的模型剪枝方法最终也是保留<span class="math inline">\(\frac{1}{C}\)</span>比例的连接作为对比</strong></p>
+<h3 id="分组个数实验">分组个数实验</h3>
+<figure>
+<img src="分组个数实验.png" alt="分组个数实验">
+<figcaption aria-hidden="true">分组个数实验</figcaption>
+</figure>
+<p>在四个对比实验中，特征凝聚因子<span class="math inline">\(C\)</span>使用固定值：8。</p>
+<h3 id="特征凝聚因子效率对比">特征凝聚因子效率对比</h3>
+<figure>
+<img src="特征凝聚因子效率对比.png" alt="特征凝聚因子效率对比">
+<figcaption aria-hidden="true">特征凝聚因子效率对比</figcaption>
+</figure>
+<p>这里作者说所有实验固定分组个数<span class="math inline">\(G=4\)</span>，然后观察不同的凝聚因子<span class="math inline">\(C\)</span>下的测试集错误率和FLOPs的关系。<strong>这里没搞清楚，按理说<span class="math inline">\(G\)</span>和<span class="math inline">\(C\)</span>一旦确定，那么FLOPs就是固定的，为什么这里对于每个<span class="math inline">\(C\)</span>可以变化FLOPs？模型不同？暂时没有看到相应的描述</strong></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag"># 论文阅读</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/05/08/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85emacs%E8%AE%B0%E5%BD%95/" rel="prev" title="编译安装emacs记录">
+      <i class="fa fa-chevron-left"></i> 编译安装emacs记录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/06/20/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-2019-06/" rel="next" title="学习笔记-2019-06">
+      学习笔记-2019-06 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%B7%A5%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">主要工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%80%9D%E6%83%B3"><span class="nav-number">2.</span> <span class="nav-text">主要思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">主要方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%88%E7%8E%87%E5%AF%B9%E6%AF%94"><span class="nav-number">4.</span> <span class="nav-text">效率对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="nav-number">5.</span> <span class="nav-text">具体实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E5%87%9D%E8%81%9A%E5%8E%9F%E5%88%99condensation-criterion"><span class="nav-number">5.1.</span> <span class="nav-text">特征凝聚原则(Condensation
+Criterion)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E5%87%9D%E8%81%9A%E5%9B%A0%E5%AD%90condensation-factor"><span class="nav-number">5.2.</span> <span class="nav-text">特征凝聚因子(Condensation
+Factor)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E5%87%9D%E8%81%9A%E8%BF%87%E7%A8%8Bcondensation-procedure"><span class="nav-number">5.3.</span> <span class="nav-text">特征凝聚过程(Condensation
+Procedure)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E9%80%89%E6%8B%A9%E5%92%8C%E9%87%8D%E6%8E%92index-layer"><span class="nav-number">5.4.</span> <span class="nav-text">特征选择和重排(Index Layer)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E7%BB%93%E6%9E%84%E8%AE%BE%E8%AE%A1architecture-design"><span class="nav-number">5.5.</span> <span class="nav-text">模型结构设计(Architecture
+Design)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8cifar-10%E6%95%B0%E6%8D%AE%E4%B8%8A%E8%BF%9B%E8%A1%8C%E7%9A%84%E5%AF%B9%E6%AF%94%E5%AE%9E%E9%AA%8C"><span class="nav-number">6.</span> <span class="nav-text">在CIFAR-10数据上进行的对比实验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E5%87%9D%E8%81%9A%E5%9B%A0%E5%AD%90%E5%AF%B9%E6%AF%94%E5%AE%9E%E9%AA%8C"><span class="nav-number">6.1.</span> <span class="nav-text">特征凝聚因子对比实验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E7%BB%84%E4%B8%AA%E6%95%B0%E5%AE%9E%E9%AA%8C"><span class="nav-number">6.2.</span> <span class="nav-text">分组个数实验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E5%87%9D%E8%81%9A%E5%9B%A0%E5%AD%90%E6%95%88%E7%8E%87%E5%AF%B9%E6%AF%94"><span class="nav-number">6.3.</span> <span class="nav-text">特征凝聚因子效率对比</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

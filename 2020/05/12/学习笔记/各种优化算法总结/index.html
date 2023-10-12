@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="梯度下降（Gradient Descnet, GD）是目前DNN（Deep Neural Network）中使用最多的优化算法，相同的数据，相同的DNN结构，相同的初始化参数值，使用不同的优化算法会得到截然不同的结果，因此优化算法非常重要，但是梯度下降法有一些缺点，为了对这些缺点进行修正，GD优化算法经历了很多演进，但是目前仍然没有一种普适的优化算法，这里根据论文《An overview of g">
+<meta property="og:type" content="article">
+<meta property="og:title" content="各种优化算法总结">
+<meta property="og:url" content="https://sutomorrow.github.io/2020/05/12/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%90%84%E7%A7%8D%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="梯度下降（Gradient Descnet, GD）是目前DNN（Deep Neural Network）中使用最多的优化算法，相同的数据，相同的DNN结构，相同的初始化参数值，使用不同的优化算法会得到截然不同的结果，因此优化算法非常重要，但是梯度下降法有一些缺点，为了对这些缺点进行修正，GD优化算法经历了很多演进，但是目前仍然没有一种普适的优化算法，这里根据论文《An overview of g">
+<meta property="og:locale">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/05/12/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%90%84%E7%A7%8D%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/狭长形状的损失函数下SGD的运行示意图.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/05/12/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%90%84%E7%A7%8D%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/狭长形状的损失函数下Momentum的运行示意图.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/05/12/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%90%84%E7%A7%8D%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/Momentum和NAG的运行差别.png">
+<meta property="article:published_time" content="2020-05-12T07:05:12.000Z">
+<meta property="article:modified_time" content="2023-10-12T11:15:02.030Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sutomorrow.github.io/2020/05/12/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%90%84%E7%A7%8D%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/狭长形状的损失函数下SGD的运行示意图.png">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2020/05/12/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%90%84%E7%A7%8D%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>各种优化算法总结 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2020/05/12/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%90%84%E7%A7%8D%E4%BC%98%E5%8C%96%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          各种优化算法总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-05-12 15:05:12" itemprop="dateCreated datePublished" datetime="2020-05-12T15:05:12+08:00">2020-05-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>梯度下降（Gradient Descnet, GD）是目前DNN（Deep Neural
+Network）中使用最多的优化算法，相同的数据，相同的DNN结构，相同的初始化参数值，使用不同的优化算法会得到截然不同的结果，因此优化算法非常重要，但是梯度下降法有一些缺点，为了对这些缺点进行修正，GD优化算法经历了很多演进，但是目前仍然没有一种普适的优化算法，这里根据论文《An
+overview of gradient descent optimization
+algorithms》的描述，将GD算法的的各种改进做了一些总结。</p>
+<h1 id="最初的gd算法">最初的GD算法</h1>
+<p>对于待优化的函数<span class="math inline">\(J(\theta)\)</span>，其中<span class="math inline">\(\theta\)</span>是待优化参数，GD算法的思路非常简洁，即指定学习速率<span class="math inline">\(\eta\)</span>和参数初始值<span class="math inline">\(\theta^0\)</span>，按照如下方式迭代的更新参数，其中<span class="math inline">\(\nabla_\theta J(\theta)\)</span>表示梯度，<span class="math inline">\(\theta^i\)</span>表示第<span class="math inline">\(i\)</span>次更新后的参数值， <span class="math display">\[
+\theta^{i+1} = \theta^i - \eta \nabla_\theta J(\theta)
+\]</span></p>
+<p>对于凸问题或者拟凸问题，这样的迭代最终会使得参数在最优点附近震荡，对于非凸且非拟凸的问题，这样的迭代大概率会最终在一个局部极小值附近震荡。</p>
+<p>这里还有个问题是<span class="math inline">\(J(\theta)\)</span>往往无法准确地计算，因为<span class="math inline">\(J(\theta)\)</span>和所有的训练数据相关，如果每一次迭代都去完整的遍历一遍所有数据，那么时间上可能不可接受，因此有了最初的两个GD算法的变种：随机梯度下降（Stochastic
+gradient descent，SGD）、批梯度下降（Mini-batch gradient descent）</p>
+<h1 id="随机梯度下降stochastic-gradient-descentsgd">随机梯度下降（Stochastic
+gradient descent，SGD）</h1>
+<p>针对<span class="math inline">\(J(\theta)\)</span>和所有的训练数据相关从而导致计算耗时长的问题，随机梯度下降的思想非常朴素：每次迭代时随机选取一个样本进行训练。如下所示，其中<span class="math inline">\(\nabla_\theta
+J(\theta;x^{(i+1)},y^{(i+1)})\)</span>表示根据第<span class="math inline">\(i+1\)</span>次随机选择到的样本标签对<span class="math inline">\((x^{(i+1)},y^{(i+1)})\)</span>计算得到的损失函数。
+<span class="math display">\[
+\theta^{i+1} = \theta^i - \eta \nabla_\theta
+J(\theta;x^{(i+1)},y^{(i+1)})
+\]</span></p>
+<h1 id="小批梯度下降mini-batch-gradient-descent">小批梯度下降（Mini-batch
+gradient descent）</h1>
+<p>和随机梯度下降的动机相同，为了简化损失函数的计算，这里每一次使用一批数据（n个样本）来进行损失函数的计算（本质上是将多个损失函数进行求和或者求平均），如下所示：
+<span class="math display">\[
+\theta^{i+1} = \theta^i - \eta \nabla_\theta J(\theta;x^{((i+1)\times
+n:(i+2)\times n)},y^{((i+1)\times n:(i+2)\times n)})
+\]</span></p>
+<p>这里需要注意的是，很多深度学习框架的实现中，SGD代表的不是随机梯度下降，而是随机小批梯度下降，即随机打乱数据之后，再使用小批梯度下降进行优化。</p>
+<p>这几个方法没有什么本质上的区别，在数据的选择上，如果每次迭代时计算梯度所用到的数据越多，那么梯度的计算自然更加准确，但是数据过多，又会引起计算时间增加导致迭代缓慢，因此每次选择多少个数据来进行计算，即批大小（batch
+size）的选择就是在这两个问题上进行权衡。至于为什么要随机选择，自然是为了将数据充分混合，在pytorch的dataloader实现中，一般是在最初将数据shuffle一次，然后每次迭代都顺序选择下一批数据。</p>
+<p>梯度下降算法的主要难点： -
+学习速率的选择，过大的学习速率会导致算法不能很好的收敛（在局部极小值附近大幅度震荡），因此一般使用初始大学习速率，然后学习速率逐渐衰减的方式，但是学习速率的初始值和衰减速度同样难以设置。
+-
+对于存在很多鞍点的问题，梯度下降算法理论上无法正确的处理在鞍点的情况（但实际上每次随机使用不同的数据计算梯度，很难得到一致的鞍点，总有可能随机到一些数据计算出来在原来的鞍点处又有梯度的情况，因此后面的一些说能够有助于逃离鞍点的动量化方法，我认为其实在这方面意义不是非常大，这可能也是很多论文中依旧在使用SGD，而且效果也还可以的原因）
+- 在狭长的损失函数区域中，梯度下降算法非常容易震荡，如下图所示。</p>
+<figure>
+<img src="狭长形状的损失函数下SGD的运行示意图.png" alt="狭长形状的损失函数下SGD的运行示意图">
+<figcaption aria-hidden="true">狭长形状的损失函数下SGD的运行示意图</figcaption>
+</figure>
+<h1 id="momentum">Momentum</h1>
+<p>为了解决上面的最后一个问题，在SGD中可以使用动量项（Momentum
+term）进行改进，类似于物理上的动量概念：运动方向的改变不是瞬间变化的，而是缓慢改变，平滑过渡。动量项可以表达为：
+<span class="math display">\[
+m^t = \gamma m^{t-1} + \nabla_\theta J(\theta^{t-1})
+\]</span></p>
+<p>有些地方也写成 <span class="math display">\[
+m^t = \gamma m^{t-1} + (1 - \gamma)\nabla_\theta J(\theta^{t-1})
+\]</span></p>
+<p>其中<span class="math inline">\(m^0\)</span>一般初始化为0，<span class="math inline">\(0 &lt; \gamma &lt;1\)</span>，<span class="math inline">\(\gamma\)</span>一般被设置为<span class="math inline">\(0.9\)</span>，这个表达式的意思就是将之前的梯度方向累积下来，优化算法在迭代时，不再是直接向着梯度方向更新，而是使用动量来更新：
+<span class="math display">\[
+\theta^t = \theta^{t-1}- \eta m^t
+\]</span>
+这样的好处是可以避免更新方向的频繁变化，减少震荡，加速收敛。</p>
+<p>Momentum可以抑制更新过程中的震荡，以狭长形状的损失函数为例，使用动量项之后，其更新轨迹类似下图：</p>
+<figure>
+<img src="狭长形状的损失函数下Momentum的运行示意图.png" alt="狭长形状的损失函数下Momentum的运行示意图">
+<figcaption aria-hidden="true">狭长形状的损失函数下Momentum的运行示意图</figcaption>
+</figure>
+<h1 id="nesterov-accelerated-gradientnag">Nesterov accelerated
+gradient（NAG）</h1>
+<p>NAG方法对Momentum方法进行了改进，其思想非常简单：既然需要沿着动量方向进行参数更新，那么梯度的计也可以在动量更新之后再进行，即沿着动量方向进行参数更新之后再计算梯度来修正动量，最后再使用修正后的动量来更新。</p>
+<p>可以通俗的理解一定程度上预测了Momentum下一步的位置，然后根据未来的位置计算梯度来对动量项进行修正。</p>
+<p>因此这里将动量定义为： <span class="math display">\[
+m^t = \gamma m^{t-1} + \nabla_\theta J(\theta^{t-1} - \eta \gamma
+m^{t-1})
+\]</span> 这样的动量项也被称为Nesterov
+Momentum，参数更新过程依旧不变：</p>
+<p><span class="math display">\[
+\theta^t = \theta^{t-1} - \eta m^t
+\]</span></p>
+<p>Momentum和NAG的运行差别如下图所示（图片来自于<a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/21486826">《路遥知马力——Momentum -
+无痛的机器学习 -
+知乎专栏》</a>），上面的是Momentum方法，下面的是NAG方法。</p>
+<figure>
+<img src="Momentum和NAG的运行差别.png" alt="Momentum和NAG的运行差别">
+<figcaption aria-hidden="true">Momentum和NAG的运行差别</figcaption>
+</figure>
+<p>NAG的另外等价一种表达方式可以写成： <span class="math display">\[
+\begin{aligned}
+d^t &amp;= \gamma d^{t-1} + \nabla_\theta J(\theta^{t-1}) +
+\gamma(\nabla_\theta J(\theta^{t-1}) - \nabla_\theta J(\theta^{t-2}))\\
+\theta^t &amp;= \theta^{t-1} - \eta d^t    
+\end{aligned}
+\]</span> 这个等价的推理过程可见<a target="_blank" rel="external nofollow noopener noreferrer" href="https://zhuanlan.zhihu.com/p/22810533/">比Momentum更快：揭开Nesterov
+Accelerated
+Gradient的真面目</a>，这里表达的意思就是“如果这次的梯度比上次的梯度变大了，那么有理由相信它会继续变大下去，那就把预计要增大的部分提前加进来；如果相比上次变小了，那么需要动量项上需要做相应的减少”，<span class="math inline">\(\gamma(\nabla_\theta J(\theta^{t-1}) -
+\nabla_\theta
+J(\theta^{t-2}))\)</span>这一项其实是利用了近似二阶导数信息。因此NAG相比于Momentum要快些。</p>
+<h1 id="adagrad">Adagrad</h1>
+<p>Adagrad的主要思想是让学习速率能够自动调整，使得更新频繁的参数有更小的学习速率，更新少的参数有更大的学习速率。</p>
+<p>这里的意思是每个参数的学习速率各不相同，使用每个参数每次的梯度平方和来计算，例如对于参数<span class="math inline">\(\theta\)</span>，其第<span class="math inline">\(i\)</span>次更新的梯度<span class="math inline">\(g^i\)</span>，初始学习速率为<span class="math inline">\(\eta\)</span>，那么第<span class="math inline">\(t\)</span>次更新的时候，该参数的学习速率<span class="math inline">\(\eta^t\)</span>的计算方式如下： <span class="math display">\[
+\begin{aligned}
+    v^t &amp;= \sum\limits_{i=1}^t (g^i)^2\\
+    \eta^t &amp;= \frac{\eta}{\sqrt{v^t + \epsilon}}\\
+\end{aligned}
+\]</span>
+如果每次梯度都很大，那么这个参数就被认为是频繁更新，学习速率衰减比较快，否则学习速率衰减比较慢，可以说Adagrad是一种学习速率衰减方法。</p>
+<h1 id="adadelta">Adadelta</h1>
+<p>在Adagrad中，由于<span class="math inline">\(v^t\)</span>是单调递增的，因此Adagrad很容易导致提前停止训练，所以在Adadelta中将其改成不关心全局的梯度，而是只关心最近一段时间的梯度，这里将<span class="math inline">\(v^t\)</span>改成如下计算方式：</p>
+<p><span class="math display">\[
+v^t = \gamma v_{t-1, j} + (1 - \gamma)(g^t)^2
+\]</span></p>
+<h1 id="rmsprop">RMSProp</h1>
+<p>RMSProp算法是Adadelta的一个特列：<span class="math inline">\(\gamma=0.9\)</span></p>
+<h1 id="adamadaptive-moment-estimation">Adam（Adaptive Moment
+Estimation）</h1>
+<p>Adam其实就是在Adadelta的基础上添加了momentum，然后稍微做了些修正，修正是因为考虑到其初值是0，会对动量和二阶动量的估计造成偏差，其实这里可以看出，修正之后<span class="math inline">\(\hat{m}_{1,j}\)</span>其实就是<span class="math inline">\(g_{1, j}\)</span>，<span class="math inline">\(\hat{v}_{1,j}\)</span>也是类似的。 <span class="math display">\[
+\begin{aligned}
+m^t &amp;= \beta_1 m^{t-1} + (1 - \beta_1)g^t\\
+v^t &amp;= \beta_2 v^{t-1} + (1 - \beta_2)(g^t)^2\\
+\hat{m}^t &amp;= \frac{m^t}{1 - \beta^t_1}\\
+\hat{v}^t &amp;= \frac{v^t}{1 - \beta^t_2}
+\end{aligned}
+\]</span> 参数<span class="math inline">\(\theta\)</span>的更新变成：
+<span class="math display">\[
+\theta^t = \theta^t - \frac{\eta}{\sqrt{\hat{v}^t}+\epsilon}\hat{m}^t
+\]</span>
+Adam在实际使用中也是非常常见的优化方法，既有动量方法的优点，又能自动调整学习速率。</p>
+<h1 id="nadam">NAdam</h1>
+<p>既然Adam都使用了动量方法，那肯定要试一下将NAG（Nesterov accelerated
+gradient）方法加入进来，因此就有了NAdam。</p>
+<p>对于NAG，这里做了一些变化，首先令<span class="math inline">\(\hat{\theta}^{t-1} = \theta^{t-1} - \eta
+m^{t-1}\)</span>，那么Nesterov Momentum可以写为： <span class="math display">\[
+\begin{aligned}
+m^t &amp;= \beta_1 m^{t-1} + (1 - \beta_1)\nabla_\theta J(\theta^{t-1} -
+\eta m^{t-1})\\
+&amp;=\beta_1 m^{t-1} + (1 - \beta_1)\nabla_\theta J(\hat{\theta}^t)
+\end{aligned}
+\]</span> 则NAG的更新可以写成： <span class="math display">\[
+\begin{aligned}
+    \theta^t &amp;= \theta^{t-1} - \eta m^t\\
+    \hat{\theta}^t &amp;= \theta^t - \eta \beta_1 m^t\\
+    &amp;=\theta^{t-1} - \eta m^t - \eta \beta_1 m^t\\
+    &amp;=\theta^{t-1} - \eta (\beta_1 m^{t-1} + (1 -
+\beta_1)\nabla_\theta J(\hat{\theta}^t)) - \eta \beta_1 m^t\\
+    &amp;=\hat{\theta}^{t-1} - \eta (\beta_1 m^t + (1 -
+\beta_1)\nabla_\theta J(\hat{\theta}^t))
+\end{aligned}
+\]</span></p>
+<p>根据NAG的思路得到了<span class="math inline">\(m^t\)</span>，那么在Adam中得到<span class="math inline">\(\hat{m}^t = \frac{m^t}{1 - \beta^t_1} =
+\frac{\beta_1 m^{t-1} + (1 - \beta_1)\nabla_\theta J(\hat{\theta}^t)}{1
+- \beta^t_1}\)</span>之后，<span class="math inline">\(\hat{\theta}^t\)</span>的计算变为： <span class="math display">\[
+\begin{aligned}
+    \hat{\theta}^t &amp;=\hat{\theta}^{t-1} -
+\frac{\eta}{\sqrt{\hat{v}^t}+\epsilon}\hat{m}^t\\
+    &amp;=\hat{\theta}^{t-1} -
+\frac{\eta}{\sqrt{\hat{v}^t}+\epsilon}\frac{\beta_1 m^{t-1} + (1 -
+\beta_1)\nabla_\theta J(\hat{\theta}^t)}{1 - \beta^t_1}\\
+\end{aligned}
+\]</span></p>
+<p>这里如果用<span class="math inline">\(\beta_1\hat{m}^{t-1}\)</span>来替换<span class="math inline">\(\frac{\beta_1 m^{t-1}}{1 -
+\beta^t_1}\)</span>，则可以简化为： <span class="math display">\[
+\hat{\theta}^t = \hat{\theta}^{t-1} -
+\frac{\eta}{\sqrt{\hat{v}^t}+\epsilon}(\beta_1\hat{m}^{t-1} + \frac{(1 -
+\beta_1)\nabla_\theta J(\hat{\theta}^t)}{1 - \beta^t_1})
+\]</span></p>
+<p>完整的NAdam表达如下： <span class="math display">\[
+\begin{aligned}
+\hat{\theta}^{t-1} &amp;= \theta^{t-1} - \eta m^{t-1}\\
+g^t &amp;= \nabla_\theta J(\hat{\theta}^t)\\
+m^t &amp;= \beta_1 m^{t-1} + (1 - \beta_1)g^t\\
+v^t &amp;= \beta_2 v^{t-1} + (1 - \beta_2)(g^t)^2\\
+\hat{m}^t &amp;= \frac{m^t}{1 - \beta^t_1}\\
+\hat{v}^t &amp;= \frac{v^t}{1 - \beta^t_2}\\
+\hat{\theta}^t &amp;= \hat{\theta}^{t-1} -
+\frac{\eta}{\sqrt{\hat{v}^t}+\epsilon}(\beta_1\hat{m}^{t-1} + \frac{(1 -
+\beta_1)}{1 - \beta^t_1} g^t)
+\end{aligned}
+\]</span></p>
+<p>一般如果使用Adam有效的场景，都可以使用NAdam来得到更好的效果。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/12/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%AD%A3%E5%88%99%E5%8C%96%E6%96%B9%E6%B3%95/" rel="prev" title="正则化方法">
+      <i class="fa fa-chevron-left"></i> 正则化方法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/05/15/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/ResNet%E6%80%BB%E7%BB%93/" rel="next" title="ResNet总结">
+      ResNet总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%80%E5%88%9D%E7%9A%84gd%E7%AE%97%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">最初的GD算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8Dstochastic-gradient-descentsgd"><span class="nav-number">2.</span> <span class="nav-text">随机梯度下降（Stochastic
+gradient descent，SGD）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%8F%E6%89%B9%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8Dmini-batch-gradient-descent"><span class="nav-number">3.</span> <span class="nav-text">小批梯度下降（Mini-batch
+gradient descent）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#momentum"><span class="nav-number">4.</span> <span class="nav-text">Momentum</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#nesterov-accelerated-gradientnag"><span class="nav-number">5.</span> <span class="nav-text">Nesterov accelerated
+gradient（NAG）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#adagrad"><span class="nav-number">6.</span> <span class="nav-text">Adagrad</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#adadelta"><span class="nav-number">7.</span> <span class="nav-text">Adadelta</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#rmsprop"><span class="nav-number">8.</span> <span class="nav-text">RMSProp</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#adamadaptive-moment-estimation"><span class="nav-number">9.</span> <span class="nav-text">Adam（Adaptive Moment
+Estimation）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#nadam"><span class="nav-number">10.</span> <span class="nav-text">NAdam</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

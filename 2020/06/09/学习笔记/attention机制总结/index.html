@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Attention机制最初是在自然语言处理领域取得了巨大成功，现在CNN中也在越来越多的使用Attention机制，这里就CNN中使用的Soft Attention（其中Attention weight是模型产生，可微可学习）做一些总结。 对Attention的理解 Attention使得神经网络（NN）可以更多的关注当前任务相关的输入（不一定是原始输入，也可能是提取出的特征），同时忽略和当前任务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="attention机制总结">
+<meta property="og:url" content="https://sutomorrow.github.io/2020/06/09/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/attention%E6%9C%BA%E5%88%B6%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="Attention机制最初是在自然语言处理领域取得了巨大成功，现在CNN中也在越来越多的使用Attention机制，这里就CNN中使用的Soft Attention（其中Attention weight是模型产生，可微可学习）做一些总结。 对Attention的理解 Attention使得神经网络（NN）可以更多的关注当前任务相关的输入（不一定是原始输入，也可能是提取出的特征），同时忽略和当前任务">
+<meta property="og:locale">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/06/09/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/attention%E6%9C%BA%E5%88%B6%E6%80%BB%E7%BB%93/Attention计算方式.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/06/09/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/attention%E6%9C%BA%E5%88%B6%E6%80%BB%E7%BB%93/Non_local_NN.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/06/09/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/attention%E6%9C%BA%E5%88%B6%E6%80%BB%E7%BB%93/Squeeze_and_Excitation.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/06/09/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/attention%E6%9C%BA%E5%88%B6%E6%80%BB%E7%BB%93/SEInceptionNet_SEResNet.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/06/09/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/attention%E6%9C%BA%E5%88%B6%E6%80%BB%E7%BB%93/CBAM_detail.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/06/09/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/attention%E6%9C%BA%E5%88%B6%E6%80%BB%E7%BB%93/Resnet_CBAM.png">
+<meta property="article:published_time" content="2020-06-09T06:50:26.000Z">
+<meta property="article:modified_time" content="2023-10-12T11:15:02.025Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sutomorrow.github.io/2020/06/09/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/attention%E6%9C%BA%E5%88%B6%E6%80%BB%E7%BB%93/Attention计算方式.png">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2020/06/09/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/attention%E6%9C%BA%E5%88%B6%E6%80%BB%E7%BB%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>attention机制总结 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2020/06/09/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/attention%E6%9C%BA%E5%88%B6%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          attention机制总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-06-09 14:50:26" itemprop="dateCreated datePublished" datetime="2020-06-09T14:50:26+08:00">2020-06-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Attention机制最初是在自然语言处理领域取得了巨大成功，现在CNN中也在越来越多的使用Attention机制，这里就CNN中使用的Soft
+Attention（其中Attention weight是模型产生，可微可学习）做一些总结。</p>
+<h1 id="对attention的理解">对Attention的理解</h1>
+<p>Attention使得神经网络（NN）可以更多的关注当前任务相关的输入（不一定是原始输入，也可能是提取出的特征），同时忽略和当前任务不相关的输入，本质上是希望对不同的信息计算得到不同的权重，以代表不同信息的重要性程度，并通过加权和的方式聚合这些信息。</p>
+<p>更抽象来说，在给定一个query元素的情况下，Attention机制的作用是：根据query元素将不同的key元素按照相关程度（或者重要程度）排序，在产生一个输出时，让模型可以选择哪些输入更加重要。这里query元素和key元素暂时没有合适的定义，不过可以通过两个例子来理解，例如在语言翻译问题中，这里的query
+element可以理解为输出语句中的某个单词，key
+element则是输入的语句中的某个单词，对于某个翻译得到的单词，不是每个输入单词都和其相关（或者说不是每个输入单词和这个翻译得到的单词的相关程度都一样），又例如在CNN中，query和key都可以理解为图像上某个像素或者某个区域。</p>
+<p>在论文《An Empirical Study of Spatial Attention Mechanisms in Deep
+Networks》中提出了广义注意力机制的表达式（Generalized attention
+formulation），如下所示，其中<span class="math inline">\(y_q\)</span>表示最终得到的Attention
+feature（通过Attention机制聚合得到的特征或者信息），<span class="math inline">\(q\)</span>表示query元素的位置，<span class="math inline">\(k\)</span>表示key元素的位置，<span class="math inline">\(M\)</span>表示Attention
+Head的个数（不同的Attention
+Head可以理解为不同的Attention计算方式），<span class="math inline">\(z_q\)</span>表示位置为<span class="math inline">\(q\)</span>的query元素的内容，<span class="math inline">\(x_k\)</span>表示位置为<span class="math inline">\(k\)</span>的key元素的内容，<span class="math inline">\(A_m\)</span>表示计算Attention weight的函数，<span class="math inline">\(W_m\)</span>和<span class="math inline">\(W&#39;_m\)</span>表示两个可学习参数，这两个参数也可以去掉（即设置为固定值），<span class="math inline">\(\Omega_q\)</span>表示query元素可以涉及到的key元素的范围（例如翻译任务中，一般这个范围是整个输入语句的所有单词）
+<span class="math display">\[
+    y_q = \sum\limits_{m=1}^M W_m[\sum\limits_{k\in \Omega_q}A_m(q, k,
+z_q, x_k)\odot W&#39;_m x_k]
+\]</span></p>
+<p>上面的公式中<span class="math inline">\(W&#39;_m
+x_k\)</span>可以理解为首先对key元素做一个投影变换，得到合适的特征，然后<span class="math inline">\(A_m\)</span>函数针对范围<span class="math inline">\(\Omega_q\)</span>中的每个key元素<span class="math inline">\(x_k\)</span>计算出其Attention
+weight（这个attention weight一般和q, k, z_q,
+x_k这几个值有关，但有些计算方式不会全部使用），按照Attention
+weight对key元素的投影进行一个加权求和，最后再进行一次投影变换，得到合适的Attention
+特征，这就完成了一种Attention的过程，但是有些时候可以多种Attention一起使用，因此可以<span class="math inline">\(M\)</span>种Attention
+feature求和得到最终的Attention feature。</p>
+<p>根据上面的广义注意力机制表达式，设计一个注意力机制时，需要确定的内容就是一下几点：
+- <span class="math inline">\(\Omega_q\)</span>，一个query元素可以涉及到的key元素的范围。
+- <span class="math inline">\(A_m\)</span>，计算Attention weight的函数。
+- <span class="math inline">\(W_m\)</span>、<span class="math inline">\(W&#39;_m\)</span>，是否需要进行特征投影变换。</p>
+<h2 id="self-attention">Self-Attention</h2>
+<p>Self-Attention是指query元素和key元素来自于同一个集合的Attention，CNN中的Attention基本上都是Self-Attention，例如《Non-local
+Neural Networks》、《CBAM: Convolutional Block Attention
+Module》这些论文中使用的Attention，其query和key元素都是特征图上的像素，属于同一个集合，因此都属于Self-Attention的范围。</p>
+<p>在论文《An Empirical Study of Spatial Attention Mechanisms in Deep
+Networks》中提到了几种Self-Attention的计算方式，如下图所示，这里有四种Attention
+weight的计算方式：</p>
+<ul>
+<li>query and key content表示仅仅使用<span class="math inline">\(z_q\)</span>和<span class="math inline">\(x_k\)</span>来计算Attention
+weight，一般其Attention weight正比于query content和 key
+content之间的相似性。</li>
+<li>query content and relative position表示使用<span class="math inline">\(z_q\)</span>和<span class="math inline">\(k,q\)</span>来计算Attention weight。</li>
+<li>key content only表示仅使用<span class="math inline">\(x_k\)</span>来计算Attention weight。</li>
+<li>relative position only表示仅使用<span class="math inline">\(k,q\)</span>来计算Attention weight。</li>
+</ul>
+<figure>
+<img src="Attention计算方式.png" alt="Attention计算方式">
+<figcaption aria-hidden="true">Attention计算方式</figcaption>
+</figure>
+<h2 id="不同的attention机制在广义attention表达式上的表示">不同的Attention机制在广义Attention表达式上的表示</h2>
+<h3 id="transformer-attention">Transformer attention</h3>
+<p>在论文《Transformer-xl: Attentive lan-guage models beyond a
+fixed-length context》中使用了4个Attention
+Head，包含了上面提到的Self-Attention的四种计算方式，论文《An Empirical
+Study of Spatial Attention Mechanisms in Deep
+Networks》中对其进行了总结，如下：</p>
+<ul>
+<li>query and key content方式计算得到的Attention weight可以表示为<span class="math inline">\(z_q^TU^T_mV^C_mx_k\)</span>，其中<span class="math inline">\(U_m\)</span>和<span class="math inline">\(V^C_m\)</span>表示可学习的嵌入矩阵，用于将query
+content和key
+content转换到合适的空间方便计算，或者缩减维度以减少计算量。</li>
+<li>query content and relative position方式计算得到的Attention
+weight可以表示为<span class="math inline">\(z_q^TU^T_mV^R_mR_{k-q}\)</span>，这里的<span class="math inline">\(R_{k-q}\)</span>表示相对位置<span class="math inline">\(k-q\)</span>的一种编码，<span class="math inline">\(V^R_m\)</span>同样是一个可学习的嵌入矩阵。</li>
+<li>key content only方式计算得到的Attention weight可以表示为<span class="math inline">\(u_m^TV_m^Cx_k\)</span>，其中<span class="math inline">\(u_m\)</span>是个可学习的向量，用于捕获对当前任务贡献突出的key
+content的编码。</li>
+<li>relative position only方式计算得到的Attention weight可以表示为<span class="math inline">\(v^T_mV^R_mR_{k-q}\)</span>，这里的<span class="math inline">\(v_m\)</span>也是个可学习的向量，用于key元素和query元素的全局位置偏差。</li>
+</ul>
+<h3 id="regular-and-deformable-convolution">Regular and deformable
+convolution</h3>
+<p>常规卷积和可变形卷积都可以看做一种注意力机制。</p>
+<p>在常规卷积中，Attention weight的计算函数<span class="math inline">\(A_m\)</span>属于上面提到的relative position
+only方式，可以表达为如下形式，这里的<span class="math inline">\(Q\)</span>表示卷积核覆盖的区域。这样的<span class="math inline">\(A_m\)</span>实际上是一种基于query和key元素相对位置的函数，计算Attention
+weight的过程不需要<span class="math inline">\(z_q\)</span>和<span class="math inline">\(x_k\)</span>的值，计算出来的Attention
+weight只是指定哪些位置和query相关。</p>
+<p><span class="math display">\[
+A_m(k, q) = \begin{cases}
+    1 &amp; if \ k \in Q\\
+    0 &amp; otherwise
+\end{cases}
+\]</span></p>
+<p>另外，常规卷积相当于只有一个Attention head，因此<span class="math inline">\(M=1\)</span>，<span class="math inline">\(\Omega_q\)</span>可以是整个特征图上的所有像素，的卷积核参数可以看成是<span class="math inline">\(W_0\)</span>，常规卷积没有<span class="math inline">\(W&#39;_0\)</span>，key元素则是输入的特征图上的像素点<span class="math inline">\(x_k\)</span>，因此常规卷积可以看做Attention的一种特例。</p>
+<p>对于可变形卷积，其<span class="math inline">\(A_m\)</span>函数可以表达如下，其中<span class="math inline">\(w_m^T\)</span>表示用于计算偏移的<span class="math inline">\(1\times 1\)</span>卷积的参数，<span class="math inline">\(p_m\)</span>表示正常卷积相对于卷积核中心的偏移，<span class="math inline">\(q + p_m + w_m^T
+x_q\)</span>实际上就是可变形卷积首先计算得到的卷积核偏移值，而<span class="math inline">\(G\)</span>是插值函数，表示在插值过程中，对于需要插值的位置<span class="math inline">\(q + p_m + w_m^T x_q\)</span>计算得到的位置<span class="math inline">\(k\)</span>的权重，因此可变形卷积的插值权重可以理解为Attention
+weight，所以可变形卷积核常规卷积一样，也可以看做是一种Attention。</p>
+<p><span class="math display">\[
+A_m(q,k,x_q) = G(k, q + p_m + w_m^T x_q)
+\]</span></p>
+<h1 id="cnn中的一些attention">CNN中的一些Attention</h1>
+<h2 id="non-local-neural-networks">Non-local Neural Networks</h2>
+<p>在论文《Non-local Neural Networks》中，提出了一种称为Non-local Neural
+Networks的结构，通过将某一位置的响应计算为所有位置特征的加权和的方式，用于捕获远程依赖，其表达式如下，其中<span class="math inline">\(i\)</span>是响应的位置，<span class="math inline">\(j\)</span>则遍历所有输入的位置，（这里的位置可以包含空间和时间，因此Non-local
+Neural Networks可以用于处理视频），<span class="math inline">\(x_i\)</span>表示响应位置的输入值，<span class="math inline">\(x_j\)</span>则可以遍历所有输入元素的值，<span class="math inline">\(f(x_i,
+x_j)\)</span>计算得到一个标量，用于表示<span class="math inline">\(x_i,
+x_j\)</span>之间的关系，例如相关程度，<span class="math inline">\(g(x_j)\)</span>则表示对<span class="math inline">\(x_j\)</span>的一种表示，例如一种投影，<span class="math inline">\(C(x)\)</span>表示归一化系数，<span class="math inline">\(y_i\)</span>是最终得到的输出。</p>
+<p><span class="math display">\[
+y_i = \frac{1}{C(x)}\sum\limits_{\forall j}f(x_i, x_j)g(x_j)
+\]</span></p>
+<p>Non-local Neural Networks的结构示意图如下所示，其中<span class="math inline">\(H,W\)</span>表示空间上的范围，<span class="math inline">\(T\)</span>表示时间上的范围，这里的示例输入形状是<span class="math inline">\(T\times H \times W \times
+1024\)</span>，如果是视频处理的话，即表示一共处理相邻的<span class="math inline">\(T\)</span>帧特征图，每幅特征图高<span class="math inline">\(H\)</span>，宽<span class="math inline">\(W\)</span>，channel个数为1024，上面表达式中的<span class="math inline">\(f(x_i, x_j)\)</span>由下图中的<span class="math inline">\(\theta(x) \times
+\phi(x)\)</span>来完成，归一化则由softmax操作来完成，softmax的结果和<span class="math inline">\(g(x)\)</span>的结果相乘，就完成了“所有位置特征的加权和操作”，得到响应<span class="math inline">\(y\)</span>，表示捕获到的远程依赖，这样一来，<span class="math inline">\(y\)</span>中每个特征值都聚合了全局的信息，再进行一些处理转换，最终和原始输入相加得到输出Z。</p>
+<figure>
+<img src="Non_local_NN.png" alt="Non-local Neural Networks 结构示意图">
+<figcaption aria-hidden="true">Non-local Neural Networks
+结构示意图</figcaption>
+</figure>
+<p>上图中的<span class="math inline">\(y\)</span>最终还经过了一次<span class="math inline">\(1\times 1\times 1\)</span>卷积得到<span class="math inline">\(z\)</span>，因此可以表达为：<span class="math inline">\(z_i = W_z y_i + x_i\)</span>，这里论文中将<span class="math inline">\(W_z\)</span>初始化为0，且加上<span class="math inline">\(x_i\)</span>这一项，其原因是为了在改变网络结构之后，还可以利用之前的预训练权重。</p>
+<p>整个Non-local Neural
+Networks过程虽然简单，但是也是Self-Attention的一种特例，类比之前提到的广义注意力机制表达式，这里只有一个Attention
+Head，<span class="math inline">\(M=1\)</span>，<span class="math inline">\(i\)</span>可以看做query元素的位置，<span class="math inline">\(j\)</span>则是key元素的位置，query元素和key元素都属于同一个集合（即输入x），<span class="math inline">\(x_i\)</span>表示query content，<span class="math inline">\(x_j\)</span>则表示key content，<span class="math inline">\(f(x_i, x_j)\)</span>则是query and key
+content方式的<span class="math inline">\(A_m\)</span>函数（<span class="math inline">\(A_m\)</span>计算得到的Attention
+weight是归一化的，因此<span class="math inline">\(A_m\)</span>还包括<span class="math inline">\(\frac{1}{C(x)}\)</span>用于归一化）。<span class="math inline">\(g(x_j)\)</span>是对key
+content的一种变换，其参数就是前面的<span class="math inline">\(W&#39;_m\)</span>，最后这里没有<span class="math inline">\(W_m\)</span>，softmax的结果和<span class="math inline">\(g(x)\)</span>的结果进行的矩阵乘法完成了特征加权和的操作。</p>
+<h2 id="squeeze-and-excitation-networksse-network">Squeeze-and-Excitation
+Networks（SE Network）</h2>
+<p>在论文《Squeeze-and-Excitation Networks》中，提出了一种用于channel
+attention的Squeeze-and-Excitation（SE）结构，通过显式地建模通道之间的相互依赖关系，自适应地重新修正不同通道的特征响应幅度，其结构示意图如下所示。其中<span class="math inline">\(F_{sq}\)</span>表示Squeeze操作，在论文中使用一个全局平均池化来实现，用于在空间维度上来聚合全局的信息，变成一种逐通道的表示状态。之后的<span class="math inline">\(F_{ex}\)</span>表示Excitation操作，其操作顺序为（全连接-ReLU-全连接-Sigmoid，这里没看懂可以参考下面在InceptionNet和ResNet中的详细结构），用于捕获通道之间的依赖性关系，并且形成通道的权重。最终将得到的各通道权重分别乘以原来的通道，达到对不同通道的响应幅度进行自适应修正的目的。</p>
+<figure>
+<img src="Squeeze_and_Excitation.png" alt="Squeeze-and-Excitation Networks 结构示意图">
+<figcaption aria-hidden="true">Squeeze-and-Excitation Networks
+结构示意图</figcaption>
+</figure>
+<p>论文中在InceptionNet以及ResNet中都尝试加入SE模块，其加入之后的结构如下图所示。其中Global
+pooling即Squeeze操作，用于聚合超出像素点感受野之外的信息并形成逐通道的表示，后面紧接着Excitation操作，首先通过全连接对其进行降维，减少计算量，之后使用ReLU激活函数来增加Excitation操作的非线性性质，之后再通过一个全连接层得到逐通道的channel
+weight，并通过Sigmoid函数将channel weight限制在0到1之间，最后将channel
+weight与原始特征图相乘，每个通道一个权重，用于调整不同通道的响应幅值。</p>
+<figure>
+<img src="SEInceptionNet_SEResNet.png" alt="InceptionNet以及ResNet中的SE结构">
+<figcaption aria-hidden="true">InceptionNet以及ResNet中的SE结构</figcaption>
+</figure>
+<p>Excitation操作很容易和之前的广义注意力机制表达式类比，其本质上就是一种简单的Self-Attention，只不过Excitation操作计算出的Attention
+weight除了query位置以外全是0，这样就不是按照权重去聚合所有通道的信息，而是使用空间维度的全局信息来调整通道的响应幅值。</p>
+<h2 id="convolutional-block-attention-module">Convolutional Block
+Attention Module</h2>
+<p>论文《CBAM: Convolutional Block Attention
+Module》中提出了一种同时进行channel和spatial
+attention的attention模块，称为CBAM。</p>
+<p>CBAM中包含了两种Attention，如下图所示，上面的结构是channel
+Attention部分，其接收输入之后分别通过空间维度上的全局最大池化和全局平均池化，和SE模块中的Squeeze类似，只不过这里使用两种池化，得到了两个结果，这两个结果再送到同一个MLP（多层感知机），这里相当于两个共享权重的Excitation操作，最后两个结果相加在进行sigmoid操作，这里可以看出来，整个Channel
+Attention过程其实就是稍微改变的SE模块。图片下面的结构是Spatial
+Attention的结构，这里的最大池化和平均池化是在Channel维度进行的，即对每个像素求出所有Channel的最大值或者平均值，最终得到两个Channel数量为1的特征图，两个特征图进行Concatenate之后经过一个<span class="math inline">\(7\times7\)</span>卷积，最后使用sigmoid函数处理得到结果，这两个模块得到的结果都是用于和原始特征图相乘，一个是逐通道的调整特征响应的幅值，一个是逐像素的调整特征响应的幅值。</p>
+<figure>
+<img src="CBAM_detail.png" alt="CBAM中的两种Attention结构">
+<figcaption aria-hidden="true">CBAM中的两种Attention结构</figcaption>
+</figure>
+<p>上面展示的两种结构在模型中先后使用，可以使得模型包含对不同channel响应幅度的调整能力的同时也包含对不同位置响应幅度的调整能力，在ResBlock中添加CBAM结构之后，模型的结构如下图所示。</p>
+<figure>
+<img src="Resnet_CBAM.png" alt="ResBlock中使用CBAM结构">
+<figcaption aria-hidden="true">ResBlock中使用CBAM结构</figcaption>
+</figure>
+<p>在该论文的实验中，CBAM模块在图像分类任务上提升不大，但是使用轻量级模型（MobileNet，ShuffleNet）试验时错误率相对于SE模块有一个百分点左右的下降（可能是参数增加，模型容量增大导致？），在目标检测任务上，ResNet+CBAM相比于原始的ResNet有一点几个百分点的mAP提升。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/05/29/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%86%B3%E7%AD%96%E6%A0%91%E6%80%BB%E7%BB%93/" rel="prev" title="决策树总结">
+      <i class="fa fa-chevron-left"></i> 决策树总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/11/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E5%B8%B8%E8%A7%81%E6%A6%82%E7%8E%87%E5%88%86%E5%B8%83/" rel="next" title="常见概率分布">
+      常见概率分布 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%B9attention%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">1.</span> <span class="nav-text">对Attention的理解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#self-attention"><span class="nav-number">1.1.</span> <span class="nav-text">Self-Attention</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E7%9A%84attention%E6%9C%BA%E5%88%B6%E5%9C%A8%E5%B9%BF%E4%B9%89attention%E8%A1%A8%E8%BE%BE%E5%BC%8F%E4%B8%8A%E7%9A%84%E8%A1%A8%E7%A4%BA"><span class="nav-number">1.2.</span> <span class="nav-text">不同的Attention机制在广义Attention表达式上的表示</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#transformer-attention"><span class="nav-number">1.2.1.</span> <span class="nav-text">Transformer attention</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#regular-and-deformable-convolution"><span class="nav-number">1.2.2.</span> <span class="nav-text">Regular and deformable
+convolution</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cnn%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9Battention"><span class="nav-number">2.</span> <span class="nav-text">CNN中的一些Attention</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#non-local-neural-networks"><span class="nav-number">2.1.</span> <span class="nav-text">Non-local Neural Networks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#squeeze-and-excitation-networksse-network"><span class="nav-number">2.2.</span> <span class="nav-text">Squeeze-and-Excitation
+Networks（SE Network）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#convolutional-block-attention-module"><span class="nav-number">2.3.</span> <span class="nav-text">Convolutional Block
+Attention Module</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

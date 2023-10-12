@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"sutomorrow.github.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="论文《UNDERSTANDING DEEP LEARNING REQUIRES RETHINKING GENERALIZATION》 该论文中首先做了两组实验：随机标签实验和随机噪声实验，数据集使用CIFAR10和ImageNet，在随机标签实验中，将所有标签替换为随机生成的，然后来训练CNN，发现即使是随机标签，CNN也可以完美拟合训练数据（训练误差为0），但是测试集误差基本上和瞎猜差不多，该实">
+<meta property="og:type" content="article">
+<meta property="og:title" content="标签噪声的处理">
+<meta property="og:url" content="https://sutomorrow.github.io/2020/10/08/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A0%87%E7%AD%BE%E5%99%AA%E5%A3%B0%E7%9A%84%E5%A4%84%E7%90%86/index.html">
+<meta property="og:site_name" content="Tennen&#39;s Blog">
+<meta property="og:description" content="论文《UNDERSTANDING DEEP LEARNING REQUIRES RETHINKING GENERALIZATION》 该论文中首先做了两组实验：随机标签实验和随机噪声实验，数据集使用CIFAR10和ImageNet，在随机标签实验中，将所有标签替换为随机生成的，然后来训练CNN，发现即使是随机标签，CNN也可以完美拟合训练数据（训练误差为0），但是测试集误差基本上和瞎猜差不多，该实">
+<meta property="og:locale">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/10/08/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A0%87%E7%AD%BE%E5%99%AA%E5%A3%B0%E7%9A%84%E5%A4%84%E7%90%86/噪声标签和真实标签的关系.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/10/08/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A0%87%E7%AD%BE%E5%99%AA%E5%A3%B0%E7%9A%84%E5%A4%84%E7%90%86/sModel.png">
+<meta property="og:image" content="https://sutomorrow.github.io/2020/10/08/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A0%87%E7%AD%BE%E5%99%AA%E5%A3%B0%E7%9A%84%E5%A4%84%E7%90%86/标签修正框架.png">
+<meta property="article:published_time" content="2020-10-08T01:41:36.000Z">
+<meta property="article:modified_time" content="2023-10-12T11:15:02.039Z">
+<meta property="article:author" content="Tennen">
+<meta property="article:tag" content="深度学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sutomorrow.github.io/2020/10/08/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A0%87%E7%AD%BE%E5%99%AA%E5%A3%B0%E7%9A%84%E5%A4%84%E7%90%86/噪声标签和真实标签的关系.png">
+
+<link rel="canonical" href="https://sutomorrow.github.io/2020/10/08/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A0%87%E7%AD%BE%E5%99%AA%E5%A3%B0%E7%9A%84%E5%A4%84%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>标签噪声的处理 | Tennen's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Tennen's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://sutomorrow.github.io/2020/10/08/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%A0%87%E7%AD%BE%E5%99%AA%E5%A3%B0%E7%9A%84%E5%A4%84%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Tennen">
+      <meta itemprop="description" content="record something">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tennen's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          标签噪声的处理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-10-08 09:41:36" itemprop="dateCreated datePublished" datetime="2020-10-08T09:41:36+08:00">2020-10-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-12 19:15:02" itemprop="dateModified" datetime="2023-10-12T19:15:02+08:00">2023-10-12</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="论文understanding-deep-learning-requires-rethinking-generalization">论文《UNDERSTANDING
+DEEP LEARNING REQUIRES RETHINKING GENERALIZATION》</h1>
+<p>该论文中首先做了两组实验：随机标签实验和随机噪声实验，数据集使用CIFAR10和ImageNet，在随机标签实验中，将所有标签替换为随机生成的，然后来训练CNN，发现即使是随机标签，CNN也可以完美拟合训练数据（训练误差为0），但是测试集误差基本上和瞎猜差不多，该实验表明模型可以强行记住所有数据，另外一个实验是随机噪声实验，在数据上添加随机噪声（例如高斯噪声），实验结果表明，随着噪声水平的增加，模型仍然可以拟合好训练集，但是泛化误差稳定上升。</p>
+<p>根据上面的实验，论文中主要突出了一个问题：模型明明可以暴力记住所有数据，为什么会得到泛化能力？论文中以一个线性模型为例，认为SGD也包含一定的正则化能力，从而导致模型可以有一定的泛化性能。</p>
+<h1 id="论文training-deep-neural-networks-using-a-noiseadaptation-layer">论文《TRAINING
+DEEP NEURAL-NETWORKS USING A NOISEADAPTATION LAYER》</h1>
+<p>论文中首先定义了噪声标签的一种概率框架，例如一个多类别的神经网络软分类器可以表达为<span class="math inline">\(p(y=i|x;w)\)</span>，其中<span class="math inline">\(x\)</span>表示特征向量，<span class="math inline">\(w\)</span>表示模型权重，<span class="math inline">\(y\)</span>表示没有包含噪声的真实标签，而当前获取到的标签<span class="math inline">\(z\)</span>包含噪声，假设噪声标签<span class="math inline">\(z\)</span>的分布和特征<span class="math inline">\(x\)</span>独立，因此可以简单的通过一个参数矩阵来描述噪声标签和真实标签的关系：<span class="math inline">\(\theta (i,j)=p(z=j|y=i)\)</span>，如下图所示。</p>
+<figure>
+<img src="噪声标签和真实标签的关系.png" alt="噪声标签和真实标签的模型示意图">
+<figcaption aria-hidden="true">噪声标签和真实标签的模型示意图</figcaption>
+</figure>
+<p>由于在当前模型中存在隐变量，因此自然使用EM算法来进行优化，在E-step，使用目前的参数估计第<span class="math inline">\(t\)</span>个样本真实标签为<span class="math inline">\(i\)</span>的概率<span class="math inline">\(c_{ti}
+= p(y_t = i | x_t, z_t; w_0, \theta_0), i=1,2,...,k,
+t=1,2,...,n\)</span>，其中<span class="math inline">\(k\)</span>是类别个数，<span class="math inline">\(n\)</span>是样本个数。而在M-step，则需要同时更新参数<span class="math inline">\(\theta\)</span>和参数<span class="math inline">\(w\)</span>，参数<span class="math inline">\(\theta\)</span>有闭式解：<span class="math inline">\(\theta(i,j) = \frac{\sum_t c_{ti}
+\mathbb{1}(z_t=j)}{\sum_t c_{ti}}, i,j \in \{1, 2, ...,
+k\}\)</span>，而参数<span class="math inline">\(w\)</span>则需要使用梯度下降的方式来更新，其目标定义为最大化<span class="math inline">\(S(w) = \sum\limits_{t=1}^n\sum\limits_{i=1}^k
+c_{ti}
+log(p(y_t=i|x_i;w))\)</span>，这个就是一个软化版本的似然函数。</p>
+<p>但是，在上面的EM算法过程中，存在一些问题，第一个是EM算法很可能收敛到局部最优点，第二个是在上面的EM框架中，每次在M-step更新的时候，都需要训练<span class="math inline">\(w\)</span>直至收敛，这个对于稍微大型的模型或者数据集来说都是非常费时间的，第三是关于上述讨论的基本假设："噪声标签<span class="math inline">\(z\)</span>的分布和特征<span class="math inline">\(x\)</span>独立"，这个假设太强，而且一般是不成立的，因此论文针对这些问题进一步提出了一些解决方案。</p>
+<p>将上面的模型顺序做个调换，得到如下图所示的模型示意图，其中上面的示意图是面模型训练的结构，下面的示意图是模型测试时的结构，在训练结构中，这里的<span class="math inline">\(x\)</span>表示样本，<span class="math inline">\(h\)</span>表示神经网络提取到的特征，<span class="math inline">\(y\)</span>和<span class="math inline">\(z\)</span>的定义和前面一样，这里有两个softmax层(这里的softmax是指以softmax为激活函数的全连接层)，这里的意思是在原始模型的基础上，增加一个softmax来对噪声进行建模，然后使用带有标签的噪声<span class="math inline">\(z\)</span>进行训练。预测时输出中间结果<span class="math inline">\(y\)</span>作为对隐藏的正确标签的预测。</p>
+<figure>
+<img src="sModel.png" alt="论文提出使用一个新加的层对噪声进行建模">
+<figcaption aria-hidden="true">论文提出使用一个新加的层对噪声进行建模</figcaption>
+</figure>
+<p>这个模型非常简单，但是如果没有一些特殊方法的话，肯定不能保证最终<span class="math inline">\(y\)</span>会收敛成为真实标签的预测，因此还需要仔细的设计该模型的初始化方法。</p>
+<p>首先softmax层可以表达如下，这里的<span class="math inline">\(u^T\)</span>和<span class="math inline">\(b\)</span>就是softmax层的参数。</p>
+<p><span class="math display">\[
+\begin{aligned}
+    p(z=j|y=i,x) = \frac{exp(u^T_{ij}h + b_{ij})}{\sum_l exp(u^T_{il}h +
+b_{il})}
+\end{aligned}
+\]</span> 论文中提出，首先使用标签<span class="math inline">\(z\)</span>去训练图中的non-linear
+function和第一个softmax层，就当成正常的训练，得到<span class="math inline">\(p(y|x;w)\)</span>，训练好后这两个模块的权重不变，而且将当前模型预测的<span class="math inline">\(y\)</span>就当做真实标签，去计算和噪声标签<span class="math inline">\(z\)</span>的混淆矩阵，使用这个混淆矩阵去初始化<span class="math inline">\(b\)</span>，另外<span class="math inline">\(u\)</span>初始化为0，<span class="math inline">\(b_{ij}\)</span>的初始化方法如下，注意这里的<span class="math inline">\(z\)</span>是表示含噪声的标签。</p>
+<p><span class="math display">\[
+\begin{aligned}
+    b_{ij} =
+log(\frac{\sum_t\mathbf{1}_{\{z_t=j\}}p(y_t=i|x_t)}{\sum_tp(y_t=i|x_t)})
+\end{aligned}
+\]</span></p>
+<h1 id="论文mentornet-learning-data-driven-curriculumfor-very-deep-neural-networks-on-corrupted-labels">论文《MentorNet:
+Learning Data-Driven Curriculumfor Very Deep Neural Networks on
+Corrupted Labels》</h1>
+<p>该论文提出了一种通过学习数据驱动的课程来在包含噪声的数据上达到更好效果的方法，论文中提出的MentorNet要不就是去学习一个预先定义好的课程，要不就在一个干净的数据上先进行训练（随机构造noisy
+label，然后让MentorNet来区分），如果直接去学习一个预定义好的课程，那么MentorNet其实没啥作用，和直接使用定义好的课程效果差不多，但是如果有一个干净的数据集可以让MentorNet去训练，那么效果会好很多。</p>
+<h1 id="论文joint-optimization-framework-for-learning-with-noisy-labels">论文《Joint
+Optimization Framework for Learning with Noisy Labels》</h1>
+<p>该论文关注的是分类任务上的噪声标签数据，并使用迭代的标签修正方法来构造伪标签，最后使用伪标签来重头训练分类器，以达到更好的分类效果，整体方法框架如下图所示，其中<span class="math inline">\(x_i\)</span>表示的是训练样本，<span class="math inline">\(y^{(t)}_i\)</span>表示的是第<span class="math inline">\(t\)</span>次迭代所使用的标签，先使用原始的含噪声标签<span class="math inline">\(y^{(0)}_i\)</span>来计算损失函数<span class="math inline">\(L\)</span>以训练模型，然后使用模型的预测概率<span class="math inline">\(s\)</span>来对标签进行更新，有两种方式，一种是one-hot的更新标签（即对模型预测概率求argmax，这种方法在论文中每次不会更新所有标签，而是只更新预测结果和当前标签差距最大的top500个样本的标签），另外一种是使用概率来构成软标签（即直接使用模型预测概率作为新的标签，这种方法每次都更新所有标签。实验表明，软标签更新的效果更好），更新后的标签又继续训练模型，经过这样的迭代过程之后，可以得到经过修复的标签，这个时候就可以使用得到的标签来重头训练一个分类器以得到更好的效果。</p>
+<figure>
+<img src="标签修正框架.png" alt="迭代的标签修正">
+<figcaption aria-hidden="true">迭代的标签修正</figcaption>
+</figure>
+<p>上面的框架非常简单，其实中心思想就是一个EM算法的过程，最终得到伪标签，然后用伪标签来训练新的模型，该论文重要的部分在于其其学习速率的选择，以及损失函数的设计。</p>
+<p>首先该论文对文章《A closer look at memorization in deep
+networks》中的提到的一种现象进行了实验验证：<strong>在大学习速率的情况下，可以有效的抑制模型对无规则数据的记忆（即可以有效的抵抗标签噪声的影响）</strong>。因此在学习速率的选择上，论文在训练上述的标签迭代修正过程时。使用了较高的学习速率（例如论文中对于CIFAR-10数据，使用batch
+size 128, SGD优化器, lr
+0.1，其他数据集的学习速率则不同，可能需要调参）</p>
+<p>第二比较重要的是在迭代标签修正过程中的损失函数<span class="math inline">\(L\)</span>的设计，其总体的损失函数定义如下，其中<span class="math inline">\(L_c\)</span>可以是任何分类损失函数，例如交叉熵，而<span class="math inline">\(L_p\)</span>和<span class="math inline">\(L_e\)</span>分别是两个不同的约束项，<span class="math inline">\(L_p\)</span>中的<span class="math inline">\(p_j\)</span>表示类<span class="math inline">\(j\)</span>的先验分布，这一项希望模型预测的类别分布（<span class="math inline">\(\bar{s}_j(\theta,X)\)</span>从一个Batch的数据统计得到，所以这里的batch
+size不宜太小）趋近于训练数据的类别先验分布，这是为了防止在标签迭代更新的过程中，<span class="math inline">\(y\)</span>和<span class="math inline">\(s\)</span>全都变成同一个类别，另外一项<span class="math inline">\(L_e\)</span>计算的是模型预测的熵，最小化模型预测的熵，可以使模型的预测更加自信，避免模型的预测变成每个类均匀分布，这里比较难的就是超参数<span class="math inline">\(\alpha\)</span>和<span class="math inline">\(\beta\)</span>的设置，从论文中来看，作者在不同的数据集上使用的超参数不太相同，可能需要经过大量实验调参。
+<span class="math display">\[
+\begin{aligned}
+    L(\theta,Y|X) &amp;= L_c(\theta,Y|X) + \alpha L_p(\theta|X) + \beta
+L_e(\theta|X)\\
+    L_p(\theta|X) &amp;= \sum\limits_{j=1}^c p_j
+\log\frac{p_j}{\bar{s}_j(\theta,X)}\\
+    \bar{s}_j(\theta,X) &amp;= \frac{1}{n}\sum\limits_{i=1}^n s(\theta,
+x_i) \approx \frac{1}{|\mathcal{B}|}\sum\limits_{x \in \mathcal{B}}
+s(\theta, x)\\
+    L_e(\theta|X) &amp;= -\frac{1}{n}\sum\limits_{i=1}^n
+\sum\limits_{j=1}^c s_j(\theta,x_i) \log s_j(\theta,x_i)\\
+\end{aligned}
+\]</span></p>
+<h1 id="论文confident-learning-estimating-uncertainty-in-dataset-labels">论文《Confident
+Learning: Estimating Uncertainty in Dataset Labels》</h1>
+<p>该论文主要关注在多分类任务上的噪声标签数据，使用置信学习的方法来估计噪声标签分布和未知的真实样本分布之间的联合分布，并据此修复数据中的噪声。</p>
+<p>首先，<span class="math inline">\(x_k \in \mathbf{X},
+k=1,2,3,...,N\)</span>代表所有数据，包含噪声的数据标签表示为<span class="math inline">\(\tilde{y} \in \{1, 2, 3, ...,
+m\}\)</span>，未知的真实标签表示为<span class="math inline">\(y^\star
+\in \{1, 2, 3, ...,
+m\}\)</span>，论文中假设噪声标签是由一个CNP(class-conditional
+classification noise process)产生的，即这个CNP构造了映射<span class="math inline">\(y^\star \rightarrow
+\tilde{y}\)</span>，这个假设算是个比较强的假设，因为其蕴含的意思就是<span class="math inline">\(p(\tilde{y} = i|y^\star=j) = p(\tilde{y} =
+i|y^\star=j,x)\)</span>，即标签是否错误和样本无关，但是事实上很多时候标签错误都是和样本相关的。</p>
+<p>论文中的目标就是直接估计联合分布<span class="math inline">\(p(\tilde{y},
+y^\star)\)</span>，为此，论文首先去估计一个矩阵<span class="math inline">\(C_{\tilde{y}, y^\star}\)</span>，其中<span class="math inline">\(C_{\tilde{y},
+y^\star}[i][j]\)</span>表示真实标签是<span class="math inline">\(j\)</span>的样本被误标注为<span class="math inline">\(i\)</span>的数量，其估计方法如下，其中绝对值符号是计算数量的意思。
+<span class="math display">\[
+\begin{aligned}
+    C_{\tilde{y}, y^\star} &amp;:= |\hat{\mathbf{X}}_{\tilde{y} =
+i,y^\star=j}|\\
+    \hat{\mathbf{X}}_{\tilde{y} = i,y^\star=j} &amp;:= \{x | x \in
+X_{\tilde{y} = i}, \hat{p}(\tilde{y}=j|x,\theta) \ge t_j,
+j=\mathop{\arg\max}\limits_{l \in [m]} \hat{p}(\tilde{y} = l|x,
+\theta)\}\\
+    t_j &amp;= \frac{1}{|\mathbf{X}_{\tilde{y} = j}|}\sum\limits_{x \in
+\mathbf{X}_{\tilde{y} = j}}\hat{p}(\tilde{y} = j| x, \theta)
+\end{aligned}
+\]</span></p>
+<p>得到<span class="math inline">\(C_{\tilde{y},
+y^\star}\)</span>之后，即可用<span class="math inline">\(C_{\tilde{y},
+y^\star}\)</span>来估计<span class="math inline">\(\tilde{y}\)</span>和<span class="math inline">\(y^\star\)</span>的联合分布矩阵<span class="math inline">\(Q_{\tilde{y}, y^\star}\)</span>，计算方法如下：
+<span class="math display">\[
+\begin{aligned}
+    \hat{Q}_{\tilde{y}=i, y^\star=j} = \frac{\frac{C_{\tilde{y}=i,
+y^\star=j}}{\sum\limits_{j\in{1, 2, ..., m}}C_{\tilde{y}=i, y^\star=j}}
+|\mathbf{X}_{\tilde{y}=i}|}{\sum\limits_{i\in{1, 2, ..., m}, j\in{1, 2,
+..., m}}(\frac{C_{\tilde{y}=i, y^\star=j}}{\sum\limits_{j\in{1, 2, ...,
+m}}C_{\tilde{y}=i, y^\star=j}} |\mathbf{X}_{\tilde{y}=i}|)}
+\end{aligned}
+\]</span></p>
+<p><span class="math inline">\(\hat{Q}_{\tilde{y},
+y^\star}\)</span>是一个概率矩阵，得到Q之后，就可以知道标签为<span class="math inline">\(i\)</span>的样本中，有<span class="math inline">\(\hat{Q}_{\tilde{y}=i, y^\star=j} \times
+n\)</span>个样本是从<span class="math inline">\(j\)</span>错误标注过来的，因此后面可以按照预测结果中的自信程度，在<span class="math inline">\(i\)</span>类别的样本中，去掉<span class="math inline">\(n\times\sum\limits_{j}\hat{Q}_{\tilde{y}=i,
+y^\star=j}\)</span>个最不自信的样本就行了，这种方法在论文中称为Prune by
+Class（PBC）。论文中也提出了一些其他处理方法，比如Prune by Noise
+Rate（PBNR），在置信度排序时，不是按照预测概率排序，而是按照间隔：<span class="math inline">\(\hat{p}_{x,\tilde{y}=j} -
+\hat{p}_{x,\tilde{y}=i}\)</span>来排序，去掉间隔最大的那些样本。</p>
+<p>该论文所提出的方法在CIFAR-10分类问题上表现较好，在Accuracy上远超INCV、Mixup等方法，且在python下的CleanLab库中有官方实现，可直接调用。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"># 深度学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/27/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E3%80%8ADeep-Bilateral-Learning-for-Real-Time-Image-Enhancement%E3%80%8B/" rel="prev" title="论文阅读《Deep-Bilateral-Learning-for-Real-Time-Image-Enhancement》">
+      <i class="fa fa-chevron-left"></i> 论文阅读《Deep-Bilateral-Learning-for-Real-Time-Image-Enhancement》
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/02/01/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Rodrigues%E6%97%8B%E8%BD%AC%E5%85%AC%E5%BC%8F/" rel="next" title="Rodrigues旋转公式">
+      Rodrigues旋转公式 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BA%E6%96%87understanding-deep-learning-requires-rethinking-generalization"><span class="nav-number">1.</span> <span class="nav-text">论文《UNDERSTANDING
+DEEP LEARNING REQUIRES RETHINKING GENERALIZATION》</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BA%E6%96%87training-deep-neural-networks-using-a-noiseadaptation-layer"><span class="nav-number">2.</span> <span class="nav-text">论文《TRAINING
+DEEP NEURAL-NETWORKS USING A NOISEADAPTATION LAYER》</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BA%E6%96%87mentornet-learning-data-driven-curriculumfor-very-deep-neural-networks-on-corrupted-labels"><span class="nav-number">3.</span> <span class="nav-text">论文《MentorNet:
+Learning Data-Driven Curriculumfor Very Deep Neural Networks on
+Corrupted Labels》</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BA%E6%96%87joint-optimization-framework-for-learning-with-noisy-labels"><span class="nav-number">4.</span> <span class="nav-text">论文《Joint
+Optimization Framework for Learning with Noisy Labels》</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BA%E6%96%87confident-learning-estimating-uncertainty-in-dataset-labels"><span class="nav-number">5.</span> <span class="nav-text">论文《Confident
+Learning: Estimating Uncertainty in Dataset Labels》</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Tennen</p>
+  <div class="site-description" itemprop="description">record something</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tennen</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="external nofollow noopener noreferrer" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
